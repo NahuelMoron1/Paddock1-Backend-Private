@@ -8,7 +8,7 @@ router.post("/github-webhook", (req, res) => {
   console.log("Webhook recibido de GitHub");
 
   exec(
-    "cd /home/safe365api/htdocs/api.safe-365.online/Safe365-Backend && git pull origin main && npm install --production && pm2 restart mi-Backend",
+    "cd /home/safe365api/htdocs/api.safe-365.online/Safe365-Backend && git pull origin main && npm install --production && pm2 restart mi-backend",
     (err, stdout, stderr) => {
       if (err) {
         console.error(err);
