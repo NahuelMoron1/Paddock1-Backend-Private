@@ -53,7 +53,7 @@ class Server {
         this.app.use("/api/reviews", Reviews_1.default);
         this.app.use("/api/cookie", Cookie_1.default);
         this.app.use("/api/socialworks", Socialworks_1.default);
-        this.app.post("/webhook", webhook_1.default);
+        this.app.use("/webhook", webhook_1.default);
     }
     middlewares() {
         const allowedOrigins = ["http://localhost:4200"];

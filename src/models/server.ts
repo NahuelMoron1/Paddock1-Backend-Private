@@ -44,7 +44,7 @@ class Server {
     this.app.use("/api/reviews", reviewsRouter);
     this.app.use("/api/cookie", cookieRouter);
     this.app.use("/api/socialworks", socialworkRouter);
-    this.app.post("/webhook", webhookRouter);
+    this.app.use("/webhook", webhookRouter);
   }
   middlewares() {
     const allowedOrigins = ["http://localhost:4200"];
