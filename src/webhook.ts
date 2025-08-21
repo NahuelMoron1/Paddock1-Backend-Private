@@ -6,6 +6,7 @@ const router = express.Router();
 router.post("/github-webhook", (req, res) => {
   // Opcional: validar el secret si lo pusiste en GitHub
   console.log("Webhook recibido de GitHub");
+  console.log("Testing spelling");
 
   exec(
     "cd /home/safe365api/htdocs/api.safe-365.online/Safe365-Backend && git pull origin main && npm install --production && pm2 restart mi-backend",
