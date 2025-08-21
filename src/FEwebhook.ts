@@ -3,7 +3,7 @@ import { exec } from "child_process";
 
 const router = express.Router();
 
-router.post("/FE/github-webhook", (req, res) => {
+router.post("/github-webhook", (req, res) => {
   // Opcional: validar el secret si lo pusiste en GitHub
   console.log("FE Webhook recibido de GitHub");
 
