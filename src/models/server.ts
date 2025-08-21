@@ -47,7 +47,11 @@ class Server {
     this.app.use("/webhook", webhookRouter);
   }
   middlewares() {
-    const allowedOrigins = ["http://localhost:4200"];
+    const allowedOrigins = [
+      "http://localhost:4200",
+      "https://www.safe-365.online",
+      "https://api.safe-365.online",
+    ];
     this.app.use(
       "/uploads",
       express.static(path.join(__dirname, "../../uploads"))
