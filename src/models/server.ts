@@ -63,6 +63,7 @@ class Server {
       express.static(path.join(__dirname, "../../backups"))
     );
     this.app.use(express.json());
+    this.app.use(express.urlencoded({ extended: true }));
     this.app.use("/webhook", webhookRouter);
     this.app.use("/fewebhook", FEwebhookRouter);
     this.app.use(cookieParser());
