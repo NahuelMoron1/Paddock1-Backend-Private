@@ -2,6 +2,7 @@ import express from "express";
 import { exec } from "child_process";
 
 const router = express.Router();
+console.log("AAAAAAAAAAAAAAAAAAAA");
 
 router.post("/github-webhook", (req, res) => {
   // Opcional: validar el secret si lo pusiste en GitHub
