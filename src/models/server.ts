@@ -57,6 +57,7 @@ class Server {
       express.static(path.join(__dirname, "../../backups"))
     );
     this.app.use(express.json());
+    this.app.use("/webhook", webhookRouter);
     this.app.use(cookieParser());
     this.app.use(morgan("dev"));
     this.app.use(

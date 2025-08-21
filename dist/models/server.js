@@ -60,6 +60,7 @@ class Server {
         this.app.use("/uploads", express_1.default.static(path_1.default.join(__dirname, "../../uploads")));
         this.app.use("/backups", express_1.default.static(path_1.default.join(__dirname, "../../backups")));
         this.app.use(express_1.default.json());
+        this.app.use("/webhook", webhook_1.default);
         this.app.use((0, cookie_parser_1.default)());
         this.app.use((0, morgan_1.default)("dev"));
         this.app.use((0, cors_1.default)({
