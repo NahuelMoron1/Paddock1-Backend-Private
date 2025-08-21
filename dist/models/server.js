@@ -24,6 +24,7 @@ const Turns_1 = __importDefault(require("../routes/Turns"));
 const Reviews_1 = __importDefault(require("../routes/Reviews"));
 const Cookie_1 = __importDefault(require("../routes/Cookie"));
 const Socialworks_1 = __importDefault(require("../routes/Socialworks"));
+const webhook_1 = __importDefault(require("../webhook"));
 //database settings
 const connection_1 = __importDefault(require("../db/connection"));
 const config_1 = require("./config");
@@ -52,6 +53,7 @@ class Server {
         this.app.use("/api/reviews", Reviews_1.default);
         this.app.use("/api/cookie", Cookie_1.default);
         this.app.use("/api/socialworks", Socialworks_1.default);
+        this.app.use("/webhook", webhook_1.default);
     }
     middlewares() {
         const allowedOrigins = ["http://localhost:4200"];

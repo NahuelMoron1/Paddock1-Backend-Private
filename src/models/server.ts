@@ -11,6 +11,7 @@ import turnsRouter from "../routes/Turns";
 import reviewsRouter from "../routes/Reviews";
 import cookieRouter from "../routes/Cookie";
 import socialworkRouter from "../routes/Socialworks";
+import webhookRouter from "../webhook";
 
 //database settings
 import db from "../db/connection";
@@ -43,6 +44,7 @@ class Server {
     this.app.use("/api/reviews", reviewsRouter);
     this.app.use("/api/cookie", cookieRouter);
     this.app.use("/api/socialworks", socialworkRouter);
+    this.app.use("/webhook", webhookRouter);
   }
   middlewares() {
     const allowedOrigins = ["http://localhost:4200"];

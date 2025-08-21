@@ -9,11 +9,11 @@ dotenv_1.default.config();
 exports.PORT = process.env.PORT;
 ///LOCAL///
 exports.DB_HOST = process.env.DB_HOST;
-exports.DB_USER = process.env.DB_USER;
-exports.DB_PASSWORD = process.env.DB_PASSWORD;
-exports.DB_NAME = process.env.DB_NAME;
+exports.DB_USER = process.env.DB_USER || "";
+exports.DB_PASSWORD = process.env.DB_PASSWORD || "";
+exports.DB_NAME = process.env.DB_NAME || "";
 exports.SECRET_JWT_KEY = process.env.SECRET_JWT_KEY;
-exports.DB_PORT = process.env.DB_PORT;
+exports.DB_PORT = parseInt(process.env.DB_PORT || "0");
 exports.MAINTENANCE = process.env.MAINTENANCE === "true";
 ///PRODUCTION
 /*export const DB_HOST = process.env.DB_HOST || "127.0.0.1";
