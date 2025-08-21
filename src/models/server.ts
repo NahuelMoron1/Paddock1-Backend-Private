@@ -19,10 +19,10 @@ import { MAINTENANCE } from "./config";
 
 class Server {
   private app: Application;
-  private port: string;
+  private port?: string;
   constructor() {
     this.app = express();
-    this.port = PORT || "3001";
+    this.port = PORT;
     this.listen();
     this.middlewares();
     this.routes();
@@ -30,7 +30,7 @@ class Server {
   }
   listen() {
     this.app.listen(this.port, () => {
-      console.log(`server listening on port ${this.port}`);
+      console.log("server listening on port ", this.port);
     });
   }
   routes() {
