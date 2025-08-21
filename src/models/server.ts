@@ -64,7 +64,7 @@ class Server {
     );
     this.app.use(express.json());
     this.app.use("/webhook", webhookRouter);
-    this.app.use("/FEwebhook", FEwebhookRouter);
+    this.app.use("/fewebhook", FEwebhookRouter);
     this.app.use(cookieParser());
     this.app.use(morgan("dev"));
     this.app.use(
