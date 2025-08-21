@@ -9,7 +9,7 @@ const router = express_1.default.Router();
 router.post("/front/github-webhook", (req, res) => {
     // Opcional: validar el secret si lo pusiste en GitHub
     console.log("Webhook recibido de GitHub");
-    (0, child_process_1.exec)("cd /home/safe365fe/htdocs/www.safe-365.online && git pull origin main", (err, stdout, stderr) => {
+    (0, child_process_1.exec)("cd /home/safe365fe/htdocs/www.safe-365.online/Safe365-Builder && git pull origin main", (err, stdout, stderr) => {
         if (err) {
             console.error(err);
             return res.status(500).send("Error ejecutando deploy");
