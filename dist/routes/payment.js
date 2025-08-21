@@ -1,0 +1,12 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const payment_1 = require("../controllers/payment");
+const router = (0, express_1.Router)();
+router.get('/', payment_1.getPayments);
+router.get('/:id', payment_1.getPayment);
+router.delete('/:id', payment_1.deletePayment);
+router.delete('/:', payment_1.deleteAllPayments);
+router.post('/', payment_1.postPayment);
+router.patch('/:id', payment_1.updatePayment);
+exports.default = router;

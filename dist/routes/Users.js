@@ -1,0 +1,26 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const multer_1 = __importDefault(require("../middlewares/multer"));
+const Users_1 = require("../controllers/Users");
+const router = (0, express_1.Router)();
+router.get("/:id", Users_1.getUser);
+router.get("/attendants/active", Users_1.getActiveAttendants);
+router.get("/attendants/inactive", Users_1.getInactiveAttendants);
+router.get("/attendants/all", Users_1.getAllAttendants);
+router.get("/attendants/active/:id", Users_1.SetActiveAttendants);
+router.get("/attendants/inactive/:id", Users_1.SetInactiveAttendants);
+router.get("/attendants/socialworks/:socialworkID", Users_1.getAttendantsBySocialwork);
+router.get("/name/:username", Users_1.getUserByName);
+router.get("/admin/list/:userRole/:userStatus", Users_1.getUsersByAdmin);
+router.get("/admin/users/:socialworkID/:userRole/:userStatus", Users_1.getAdminUsersBySocialwork);
+router.post("/", multer_1.default.single("file"), Users_1.postUser);
+router.post("/modify", multer_1.default.single("file"), Users_1.modifyUser);
+router.post("/admin/modify", multer_1.default.single("file"), Users_1.modifyUserByAdmin);
+router.post("/login", Users_1.login);
+router.post("/logout", Users_1.logout);
+router.post("/validate/password", Users_1.validatePasswordModal);
+exports.default = router;

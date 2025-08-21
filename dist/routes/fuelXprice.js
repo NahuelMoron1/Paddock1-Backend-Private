@@ -1,0 +1,12 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const fuelXprice_1 = require("../controllers/fuelXprice");
+const router = (0, express_1.Router)();
+router.get('/', fuelXprice_1.getFuelXprices);
+router.get('/:id', fuelXprice_1.getFuelXprice);
+router.delete('/:id', fuelXprice_1.deleteFuelXprice);
+router.delete('/:', fuelXprice_1.deleteAllFuelXprice);
+router.post('/', fuelXprice_1.postFuelXprice);
+router.patch('/:id', fuelXprice_1.updateFuelXprice);
+exports.default = router;

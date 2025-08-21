@@ -1,0 +1,11 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const UserXcoupons_1 = require("../controllers/UserXcoupons");
+const router = (0, express_1.Router)();
+router.get('/:userID/:couponID', UserXcoupons_1.getUserXcoupon);
+router.delete('/:id', UserXcoupons_1.deleteUser);
+router.delete('/:', UserXcoupons_1.deleteUsers);
+router.post('/', UserXcoupons_1.postUser);
+router.patch('/:id', UserXcoupons_1.updateUser);
+exports.default = router;

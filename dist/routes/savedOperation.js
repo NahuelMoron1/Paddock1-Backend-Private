@@ -1,0 +1,12 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const savedOperation_1 = require("../controllers/savedOperation");
+const router = (0, express_1.Router)();
+router.get('/', savedOperation_1.getSaved);
+router.get('/:id', savedOperation_1.getSavedOp);
+router.delete('/:id', savedOperation_1.deleteSavedOp);
+router.delete('/:', savedOperation_1.deleteAllSavedOps);
+router.post('/', savedOperation_1.postSavedOp);
+router.patch('/:id', savedOperation_1.updateSavedOp);
+exports.default = router;
