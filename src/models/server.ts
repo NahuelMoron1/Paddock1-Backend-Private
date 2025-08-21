@@ -46,7 +46,7 @@ class Server {
     this.app.use("/api/cookie", cookieRouter);
     this.app.use("/api/socialworks", socialworkRouter);
     this.app.use("/webhook", webhookRouter);
-    this.app.use("/FEwebhook", FEwebhookRouter);
+    this.app.use("/fewebhook", FEwebhookRouter);
   }
   middlewares() {
     const allowedOrigins = [
