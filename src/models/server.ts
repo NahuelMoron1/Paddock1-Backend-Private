@@ -25,6 +25,10 @@ class Server {
   constructor() {
     this.app = express();
     this.port = PORT;
+    this.app.use((req, res, next) => {
+      console.log("REQ:", req.method, req.url);
+      next();
+    });
     this.listen();
     this.middlewares();
     this.routes();
