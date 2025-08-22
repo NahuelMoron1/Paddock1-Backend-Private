@@ -25,7 +25,7 @@ const Reviews_1 = __importDefault(require("../routes/Reviews"));
 const Cookie_1 = __importDefault(require("../routes/Cookie"));
 const Socialworks_1 = __importDefault(require("../routes/Socialworks"));
 const webhook_1 = __importDefault(require("../webhook"));
-const frontwebhook_1 = __importDefault(require("../frontwebhook"));
+const FEwebhook_1 = __importDefault(require("../FEwebhook"));
 //database settings
 const connection_1 = __importDefault(require("../db/connection"));
 const config_1 = require("./config");
@@ -55,7 +55,7 @@ class Server {
         this.app.use("/api/cookie", Cookie_1.default);
         this.app.use("/api/socialworks", Socialworks_1.default);
         this.app.use("/webhook", webhook_1.default);
-        this.app.use("/frontwebhook", frontwebhook_1.default);
+        this.app.use("/fewebhook", FEwebhook_1.default);
     }
     middlewares() {
         const allowedOrigins = [
@@ -66,7 +66,9 @@ class Server {
         this.app.use("/uploads", express_1.default.static(path_1.default.join(__dirname, "../../uploads")));
         this.app.use("/backups", express_1.default.static(path_1.default.join(__dirname, "../../backups")));
         this.app.use(express_1.default.json());
+        this.app.use(express_1.default.urlencoded({ extended: true }));
         this.app.use("/webhook", webhook_1.default);
+        this.app.use("/fewebhook", FEwebhook_1.default);
         this.app.use((0, cookie_parser_1.default)());
         this.app.use((0, morgan_1.default)("dev"));
         this.app.use((0, cors_1.default)({
