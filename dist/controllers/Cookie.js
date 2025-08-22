@@ -39,8 +39,8 @@ const tokenExist = (req, res) => {
                     path: "/",
                     httpOnly: true,
                     secure: true,
-                    domain: ".localhost", // Comparte la cookie entre www.localhost.com y api.localhost.com
-                    ///domain: '.distribucionlosvascos.com', // Comparte la cookie entre www.localhost.com y api.localhost.com
+                    //domain: ".localhost", // Comparte la cookie entre www.localhost.com y api.localhost.com
+                    domain: ".safe-365.online", // Comparte la cookie entre www.localhost.com y api.localhost.com
                     sameSite: "none",
                     maxAge: 1000 * 60 * 60,
                 });
