@@ -54,8 +54,8 @@ class Server {
         this.app.use("/api/reviews", Reviews_1.default);
         this.app.use("/api/cookie", Cookie_1.default);
         this.app.use("/api/socialworks", Socialworks_1.default);
-        this.app.use("/webhook", webhook_1.default);
         this.app.use("/fewebhook", FEwebhook_1.default);
+        this.app.use("/webhook", webhook_1.default);
     }
     middlewares() {
         const allowedOrigins = [
