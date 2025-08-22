@@ -716,8 +716,7 @@ function createCookies(userValidated, res) {
         httpOnly: true,
         secure: true, ///process.env.NODE_ENV == 'production',
         sameSite: "none",
-        //domain: ".localhost", // Comparte la cookie entre www.localhost.com y api.localhost.com
-        domain: ".safe-365.online", // Comparte la cookie entre www.localhost.com y api.localhost.com
+        domain: config_1.DOMAIN,
         maxAge: 1000 * 60 * 60,
     });
     res.cookie("refresh_token", refresh_token, {
@@ -725,8 +724,7 @@ function createCookies(userValidated, res) {
         httpOnly: true,
         secure: true, ///process.env.NODE_ENV == 'production',
         sameSite: "none",
-        //domain: ".localhost", // Comparte la cookie entre www.localhost.com y api.localhost.com
-        domain: ".safe-365.online", // Comparte la cookie entre www.localhost.com y api.localhost.com
+        domain: config_1.DOMAIN,
         maxAge: 1000 * 60 * 60 * 24,
     });
 }
@@ -739,8 +737,7 @@ const logout = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                 httpOnly: true,
                 secure: true, ///process.env.NODE_ENV == 'production',
                 sameSite: "none",
-                //domain: ".localhost", // Comparte la cookie entre www.localhost.com y api.localhost.com
-                domain: ".safe-365.online", // Comparte la cookie entre www.localhost.com y api.localhost.com
+                domain: config_1.DOMAIN,
                 maxAge: 0,
             });
             res.cookie("access_token", "", {
@@ -748,8 +745,7 @@ const logout = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                 httpOnly: true,
                 secure: true, ///process.env.NODE_ENV == 'production',
                 sameSite: "none",
-                //domain: ".localhost", // Comparte la cookie entre www.localhost.com y api.localhost.com
-                domain: ".safe-365.online", // Comparte la cookie entre www.localhost.com y api.localhost.com
+                domain: config_1.DOMAIN,
                 maxAge: 0,
             });
             return res.send("finish");

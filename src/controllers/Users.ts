@@ -4,7 +4,7 @@ import { User } from "../models/Users";
 import { UserRole } from "../models/enums/UserRole";
 import { UserStatus } from "../models/enums/UserStatus";
 import jwt from "jsonwebtoken";
-import { SECRET_JWT_KEY } from "../models/config";
+import { DOMAIN, SECRET_JWT_KEY } from "../models/config";
 import path from "path";
 import { v4 as UUIDV4 } from "uuid";
 import fs from "fs";
@@ -699,10 +699,10 @@ export const postImage = (
 
   // 🔹 Si `file` es un Buffer (imagen procesada), lo guarda como un archivo
   if (file instanceof Buffer) {
-    fs.writeFileSync(uploadPath, file);
+    fs.writeFileSync(uploadPath, file as NodeJS.ArrayBufferView);
   } else {
     // 🔹 Si es un archivo Multer, guarda el buffer
-    fs.writeFileSync(uploadPath, file.buffer);
+    fs.writeFileSync(uploadPath, file.buffer as NodeJS.ArrayBufferView);
   }
 
   return uploadPath;
@@ -838,8 +838,7 @@ function createCookies(userValidated: User, res: Response) {
     httpOnly: true,
     secure: true, ///process.env.NODE_ENV == 'production',
     sameSite: "none",
-    //domain: ".localhost", // Comparte la cookie entre www.localhost.com y api.localhost.com
-    domain: ".safe-365.online", // Comparte la cookie entre www.localhost.com y api.localhost.com
+    domain: DOMAIN,
     maxAge: 1000 * 60 * 60,
   });
 
@@ -848,8 +847,7 @@ function createCookies(userValidated: User, res: Response) {
     httpOnly: true,
     secure: true, ///process.env.NODE_ENV == 'production',
     sameSite: "none",
-    //domain: ".localhost", // Comparte la cookie entre www.localhost.com y api.localhost.com
-    domain: ".safe-365.online", // Comparte la cookie entre www.localhost.com y api.localhost.com
+    domain: DOMAIN,
     maxAge: 1000 * 60 * 60 * 24,
   });
 }
@@ -864,8 +862,7 @@ export const logout = async (req: Request, res: Response) => {
         httpOnly: true,
         secure: true, ///process.env.NODE_ENV == 'production',
         sameSite: "none",
-        //domain: ".localhost", // Comparte la cookie entre www.localhost.com y api.localhost.com
-        domain: ".safe-365.online", // Comparte la cookie entre www.localhost.com y api.localhost.com
+        domain: DOMAIN,
         maxAge: 0,
       });
 
@@ -874,8 +871,7 @@ export const logout = async (req: Request, res: Response) => {
         httpOnly: true,
         secure: true, ///process.env.NODE_ENV == 'production',
         sameSite: "none",
-        //domain: ".localhost", // Comparte la cookie entre www.localhost.com y api.localhost.com
-        domain: ".safe-365.online", // Comparte la cookie entre www.localhost.com y api.localhost.com
+        domain: DOMAIN,
         maxAge: 0,
       });
       return res.send("finish");

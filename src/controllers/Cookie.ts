@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
-import { SECRET_JWT_KEY } from "../models/config";
+import { DOMAIN, SECRET_JWT_KEY } from "../models/config";
 import { User } from "../models/Users";
 
 export const tokenExist = (req: Request, res: Response) => {
@@ -40,8 +40,7 @@ export const tokenExist = (req: Request, res: Response) => {
           path: "/",
           httpOnly: true,
           secure: true,
-          //domain: ".localhost", // Comparte la cookie entre www.localhost.com y api.localhost.com
-          domain: ".safe-365.online", // Comparte la cookie entre www.localhost.com y api.localhost.com
+          domain: DOMAIN,
           sameSite: "none",
           maxAge: 1000 * 60 * 60,
         });
