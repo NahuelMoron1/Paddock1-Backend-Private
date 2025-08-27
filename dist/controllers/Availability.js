@@ -13,13 +13,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteAttendantAvailability = exports.modifyAttendantAvailability = exports.postAttendantAvailability = exports.checkAttendantAvailability = exports.isAttendantAvailable = exports.getAttendantAvailability = void 0;
-const Availability_1 = __importDefault(require("../models/mysql/Availability"));
-const UserRole_1 = require("../models/enums/UserRole");
-const config_1 = require("../models/config");
-const UserStatus_1 = require("../models/enums/UserStatus");
-const Users_1 = require("../models/Users");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const sequelize_1 = require("sequelize");
+const config_1 = require("../models/config");
+const UserRole_1 = require("../models/enums/UserRole");
+const UserStatus_1 = require("../models/enums/UserStatus");
+const Availability_1 = __importDefault(require("../models/mysql/Availability"));
+const Users_1 = require("../models/Users");
 const getAttendantAvailability = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { attendantID } = req.params;

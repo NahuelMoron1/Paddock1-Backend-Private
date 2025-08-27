@@ -1,11 +1,11 @@
 import { Request, Response } from "express";
-import Availability from "../models/mysql/Availability";
-import { UserRole } from "../models/enums/UserRole";
-import { SECRET_JWT_KEY } from "../models/config";
-import { UserStatus } from "../models/enums/UserStatus";
-import { User } from "../models/Users";
 import jwt from "jsonwebtoken";
 import { Op } from "sequelize";
+import { SECRET_JWT_KEY } from "../models/config";
+import { UserRole } from "../models/enums/UserRole";
+import { UserStatus } from "../models/enums/UserStatus";
+import Availability from "../models/mysql/Availability";
+import { User } from "../models/Users";
 export const getAttendantAvailability = async (req: Request, res: Response) => {
   try {
     const { attendantID } = req.params;
