@@ -12,14 +12,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getSocialworkByAttendant = exports.SetinActiveSocialwork = exports.SetActiveSocialwork = exports.getAllSocialworks = exports.getinActiveSocialworks = exports.getActiveSocialworks = void 0;
+exports.postSocialwork = exports.getSocialworkByAttendant = exports.SetinActiveSocialwork = exports.SetActiveSocialwork = exports.getAllSocialworks = exports.getinActiveSocialworks = exports.getActiveSocialworks = void 0;
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const config_1 = require("../models/config");
 const UserRole_1 = require("../models/enums/UserRole");
 const UserStatus_1 = require("../models/enums/UserStatus");
 const associations_1 = require("../models/mysql/associations");
 const Users_1 = require("../models/Users");
-const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-const associations_2 = require("../models/mysql/associations");
 const getActiveSocialworks = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const activeSocialworks = yield associations_1.Socialworks.findAll({
@@ -56,7 +55,12 @@ const getinActiveSocialworks = (req, res) => __awaiter(void 0, void 0, void 0, f
 exports.getinActiveSocialworks = getinActiveSocialworks;
 const getAllSocialworks = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const allSocialworks = yield associations_1.Socialworks.findAll();
+        const allSocialworks = yield associations_1.Socialworks.findAll({
+            order: [
+                ["active", "DESC"], // primero los activos (true), luego inactivos (false)
+                ["name", "ASC"], // dentro de cada grupo, ordenar alfabéticamente
+            ],
+        });
         if (!allSocialworks) {
             return res
                 .status(404)
@@ -153,7 +157,7 @@ const getSocialworkByAttendant = (req, res) => __awaiter(void 0, void 0, void 0,
             where: { active: true },
             include: [
                 {
-                    model: associations_2.AttendantXSocialworks,
+                    model: associations_1.AttendantXSocialworks,
                     where: { attendantID: attendantID },
                 },
             ],
@@ -170,6 +174,41 @@ const getSocialworkByAttendant = (req, res) => __awaiter(void 0, void 0, void 0,
     }
 });
 exports.getSocialworkByAttendant = getSocialworkByAttendant;
+const postSocialwork = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const user = yield getUserLogged(req);
+        if (!user) {
+            return res
+                .status(401)
+                .json({ message: "You're not allowed to see this information." });
+        }
+        if (user.role !== UserRole_1.UserRole.ADMIN) {
+            return res
+                .status(401)
+                .json({ message: "You're not allowed to see this information." });
+        }
+        const body = req.body;
+        if (!body.name ||
+            !body.id ||
+            typeof body.name !== "string" ||
+            typeof body.id !== "string") {
+            return res.status(400).json({ message: "Error en la carga de datos" });
+        }
+        const socialwork = {
+            id: body.id,
+            name: body.name,
+            active: true,
+        };
+        yield associations_1.Socialworks.create(socialwork);
+        return res
+            .status(200)
+            .json({ message: "Cobertura médica cargada correctamente" });
+    }
+    catch (error) {
+        return res.status(500).json({ message: error });
+    }
+});
+exports.postSocialwork = postSocialwork;
 function getUserLogged(req) {
     return __awaiter(this, void 0, void 0, function* () {
         let access = req.cookies["access_token"];

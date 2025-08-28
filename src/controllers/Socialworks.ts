@@ -1,11 +1,13 @@
+import { Request, Response } from "express";
+import jwt from "jsonwebtoken";
 import { SECRET_JWT_KEY } from "../models/config";
 import { UserRole } from "../models/enums/UserRole";
 import { UserStatus } from "../models/enums/UserStatus";
-import { Socialworks } from "../models/mysql/associations";
-import { Request, Response } from "express";
+import {
+  AttendantXSocialworks,
+  Socialworks,
+} from "../models/mysql/associations";
 import { User } from "../models/Users";
-import jwt from "jsonwebtoken";
-import { AttendantXSocialworks } from "../models/mysql/associations";
 
 export const getActiveSocialworks = async (req: Request, res: Response) => {
   try {
@@ -45,7 +47,12 @@ export const getinActiveSocialworks = async (req: Request, res: Response) => {
 
 export const getAllSocialworks = async (req: Request, res: Response) => {
   try {
-    const allSocialworks = await Socialworks.findAll();
+    const allSocialworks = await Socialworks.findAll({
+      order: [
+        ["active", "DESC"], // primero los activos (true), luego inactivos (false)
+        ["name", "ASC"], // dentro de cada grupo, ordenar alfabéticamente
+      ],
+    });
 
     if (!allSocialworks) {
       return res
@@ -170,6 +177,49 @@ export const getSocialworkByAttendant = async (req: Request, res: Response) => {
     }
 
     return res.json(socialworks);
+  } catch (error) {
+    return res.status(500).json({ message: error });
+  }
+};
+
+export const postSocialwork = async (req: Request, res: Response) => {
+  try {
+    const user = await getUserLogged(req);
+
+    if (!user) {
+      return res
+        .status(401)
+        .json({ message: "You're not allowed to see this information." });
+    }
+
+    if (user.role !== UserRole.ADMIN) {
+      return res
+        .status(401)
+        .json({ message: "You're not allowed to see this information." });
+    }
+
+    const body = req.body;
+
+    if (
+      !body.name ||
+      !body.id ||
+      typeof body.name !== "string" ||
+      typeof body.id !== "string"
+    ) {
+      return res.status(400).json({ message: "Error en la carga de datos" });
+    }
+
+    const socialwork = {
+      id: body.id,
+      name: body.name,
+      active: true,
+    };
+
+    await Socialworks.create(socialwork);
+
+    return res
+      .status(200)
+      .json({ message: "Cobertura médica cargada correctamente" });
   } catch (error) {
     return res.status(500).json({ message: error });
   }
