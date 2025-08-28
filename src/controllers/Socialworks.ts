@@ -182,6 +182,40 @@ export const getSocialworkByAttendant = async (req: Request, res: Response) => {
   }
 };
 
+export const getSocialworkByAttendantModify = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const { attendantID } = req.params;
+
+    if (!attendantID) {
+      return res.status(400).json({
+        message: "Not all fields contains a value.",
+      });
+    }
+
+    const socialworks = await Socialworks.findAll({
+      include: [
+        {
+          model: AttendantXSocialworks,
+          where: { attendantID: attendantID },
+        },
+      ],
+    });
+
+    if (!socialworks) {
+      return res.status(404).json({
+        message: "No attendants at the moment with the current social work",
+      });
+    }
+
+    return res.json(socialworks);
+  } catch (error) {
+    return res.status(500).json({ message: error });
+  }
+};
+
 export const postSocialwork = async (req: Request, res: Response) => {
   try {
     const user = await getUserLogged(req);

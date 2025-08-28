@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.postSocialwork = exports.getSocialworkByAttendant = exports.SetinActiveSocialwork = exports.SetActiveSocialwork = exports.getAllSocialworks = exports.getinActiveSocialworks = exports.getActiveSocialworks = void 0;
+exports.postSocialwork = exports.getSocialworkByAttendantModify = exports.getSocialworkByAttendant = exports.SetinActiveSocialwork = exports.SetActiveSocialwork = exports.getAllSocialworks = exports.getinActiveSocialworks = exports.getActiveSocialworks = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const config_1 = require("../models/config");
 const UserRole_1 = require("../models/enums/UserRole");
@@ -174,6 +174,34 @@ const getSocialworkByAttendant = (req, res) => __awaiter(void 0, void 0, void 0,
     }
 });
 exports.getSocialworkByAttendant = getSocialworkByAttendant;
+const getSocialworkByAttendantModify = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { attendantID } = req.params;
+        if (!attendantID) {
+            return res.status(400).json({
+                message: "Not all fields contains a value.",
+            });
+        }
+        const socialworks = yield associations_1.Socialworks.findAll({
+            include: [
+                {
+                    model: associations_1.AttendantXSocialworks,
+                    where: { attendantID: attendantID },
+                },
+            ],
+        });
+        if (!socialworks) {
+            return res.status(404).json({
+                message: "No attendants at the moment with the current social work",
+            });
+        }
+        return res.json(socialworks);
+    }
+    catch (error) {
+        return res.status(500).json({ message: error });
+    }
+});
+exports.getSocialworkByAttendantModify = getSocialworkByAttendantModify;
 const postSocialwork = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const user = yield getUserLogged(req);
