@@ -8,7 +8,7 @@ router.get("/socialworks/inactive", Socialworks_1.getinActiveSocialworks);
 router.get("/socialworks/all", Socialworks_1.getAllSocialworks);
 router.get("/set/active/:id", Socialworks_1.SetActiveSocialwork);
 router.get("/set/inactive/:id", Socialworks_1.SetinActiveSocialwork);
-router.get("/name/:name", Socialworks_1.getSocialworkByAttendant);
+router.get("/name/:attendantID", Socialworks_1.getSocialworkByAttendant);
 router.post("/", Socialworks_1.postSocialwork); /// TO DO
 //router.post("/", upload.single("file"), postSocialwork); /// TO DO
 exports.default = router;

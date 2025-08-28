@@ -1,23 +1,23 @@
-import express, { Application, Request, Response } from "express";
-import cors from "cors";
 import cookieParser from "cookie-parser";
+import cors from "cors";
+import express, { Application, Request, Response } from "express";
 import morgan from "morgan";
 import path from "path";
 
 //routes
-import usersRouter from "../routes/Users";
-import availabilityRouter from "../routes/Availability";
-import turnsRouter from "../routes/Turns";
-import reviewsRouter from "../routes/Reviews";
-import cookieRouter from "../routes/Cookie";
-import socialworkRouter from "../routes/Socialworks";
-import webhookRouter from "../webhook";
 import FEwebhookRouter from "../FEwebhook";
+import attendantXSocialworkRouter from "../routes/AttendantXSocialworks";
+import availabilityRouter from "../routes/Availability";
+import cookieRouter from "../routes/Cookie";
+import reviewsRouter from "../routes/Reviews";
+import socialworkRouter from "../routes/Socialworks";
+import turnsRouter from "../routes/Turns";
+import usersRouter from "../routes/Users";
+import webhookRouter from "../webhook";
 
 //database settings
 import db from "../db/connection";
-import { DB_NAME, PORT } from "./config";
-import { MAINTENANCE } from "./config";
+import { DB_NAME, MAINTENANCE, PORT } from "./config";
 
 class Server {
   private app: Application;
@@ -45,7 +45,9 @@ class Server {
     this.app.use("/api/reviews", reviewsRouter);
     this.app.use("/api/cookie", cookieRouter);
     this.app.use("/api/socialworks", socialworkRouter);
+    this.app.use("/api/attendantXSocialwork", attendantXSocialworkRouter);
     this.app.use("/fewebhook", FEwebhookRouter);
+    this.app.use("/webhook", webhookRouter);
     this.app.use("/webhook", webhookRouter);
   }
   middlewares() {

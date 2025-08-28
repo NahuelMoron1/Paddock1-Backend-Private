@@ -12,24 +12,24 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const express_1 = __importDefault(require("express"));
-const cors_1 = __importDefault(require("cors"));
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
+const cors_1 = __importDefault(require("cors"));
+const express_1 = __importDefault(require("express"));
 const morgan_1 = __importDefault(require("morgan"));
 const path_1 = __importDefault(require("path"));
 //routes
-const Users_1 = __importDefault(require("../routes/Users"));
-const Availability_1 = __importDefault(require("../routes/Availability"));
-const Turns_1 = __importDefault(require("../routes/Turns"));
-const Reviews_1 = __importDefault(require("../routes/Reviews"));
-const Cookie_1 = __importDefault(require("../routes/Cookie"));
-const Socialworks_1 = __importDefault(require("../routes/Socialworks"));
-const webhook_1 = __importDefault(require("../webhook"));
 const FEwebhook_1 = __importDefault(require("../FEwebhook"));
+const AttendantXSocialworks_1 = __importDefault(require("../routes/AttendantXSocialworks"));
+const Availability_1 = __importDefault(require("../routes/Availability"));
+const Cookie_1 = __importDefault(require("../routes/Cookie"));
+const Reviews_1 = __importDefault(require("../routes/Reviews"));
+const Socialworks_1 = __importDefault(require("../routes/Socialworks"));
+const Turns_1 = __importDefault(require("../routes/Turns"));
+const Users_1 = __importDefault(require("../routes/Users"));
+const webhook_1 = __importDefault(require("../webhook"));
 //database settings
 const connection_1 = __importDefault(require("../db/connection"));
 const config_1 = require("./config");
-const config_2 = require("./config");
 class Server {
     constructor() {
         this.app = (0, express_1.default)();
@@ -54,7 +54,9 @@ class Server {
         this.app.use("/api/reviews", Reviews_1.default);
         this.app.use("/api/cookie", Cookie_1.default);
         this.app.use("/api/socialworks", Socialworks_1.default);
+        this.app.use("/api/attendantXSocialwork", AttendantXSocialworks_1.default);
         this.app.use("/fewebhook", FEwebhook_1.default);
+        this.app.use("/webhook", webhook_1.default);
         this.app.use("/webhook", webhook_1.default);
     }
     middlewares() {
@@ -79,7 +81,7 @@ class Server {
     }
     dbConnect() {
         return __awaiter(this, void 0, void 0, function* () {
-            if (!config_2.MAINTENANCE) {
+            if (!config_1.MAINTENANCE) {
                 try {
                     yield connection_1.default.authenticate();
                     console.log("DATABASE CONNECTED: " + config_1.DB_NAME);
