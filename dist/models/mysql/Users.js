@@ -3,8 +3,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const connection_1 = __importDefault(require("../../db/connection"));
 const sequelize_1 = require("sequelize");
+const connection_1 = __importDefault(require("../../db/connection"));
 const Users = connection_1.default.define("Users", {
     id: {
         type: sequelize_1.DataTypes.STRING,
@@ -60,11 +60,11 @@ const Users = connection_1.default.define("Users", {
 }, {
     timestamps: false,
     defaultScope: {
-        attributes: { exclude: ["password", "userID", "email"] }, // Excluir 'password' por defecto
+        attributes: { exclude: ["password", "userID", "email"] },
     },
     scopes: {
         withAll: {
-            attributes: { include: ["password", "userID", "email"] }, // Incluir 'password' solo cuando se use este scope
+            attributes: { include: ["password", "userID", "email"] },
         },
     },
 });

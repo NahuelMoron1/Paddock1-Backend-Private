@@ -1,5 +1,5 @@
-import db from "../../db/connection";
 import { DataTypes } from "sequelize";
+import db from "../../db/connection";
 
 const Users = db.define(
   "Users",
@@ -59,11 +59,11 @@ const Users = db.define(
   {
     timestamps: false,
     defaultScope: {
-      attributes: { exclude: ["password", "userID", "email"] }, // Excluir 'password' por defecto
+      attributes: { exclude: ["password", "userID", "email"] },
     },
     scopes: {
       withAll: {
-        attributes: { include: ["password", "userID", "email"] }, // Incluir 'password' solo cuando se use este scope
+        attributes: { include: ["password", "userID", "email"] },
       },
     },
   }
