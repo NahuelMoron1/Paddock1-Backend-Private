@@ -10,6 +10,7 @@ import attendantXSocialworkRouter from "../routes/AttendantXSocialworks";
 import availabilityRouter from "../routes/Availability";
 import cookieRouter from "../routes/Cookie";
 import reviewsRouter from "../routes/Reviews";
+import slackRouter from "../routes/Slack";
 import socialworkRouter from "../routes/Socialworks";
 import turnsRouter from "../routes/Turns";
 import usersRouter from "../routes/Users";
@@ -46,6 +47,7 @@ class Server {
     this.app.use("/api/cookie", cookieRouter);
     this.app.use("/api/socialworks", socialworkRouter);
     this.app.use("/api/attendantXSocialwork", attendantXSocialworkRouter);
+    this.app.use("/api/slack", slackRouter);
     this.app.use("/fewebhook", FEwebhookRouter);
     this.app.use("/webhook", webhookRouter);
     this.app.use("/webhook", webhookRouter);

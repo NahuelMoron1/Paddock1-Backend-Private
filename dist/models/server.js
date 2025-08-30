@@ -23,6 +23,7 @@ const AttendantXSocialworks_1 = __importDefault(require("../routes/AttendantXSoc
 const Availability_1 = __importDefault(require("../routes/Availability"));
 const Cookie_1 = __importDefault(require("../routes/Cookie"));
 const Reviews_1 = __importDefault(require("../routes/Reviews"));
+const Slack_1 = __importDefault(require("../routes/Slack"));
 const Socialworks_1 = __importDefault(require("../routes/Socialworks"));
 const Turns_1 = __importDefault(require("../routes/Turns"));
 const Users_1 = __importDefault(require("../routes/Users"));
@@ -55,6 +56,7 @@ class Server {
         this.app.use("/api/cookie", Cookie_1.default);
         this.app.use("/api/socialworks", Socialworks_1.default);
         this.app.use("/api/attendantXSocialwork", AttendantXSocialworks_1.default);
+        this.app.use("/api/slack", Slack_1.default);
         this.app.use("/fewebhook", FEwebhook_1.default);
         this.app.use("/webhook", webhook_1.default);
         this.app.use("/webhook", webhook_1.default);

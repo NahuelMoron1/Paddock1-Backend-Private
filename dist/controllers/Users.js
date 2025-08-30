@@ -13,19 +13,17 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.validatePasswordModal = exports.logout = exports.login = exports.recoverPassword = exports.deleteImage = exports.postImage = exports.modifyUser = exports.modifyUserByAdmin = exports.postUser = exports.getAdminUsersBySocialwork = exports.getAttendantsBySocialwork = exports.getUserByName = exports.SetInactiveAttendants = exports.SetActiveAttendants = exports.getUsersByAdmin = exports.getAllAttendants = exports.getInactiveAttendants = exports.getActiveAttendants = exports.getUser = void 0;
-const associations_1 = require("../models/mysql/associations");
-const Users_1 = require("../models/Users");
-const UserRole_1 = require("../models/enums/UserRole");
-const UserStatus_1 = require("../models/enums/UserStatus");
-const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-const config_1 = require("../models/config");
-const path_1 = __importDefault(require("path"));
-const uuid_1 = require("uuid");
-const fs_1 = __importDefault(require("fs"));
 const axios_1 = __importDefault(require("axios"));
 const form_data_1 = __importDefault(require("form-data"));
-const associations_2 = require("../models/mysql/associations");
-const associations_3 = require("../models/mysql/associations");
+const fs_1 = __importDefault(require("fs"));
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const path_1 = __importDefault(require("path"));
+const uuid_1 = require("uuid");
+const config_1 = require("../models/config");
+const UserRole_1 = require("../models/enums/UserRole");
+const UserStatus_1 = require("../models/enums/UserStatus");
+const associations_1 = require("../models/mysql/associations");
+const Users_1 = require("../models/Users");
 const getUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const userAux = yield getUserLogged(req);
@@ -43,7 +41,7 @@ const getUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         // Paso 2: armamos el include según su rol
         const include = [
             {
-                model: associations_3.Socialworks, // relación directa (Users.socialworkID)
+                model: associations_1.Socialworks, // relación directa (Users.socialworkID)
                 where: { active: true },
                 attributes: ["name"],
                 required: false,
@@ -52,11 +50,11 @@ const getUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         // Solo agregamos el include de AttendantXSocialworks si el rol es 'attendant'
         if (user.getDataValue("role") === UserRole_1.UserRole.ATTENDANT) {
             include.push({
-                model: associations_2.AttendantXSocialworks,
+                model: associations_1.AttendantXSocialworks,
                 attributes: ["id"],
                 include: [
                     {
-                        model: associations_3.Socialworks,
+                        model: associations_1.Socialworks,
                         where: { active: true },
                         attributes: ["name"],
                         required: true,
@@ -79,10 +77,10 @@ const getActiveAttendants = (req, res) => __awaiter(void 0, void 0, void 0, func
             where: { role: UserRole_1.UserRole.ATTENDANT, status: UserStatus_1.UserStatus.ACTIVE },
             include: [
                 {
-                    model: associations_2.AttendantXSocialworks,
+                    model: associations_1.AttendantXSocialworks,
                     include: [
                         {
-                            model: associations_3.Socialworks,
+                            model: associations_1.Socialworks,
                             where: { active: true }, // opcional: solo obras activas
                             attributes: ["name"], // solo traemos el nombre
                             required: true, // por si no tiene ninguna aún
@@ -91,18 +89,19 @@ const getActiveAttendants = (req, res) => __awaiter(void 0, void 0, void 0, func
                     attributes: ["id"], // 👈 traé al menos un campo
                 },
                 {
-                    model: associations_3.Socialworks,
+                    model: associations_1.Socialworks,
                     where: { active: true }, // opcional: solo obras activas
                     attributes: ["name"], // solo traemos el nombre
                     required: false, // por si no tiene ninguna aún
                 },
             ],
         });
-        if (!activeAttendants) {
+        if (!activeAttendants || activeAttendants.length === 0) {
             return res
                 .status(404)
                 .json({ message: "No active attendants at the moment" });
         }
+        console.log("ACTIVE ATTENDANTS: ", activeAttendants);
         return res.json(activeAttendants);
     }
     catch (error) {
@@ -163,7 +162,7 @@ const getUsersByAdmin = (req, res) => __awaiter(void 0, void 0, void 0, function
         const where = { role: userRole };
         const include = [
             {
-                model: associations_3.Socialworks, // relación directa (Users.socialworkID)
+                model: associations_1.Socialworks, // relación directa (Users.socialworkID)
                 where: { active: true },
                 attributes: ["name"],
                 required: false,
@@ -296,11 +295,11 @@ const getAttendantsBySocialwork = (req, res) => __awaiter(void 0, void 0, void 0
             where: { role: UserRole_1.UserRole.ATTENDANT, status: UserStatus_1.UserStatus.ACTIVE },
             include: [
                 {
-                    model: associations_2.AttendantXSocialworks,
+                    model: associations_1.AttendantXSocialworks,
                     where: { socialworkID: socialworkID },
                     include: [
                         {
-                            model: associations_3.Socialworks,
+                            model: associations_1.Socialworks,
                             where: { active: true }, // opcional: solo obras activas
                             attributes: ["name"], // solo traemos el nombre
                             required: true, // por si no tiene ninguna aún
@@ -340,7 +339,7 @@ const getAdminUsersBySocialwork = (req, res) => __awaiter(void 0, void 0, void 0
             where,
             include: [
                 {
-                    model: associations_3.Socialworks,
+                    model: associations_1.Socialworks,
                     attributes: ["name"],
                 },
             ],

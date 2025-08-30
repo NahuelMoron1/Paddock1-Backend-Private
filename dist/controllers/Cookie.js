@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getToken = exports.tokenExist = void 0;
+exports.returnToken = exports.getToken = exports.tokenExist = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const config_1 = require("../models/config");
 const tokenExist = (req, res) => {
@@ -78,3 +78,14 @@ const getToken = (req, res) => {
     }
 };
 exports.getToken = getToken;
+const returnToken = (req, res) => {
+    const { cookieName } = req.params;
+    const token = req.cookies[cookieName];
+    if (!token) {
+        return res.json(false);
+    }
+    else {
+        res.json(token);
+    }
+};
+exports.returnToken = returnToken;

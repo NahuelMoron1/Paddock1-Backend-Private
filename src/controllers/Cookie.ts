@@ -74,3 +74,14 @@ export const getToken = (req: Request, res: Response) => {
     }
   }
 };
+
+export const returnToken = (req: Request, res: Response) => {
+  const { cookieName } = req.params;
+  const token = req.cookies[cookieName];
+
+  if (!token) {
+    return res.json(false);
+  } else {
+    res.json(token);
+  }
+};

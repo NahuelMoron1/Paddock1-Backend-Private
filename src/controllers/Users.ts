@@ -1,17 +1,19 @@
+import axios from "axios";
 import { Request, Response } from "express";
-import { Users } from "../models/mysql/associations";
-import { User } from "../models/Users";
-import { UserRole } from "../models/enums/UserRole";
-import { UserStatus } from "../models/enums/UserStatus";
+import FormData from "form-data";
+import fs from "fs";
 import jwt from "jsonwebtoken";
-import { DOMAIN, SECRET_JWT_KEY } from "../models/config";
 import path from "path";
 import { v4 as UUIDV4 } from "uuid";
-import fs from "fs";
-import axios from "axios";
-import FormData from "form-data";
-import { AttendantXSocialworks } from "../models/mysql/associations";
-import { Socialworks } from "../models/mysql/associations";
+import { DOMAIN, SECRET_JWT_KEY } from "../models/config";
+import { UserRole } from "../models/enums/UserRole";
+import { UserStatus } from "../models/enums/UserStatus";
+import {
+  AttendantXSocialworks,
+  Socialworks,
+  Users,
+} from "../models/mysql/associations";
+import { User } from "../models/Users";
 
 export const getUser = async (req: Request, res: Response) => {
   try {
@@ -89,11 +91,13 @@ export const getActiveAttendants = async (req: Request, res: Response) => {
       ],
     });
 
-    if (!activeAttendants) {
+    if (!activeAttendants || activeAttendants.length === 0) {
       return res
         .status(404)
         .json({ message: "No active attendants at the moment" });
     }
+
+    console.log("ACTIVE ATTENDANTS: ", activeAttendants);
 
     return res.json(activeAttendants);
   } catch (error) {
