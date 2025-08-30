@@ -64,13 +64,11 @@ const postErrorNotification = (req, res) => __awaiter(void 0, void 0, void 0, fu
                 },
             ],
         };
-        console.log("PAYLOAD: ", payload);
         const resp = yield fetch(config_1.SLACK, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(payload),
         });
-        console.log("RESP: ", resp);
         res.json({ ok: true });
     }
     catch (error) {

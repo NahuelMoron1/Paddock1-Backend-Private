@@ -57,15 +57,11 @@ export const postErrorNotification = async (req: Request, res: Response) => {
       ],
     };
 
-    console.log("PAYLOAD: ", payload);
-
     const resp = await fetch(SLACK, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
     });
-
-    console.log("RESP: ", resp);
 
     res.json({ ok: true });
   } catch (error) {
