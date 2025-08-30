@@ -10,6 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.postErrorNotification = void 0;
+const config_1 = require("../models/config");
 const postErrorNotification = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, _b, _c;
     try {
@@ -64,7 +65,7 @@ const postErrorNotification = (req, res) => __awaiter(void 0, void 0, void 0, fu
             ],
         };
         console.log("PAYLOAD: ", payload);
-        const resp = yield fetch("https://hooks.slack.com/services/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", {
+        const resp = yield fetch(config_1.SLACK, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(payload),

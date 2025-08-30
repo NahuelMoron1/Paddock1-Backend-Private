@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import { SLACK } from "../models/config";
 
 export const postErrorNotification = async (req: Request, res: Response) => {
   try {
@@ -58,14 +59,11 @@ export const postErrorNotification = async (req: Request, res: Response) => {
 
     console.log("PAYLOAD: ", payload);
 
-    const resp = await fetch(
-      "https://hooks.slack.com/services/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",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      }
-    );
+    const resp = await fetch(SLACK, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
 
     console.log("RESP: ", resp);
 
