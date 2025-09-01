@@ -1,14 +1,14 @@
 import { Request, Response } from "express";
+import jwt from "jsonwebtoken";
+import { Op } from "sequelize";
+import { SECRET_JWT_KEY } from "../models/config";
 import { UserRole } from "../models/enums/UserRole";
 import { UserStatus } from "../models/enums/UserStatus";
-import jwt from "jsonwebtoken";
-import { SECRET_JWT_KEY } from "../models/config";
-import { User } from "../models/Users";
-import Turns from "../models/mysql/Turns";
-import { Op } from "sequelize";
-import { isAttendantAvailable } from "./Availability";
-import Users from "../models/mysql/Users";
 import Socialworks from "../models/mysql/Socialworks";
+import Turns from "../models/mysql/Turns";
+import Users from "../models/mysql/Users";
+import { User } from "../models/Users";
+import { isAttendantAvailable } from "./Availability";
 
 export const getAllUserTurns = async (req: Request, res: Response) => {
   try {
@@ -746,7 +746,6 @@ export const addCommentsAdmin = async (req: Request, res: Response) => {
     const { comments } = req.body;
     const { turnID } = req.params;
 
-    console.log("COMMENTS: ", comments);
     if (!turnID) {
       return res
         .status(400)

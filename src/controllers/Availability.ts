@@ -57,8 +57,6 @@ export const isAttendantAvailable = async (
   try {
     const datetime = new Date(date);
 
-    console.log("DATETIME: ", datetime);
-
     // 1. Obtener día de la semana en inglés (ej: "Monday")
     const dayOfWeek = datetime.toLocaleDateString("en-US", { weekday: "long" });
 
@@ -66,8 +64,6 @@ export const isAttendantAvailable = async (
     const hour = datetime.toTimeString().slice(0, 5); // ej: "14:30"
 
     // 3. Buscar disponibilidad para ese día y que cubra ese horario
-    console.log(dayOfWeek);
-    console.log(hour);
 
     const availability = await Availability.findOne({
       where: {

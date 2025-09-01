@@ -13,16 +13,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.completeTurn = exports.cancelTurn = exports.addCommentsAdmin = exports.attendantCreateTurn = exports.createTurn = exports.getCanceledAttendantTurns = exports.getCompletedAttendantTurns = exports.getScheduledAttendantTurns = exports.getAttendantTurnsByDate = exports.getAllAttendantTurns = exports.getCanceledAdminTurns = exports.getCompletedAdminTurns = exports.getScheduledAdminTurns = exports.getNotScheduledUserTurns = exports.getCanceledUserTurns = exports.getCompletedUserTurns = exports.getScheduledUserTurns = exports.getAllUserTurns = void 0;
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const sequelize_1 = require("sequelize");
+const config_1 = require("../models/config");
 const UserRole_1 = require("../models/enums/UserRole");
 const UserStatus_1 = require("../models/enums/UserStatus");
-const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-const config_1 = require("../models/config");
-const Users_1 = require("../models/Users");
-const Turns_1 = __importDefault(require("../models/mysql/Turns"));
-const sequelize_1 = require("sequelize");
-const Availability_1 = require("./Availability");
-const Users_2 = __importDefault(require("../models/mysql/Users"));
 const Socialworks_1 = __importDefault(require("../models/mysql/Socialworks"));
+const Turns_1 = __importDefault(require("../models/mysql/Turns"));
+const Users_1 = __importDefault(require("../models/mysql/Users"));
+const Users_2 = require("../models/Users");
+const Availability_1 = require("./Availability");
 const getAllUserTurns = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const user = yield getUserLogged(req);
@@ -36,7 +36,7 @@ const getAllUserTurns = (req, res) => __awaiter(void 0, void 0, void 0, function
             order: [["date", "DESC"]],
             include: [
                 {
-                    model: Users_2.default,
+                    model: Users_1.default,
                     as: "User", // ← cliente
                     attributes: ["fullName", "userID"],
                     include: [
@@ -47,7 +47,7 @@ const getAllUserTurns = (req, res) => __awaiter(void 0, void 0, void 0, function
                     ],
                 },
                 {
-                    model: Users_2.default,
+                    model: Users_1.default,
                     as: "Attendant", // ← médico
                     attributes: ["id", "fullName", "profileImage", "userID"],
                 },
@@ -76,7 +76,7 @@ const getScheduledUserTurns = (req, res) => __awaiter(void 0, void 0, void 0, fu
             order: [["date", "DESC"]],
             include: [
                 {
-                    model: Users_2.default,
+                    model: Users_1.default,
                     as: "User", // ← cliente
                     attributes: ["fullName", "userID"],
                     include: [
@@ -87,7 +87,7 @@ const getScheduledUserTurns = (req, res) => __awaiter(void 0, void 0, void 0, fu
                     ],
                 },
                 {
-                    model: Users_2.default,
+                    model: Users_1.default,
                     as: "Attendant", // ← médico
                     attributes: ["id", "fullName", "profileImage", "userID"],
                 },
@@ -116,7 +116,7 @@ const getCompletedUserTurns = (req, res) => __awaiter(void 0, void 0, void 0, fu
             order: [["date", "DESC"]],
             include: [
                 {
-                    model: Users_2.default,
+                    model: Users_1.default,
                     as: "User", // ← cliente
                     attributes: ["fullName", "userID"],
                     include: [
@@ -127,7 +127,7 @@ const getCompletedUserTurns = (req, res) => __awaiter(void 0, void 0, void 0, fu
                     ],
                 },
                 {
-                    model: Users_2.default,
+                    model: Users_1.default,
                     as: "Attendant", // ← médico
                     attributes: ["id", "fullName", "profileImage", "userID"],
                 },
@@ -156,7 +156,7 @@ const getCanceledUserTurns = (req, res) => __awaiter(void 0, void 0, void 0, fun
             order: [["date", "DESC"]],
             include: [
                 {
-                    model: Users_2.default,
+                    model: Users_1.default,
                     as: "User", // ← cliente
                     attributes: ["fullName", "userID"],
                     include: [
@@ -167,7 +167,7 @@ const getCanceledUserTurns = (req, res) => __awaiter(void 0, void 0, void 0, fun
                     ],
                 },
                 {
-                    model: Users_2.default,
+                    model: Users_1.default,
                     as: "Attendant", // ← médico
                     attributes: ["id", "fullName", "profileImage", "userID"],
                 },
@@ -199,7 +199,7 @@ const getNotScheduledUserTurns = (req, res) => __awaiter(void 0, void 0, void 0,
             order: [["date", "DESC"]],
             include: [
                 {
-                    model: Users_2.default,
+                    model: Users_1.default,
                     as: "User", // ← cliente
                     attributes: ["fullName", "userID"],
                     include: [
@@ -210,7 +210,7 @@ const getNotScheduledUserTurns = (req, res) => __awaiter(void 0, void 0, void 0,
                     ],
                 },
                 {
-                    model: Users_2.default,
+                    model: Users_1.default,
                     as: "Attendant", // ← médico
                     attributes: ["id", "fullName", "profileImage", "userID"],
                 },
@@ -239,7 +239,7 @@ const getScheduledAdminTurns = (req, res) => __awaiter(void 0, void 0, void 0, f
             order: [["date", "DESC"]],
             include: [
                 {
-                    model: Users_2.default,
+                    model: Users_1.default,
                     as: "User", // ← cliente
                     attributes: ["fullName", "userID"],
                     include: [
@@ -250,7 +250,7 @@ const getScheduledAdminTurns = (req, res) => __awaiter(void 0, void 0, void 0, f
                     ],
                 },
                 {
-                    model: Users_2.default,
+                    model: Users_1.default,
                     as: "Attendant", // ← médico
                     attributes: ["id", "fullName", "profileImage", "userID"],
                 },
@@ -279,7 +279,7 @@ const getCompletedAdminTurns = (req, res) => __awaiter(void 0, void 0, void 0, f
             order: [["date", "DESC"]],
             include: [
                 {
-                    model: Users_2.default,
+                    model: Users_1.default,
                     as: "User", // ← cliente
                     attributes: ["fullName", "userID"],
                     include: [
@@ -290,7 +290,7 @@ const getCompletedAdminTurns = (req, res) => __awaiter(void 0, void 0, void 0, f
                     ],
                 },
                 {
-                    model: Users_2.default,
+                    model: Users_1.default,
                     as: "Attendant", // ← médico
                     attributes: ["id", "fullName", "profileImage", "userID"],
                 },
@@ -319,7 +319,7 @@ const getCanceledAdminTurns = (req, res) => __awaiter(void 0, void 0, void 0, fu
             order: [["date", "DESC"]],
             include: [
                 {
-                    model: Users_2.default,
+                    model: Users_1.default,
                     as: "User", // ← cliente
                     attributes: ["fullName", "userID"],
                     include: [
@@ -330,7 +330,7 @@ const getCanceledAdminTurns = (req, res) => __awaiter(void 0, void 0, void 0, fu
                     ],
                 },
                 {
-                    model: Users_2.default,
+                    model: Users_1.default,
                     as: "Attendant", // ← médico
                     attributes: ["id", "fullName", "profileImage", "userID"],
                 },
@@ -359,7 +359,7 @@ const getAllAttendantTurns = (req, res) => __awaiter(void 0, void 0, void 0, fun
             order: [["date", "DESC"]],
             include: [
                 {
-                    model: Users_2.default,
+                    model: Users_1.default,
                     as: "User", // ← cliente
                     attributes: ["fullName", "userID"],
                     include: [
@@ -370,7 +370,7 @@ const getAllAttendantTurns = (req, res) => __awaiter(void 0, void 0, void 0, fun
                     ],
                 },
                 {
-                    model: Users_2.default,
+                    model: Users_1.default,
                     as: "Attendant", // ← médico
                     attributes: ["id", "fullName", "profileImage", "userID"],
                 },
@@ -474,7 +474,7 @@ const getScheduledAttendantTurns = (req, res) => __awaiter(void 0, void 0, void 
             order: [["date", "DESC"]],
             include: [
                 {
-                    model: Users_2.default,
+                    model: Users_1.default,
                     as: "User", // ← cliente
                     attributes: ["fullName", "userID"],
                     include: [
@@ -485,7 +485,7 @@ const getScheduledAttendantTurns = (req, res) => __awaiter(void 0, void 0, void 
                     ],
                 },
                 {
-                    model: Users_2.default,
+                    model: Users_1.default,
                     as: "Attendant", // ← médico
                     attributes: ["id", "fullName", "userID"],
                 },
@@ -514,7 +514,7 @@ const getCompletedAttendantTurns = (req, res) => __awaiter(void 0, void 0, void 
             order: [["date", "DESC"]],
             include: [
                 {
-                    model: Users_2.default,
+                    model: Users_1.default,
                     as: "User", // ← cliente
                     attributes: ["fullName", "userID"],
                     include: [
@@ -525,7 +525,7 @@ const getCompletedAttendantTurns = (req, res) => __awaiter(void 0, void 0, void 
                     ],
                 },
                 {
-                    model: Users_2.default,
+                    model: Users_1.default,
                     as: "Attendant", // ← médico
                     attributes: ["id", "fullName", "userID"],
                 },
@@ -554,7 +554,7 @@ const getCanceledAttendantTurns = (req, res) => __awaiter(void 0, void 0, void 0
             order: [["date", "DESC"]],
             include: [
                 {
-                    model: Users_2.default,
+                    model: Users_1.default,
                     as: "User", // ← cliente
                     attributes: ["fullName", "userID"],
                     include: [
@@ -565,7 +565,7 @@ const getCanceledAttendantTurns = (req, res) => __awaiter(void 0, void 0, void 0
                     ],
                 },
                 {
-                    model: Users_2.default,
+                    model: Users_1.default,
                     as: "Attendant", // ← médico
                     attributes: ["id", "fullName", "userID"],
                 },
@@ -664,7 +664,6 @@ const addCommentsAdmin = (req, res) => __awaiter(void 0, void 0, void 0, functio
         }
         const { comments } = req.body;
         const { turnID } = req.params;
-        console.log("COMMENTS: ", comments);
         if (!turnID) {
             return res
                 .status(400)
@@ -765,7 +764,7 @@ exports.completeTurn = completeTurn;
 function getUserLogged(req) {
     return __awaiter(this, void 0, void 0, function* () {
         let access = req.cookies["access_token"];
-        let user = new Users_1.User("", "", "", "", "", "", UserRole_1.UserRole.CLIENT, UserStatus_1.UserStatus.ACTIVE, "", "");
+        let user = new Users_2.User("", "", "", "", "", "", UserRole_1.UserRole.CLIENT, UserStatus_1.UserStatus.ACTIVE, "", "");
         if (access) {
             let userAux = yield getToken(access);
             if (userAux) {
@@ -778,7 +777,7 @@ function getUserLogged(req) {
 }
 function getToken(tokenAux) {
     return __awaiter(this, void 0, void 0, function* () {
-        let user = new Users_1.User("", "", "", "", "", "", UserRole_1.UserRole.CLIENT, UserStatus_1.UserStatus.ACTIVE, "", "");
+        let user = new Users_2.User("", "", "", "", "", "", UserRole_1.UserRole.CLIENT, UserStatus_1.UserStatus.ACTIVE, "", "");
         try {
             const data = jsonwebtoken_1.default.verify(tokenAux, config_1.SECRET_JWT_KEY);
             if (typeof data === "object" && data !== null) {

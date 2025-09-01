@@ -60,14 +60,11 @@ const isAttendantAvailable = (attendantID, date) => __awaiter(void 0, void 0, vo
     }
     try {
         const datetime = new Date(date);
-        console.log("DATETIME: ", datetime);
         // 1. Obtener día de la semana en inglés (ej: "Monday")
         const dayOfWeek = datetime.toLocaleDateString("en-US", { weekday: "long" });
         // 2. Obtener la hora en formato "HH:mm"
         const hour = datetime.toTimeString().slice(0, 5); // ej: "14:30"
         // 3. Buscar disponibilidad para ese día y que cubra ese horario
-        console.log(dayOfWeek);
-        console.log(hour);
         const availability = yield Availability_1.default.findOne({
             where: {
                 attendantID,

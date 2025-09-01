@@ -13,13 +13,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteAttendantReview = exports.modifyReview = exports.setAttendantReview = exports.getUserReview = exports.getUserReviews = exports.getAttendantReviews = void 0;
-const Reviews_1 = __importDefault(require("../models/mysql/Reviews"));
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const config_1 = require("../models/config");
 const UserRole_1 = require("../models/enums/UserRole");
 const UserStatus_1 = require("../models/enums/UserStatus");
-const Users_1 = require("../models/Users");
-const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-const Users_2 = __importDefault(require("../models/mysql/Users"));
+const Reviews_1 = __importDefault(require("../models/mysql/Reviews"));
+const Users_1 = __importDefault(require("../models/mysql/Users"));
+const Users_2 = require("../models/Users");
 const getAttendantReviews = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { attendantID } = req.params;
@@ -32,7 +32,7 @@ const getAttendantReviews = (req, res) => __awaiter(void 0, void 0, void 0, func
             where: { attendantID: attendantID },
             include: [
                 {
-                    model: Users_2.default,
+                    model: Users_1.default,
                     as: "User", // ← cliente
                     attributes: ["fullName", "profileImage"],
                 },
@@ -60,12 +60,12 @@ const getUserReviews = (req, res) => __awaiter(void 0, void 0, void 0, function*
             where: { userID: userID },
             include: [
                 {
-                    model: Users_2.default,
+                    model: Users_1.default,
                     as: "User", // ← cliente
                     attributes: ["fullName", "profileImage"],
                 },
                 {
-                    model: Users_2.default,
+                    model: Users_1.default,
                     as: "Attendant",
                     attributes: ["fullName", "profileImage"],
                 },
@@ -179,7 +179,6 @@ const modifyReview = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         return res.status(200).json({ message: "Reseña creada correctamente" });
     }
     catch (error) {
-        console.log(error);
         return res.status(500).json({ message: error });
     }
 });
@@ -229,7 +228,7 @@ exports.deleteAttendantReview = deleteAttendantReview;
 function getUserLogged(req) {
     return __awaiter(this, void 0, void 0, function* () {
         let access = req.cookies["access_token"];
-        let user = new Users_1.User("", "", "", "", "", "", UserRole_1.UserRole.CLIENT, UserStatus_1.UserStatus.ACTIVE, "", "");
+        let user = new Users_2.User("", "", "", "", "", "", UserRole_1.UserRole.CLIENT, UserStatus_1.UserStatus.ACTIVE, "", "");
         if (access) {
             let userAux = yield getToken(access);
             if (userAux) {
@@ -242,7 +241,7 @@ function getUserLogged(req) {
 }
 function getToken(tokenAux) {
     return __awaiter(this, void 0, void 0, function* () {
-        let user = new Users_1.User("", "", "", "", "", "", UserRole_1.UserRole.CLIENT, UserStatus_1.UserStatus.ACTIVE, "", "");
+        let user = new Users_2.User("", "", "", "", "", "", UserRole_1.UserRole.CLIENT, UserStatus_1.UserStatus.ACTIVE, "", "");
         try {
             const data = jsonwebtoken_1.default.verify(tokenAux, config_1.SECRET_JWT_KEY);
             if (typeof data === "object" && data !== null) {

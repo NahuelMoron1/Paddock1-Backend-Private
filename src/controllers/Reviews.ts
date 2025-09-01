@@ -1,11 +1,11 @@
 import { Request, Response } from "express";
-import Reviews from "../models/mysql/Reviews";
+import jwt from "jsonwebtoken";
 import { SECRET_JWT_KEY } from "../models/config";
 import { UserRole } from "../models/enums/UserRole";
 import { UserStatus } from "../models/enums/UserStatus";
-import { User } from "../models/Users";
-import jwt from "jsonwebtoken";
+import Reviews from "../models/mysql/Reviews";
 import Users from "../models/mysql/Users";
+import { User } from "../models/Users";
 
 export const getAttendantReviews = async (req: Request, res: Response) => {
   try {
@@ -184,8 +184,6 @@ export const modifyReview = async (req: Request, res: Response) => {
     await Reviews.create(reviewAux);
     return res.status(200).json({ message: "Reseña creada correctamente" });
   } catch (error) {
-    console.log(error);
-
     return res.status(500).json({ message: error });
   }
 };

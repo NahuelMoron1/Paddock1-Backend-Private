@@ -101,7 +101,6 @@ const getActiveAttendants = (req, res) => __awaiter(void 0, void 0, void 0, func
                 .status(404)
                 .json({ message: "No active attendants at the moment" });
         }
-        console.log("ACTIVE ATTENDANTS: ", activeAttendants);
         return res.json(activeAttendants);
     }
     catch (error) {

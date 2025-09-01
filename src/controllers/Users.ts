@@ -97,8 +97,6 @@ export const getActiveAttendants = async (req: Request, res: Response) => {
         .json({ message: "No active attendants at the moment" });
     }
 
-    console.log("ACTIVE ATTENDANTS: ", activeAttendants);
-
     return res.json(activeAttendants);
   } catch (error) {
     return res.status(500).json({ message: error });
