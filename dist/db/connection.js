@@ -6,9 +6,9 @@ const sequelize = new sequelize_1.Sequelize(config_1.DB_NAME, config_1.DB_USER, 
     host: config_1.DB_HOST,
     port: config_1.DB_PORT,
     dialect: "mysql",
-    timezone: "America/Argentina/Buenos_Aires",
+    timezone: "-03:00",
     dialectOptions: {
-        timezone: "Etc/GMT+3", // para el lado del servidor MySQL
+        timezone: "America/Argentina/Buenos_Aires", // para el lado del servidor MySQL
         dateStrings: true,
         typeCast: true,
     },
