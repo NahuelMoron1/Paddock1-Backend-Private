@@ -29,14 +29,13 @@ function notifySlack(text) {
 function slackStatus() {
     (() => __awaiter(this, void 0, void 0, function* () {
         try {
-            // Ejecutar pm2 status
+            // Le saco los colores con --no-color
             const status = execSync("pm2 status --no-color", { encoding: "utf8" });
-            // Mandar a Slack
             yield fetch(config_1.SLACK_WEBHOOK_URL, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    text: `🚀 Servidor reiniciado\n\`\`\`${status}\`\`\``,
+                    text: `🚀 Servidor reiniciado\n\`\`\`\n${status}\n\`\`\``,
                 }),
             });
             console.log("Notificación enviada a Slack");

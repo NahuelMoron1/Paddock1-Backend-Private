@@ -19,15 +19,14 @@ function notifySlack(text: string) {
 function slackStatus() {
   (async () => {
     try {
-      // Ejecutar pm2 status
+      // Le saco los colores con --no-color
       const status = execSync("pm2 status --no-color", { encoding: "utf8" });
 
-      // Mandar a Slack
       await fetch(SLACK_WEBHOOK_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          text: `🚀 Servidor reiniciado\n\`\`\`${status}\`\`\``,
+          text: `🚀 Servidor reiniciado\n\`\`\`\n${status}\n\`\`\``,
         }),
       });
 
