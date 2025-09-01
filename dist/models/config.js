@@ -15,6 +15,6 @@ exports.SECRET_JWT_KEY = process.env.SECRET_JWT_KEY;
 exports.DOMAIN = process.env.DOMAIN;
 exports.SLACK = process.env.SLACK;
 exports.SLACK_WEBHOOK_URL = process.env.SLACK_WEBHOOK_URL;
-exports.PRODUCTION = process.env.production === "true";
+exports.PRODUCTION = process.env.PRODUCTION === "true";
 exports.DB_PORT = parseInt(process.env.DB_PORT || "0");
 exports.MAINTENANCE = process.env.MAINTENANCE === "true";
