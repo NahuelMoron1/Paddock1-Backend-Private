@@ -29,14 +29,28 @@ function notifySlack(text) {
 function slackStatus() {
     (() => __awaiter(this, void 0, void 0, function* () {
         try {
-            // Le saco los colores con --no-color
-            const status = execSync("pm2 status --no-color", { encoding: "utf8" });
+            // Saco la lista en JSON
+            const raw = execSync("pm2 jlist", { encoding: "utf8" });
+            const apps = JSON.parse(raw);
+            // Armo un mensaje limpio
+            let message = "🚀 *Server restarted*\n\n";
+            apps.forEach((app) => {
+                const name = app.name;
+                const status = app.pm2_env.status;
+                const uptime = Math.floor((Date.now() - app.pm2_env.pm_uptime) / 1000);
+                const cpu = app.monit.cpu;
+                const mem = (app.monit.memory / 1024 / 1024).toFixed(1) + " MB";
+                message += `*App:* ${name}\n`;
+                message += `• Status: ${status}\n`;
+                message += `• Uptime: ${uptime}s\n`;
+                message += `• CPU: ${cpu}%\n`;
+                message += `• Memoria: ${mem}\n\n`;
+            });
+            // Envío a Slack
             yield fetch(config_1.SLACK_WEBHOOK_URL, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    text: `🚀 Servidor reiniciado\n\`\`\`\n${status}\n\`\`\``,
-                }),
+                body: JSON.stringify({ text: message }),
             });
             console.log("Notificación enviada a Slack");
         }
