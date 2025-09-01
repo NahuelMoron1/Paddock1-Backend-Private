@@ -40,8 +40,15 @@ function slackStatus() {
                 const uptime = Math.floor((Date.now() - app.pm2_env.pm_uptime) / 1000);
                 const cpu = app.monit.cpu;
                 const mem = (app.monit.memory / 1024 / 1024).toFixed(1) + " MB";
+                let statusIcon = "⚪️";
+                if (status === "online")
+                    statusIcon = "🟢";
+                else if (status === "errored" || status === "stopped")
+                    statusIcon = "🔴";
+                else if (status === "launching")
+                    statusIcon = "🟡";
                 message += `*App:* ${name}\n`;
-                message += `• Status: ${status}\n`;
+                message += `• Status: ${statusIcon} ${status}\n`;
                 message += `• Uptime: ${uptime}s\n`;
                 message += `• CPU: ${cpu}%\n`;
                 message += `• Memoria: ${mem}\n\n`;
