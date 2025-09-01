@@ -8,7 +8,6 @@ const sequelize = new sequelize_1.Sequelize(config_1.DB_NAME, config_1.DB_USER, 
     dialect: "mysql",
     timezone: "-03:00",
     dialectOptions: {
-        timezone: "America/Argentina/Buenos_Aires", // para el lado del servidor MySQL
         dateStrings: true,
         typeCast: true,
     },
