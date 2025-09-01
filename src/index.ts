@@ -20,7 +20,7 @@ function slackStatus() {
   (async () => {
     try {
       // Ejecutar pm2 status
-      const status = execSync("pm2 status", { encoding: "utf8" });
+      const status = execSync("pm2 status --no-color", { encoding: "utf8" });
 
       // Mandar a Slack
       await fetch(SLACK_WEBHOOK_URL, {

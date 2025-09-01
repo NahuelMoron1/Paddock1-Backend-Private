@@ -30,7 +30,7 @@ function slackStatus() {
     (() => __awaiter(this, void 0, void 0, function* () {
         try {
             // Ejecutar pm2 status
-            const status = execSync("pm2 status", { encoding: "utf8" });
+            const status = execSync("pm2 status --no-color", { encoding: "utf8" });
             // Mandar a Slack
             yield fetch(config_1.SLACK_WEBHOOK_URL, {
                 method: "POST",
