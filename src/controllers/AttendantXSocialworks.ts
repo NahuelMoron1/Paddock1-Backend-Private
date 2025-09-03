@@ -13,13 +13,13 @@ export const postAttendantXSocialwork = async (req: Request, res: Response) => {
     if (!user) {
       return res
         .status(401)
-        .json({ message: "You're not allowed to see this information." });
+        .json({ message: "No tiene permiso para ver esta información" });
     }
 
     if (user.role !== UserRole.ATTENDANT) {
       return res
         .status(401)
-        .json({ message: "You're not allowed to see this information." });
+        .json({ message: "No tiene permiso para ver esta información" });
     }
 
     const body = req.body;
@@ -61,13 +61,13 @@ export const deleteAttendantXSocialwork = async (
     if (!user) {
       return res
         .status(401)
-        .json({ message: "You're not allowed to see this information." });
+        .json({ message: "No tiene permiso para ver esta información" });
     }
 
     if (user.role !== UserRole.ATTENDANT) {
       return res
         .status(401)
-        .json({ message: "You're not allowed to see this information." });
+        .json({ message: "No tiene permiso para ver esta información" });
     }
 
     const { attendantID, socialworkID } = req.params;
@@ -80,7 +80,7 @@ export const deleteAttendantXSocialwork = async (
     ) {
       return res
         .status(400)
-        .json({ message: "Not all fields contains a value." });
+        .json({ message: "No todos los campos contienen un valor" });
     }
 
     const attendantXSocialworkToDelete = await AttendantXSocialworks.findOne({
@@ -89,14 +89,14 @@ export const deleteAttendantXSocialwork = async (
 
     if (!attendantXSocialworkToDelete) {
       return res.status(404).json({
-        message: "Cannot delete: we didn't found this attendantXSocialwork",
+        message: "No se encontró esta información",
       });
     }
 
     await attendantXSocialworkToDelete.destroy();
     return res
       .status(200)
-      .json({ message: "attendantXSocialwork deleted successfully" });
+      .json({ message: "Información borrada correctamente" });
   } catch (error) {
     return res.status(500).json({ message: error });
   }

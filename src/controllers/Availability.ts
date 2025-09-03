@@ -13,7 +13,7 @@ export const getAttendantAvailability = async (req: Request, res: Response) => {
     if (!attendantID) {
       return res
         .status(400)
-        .json({ message: "Not all fields contains a value." });
+        .json({ message: "No todos los campos contienen un valor" });
     }
 
     const availability = await Availability.findAll({
@@ -21,7 +21,9 @@ export const getAttendantAvailability = async (req: Request, res: Response) => {
     });
 
     if (!availability) {
-      return res.status(404).json({ message: "No availability found" });
+      return res
+        .status(404)
+        .json({ message: "No se encontró la disponibilidad" });
     }
 
     const dayOrder = [
@@ -51,7 +53,7 @@ export const isAttendantAvailable = async (
   if (!attendantID || !date) {
     return {
       available: false,
-      message: "Not all fields have a value",
+      message: "No todos los campos contienen un valor",
     };
   }
   try {
@@ -78,13 +80,13 @@ export const isAttendantAvailable = async (
     } else {
       return {
         available: false,
-        message: "No availability at that time",
+        message: "No hay disponibilidad en ese horario",
       };
     }
   } catch (err) {
     return {
       available: false,
-      message: "An error happened",
+      message: "Ocurrió un error",
     };
   }
 };
@@ -116,13 +118,13 @@ export const postAttendantAvailability = async (
     if (!user) {
       return res
         .status(401)
-        .json({ message: "You're not allowed to see this information." });
+        .json({ message: "No tiene permiso para ver esta información" });
     }
 
     if (user.role !== UserRole.ATTENDANT) {
       return res
         .status(401)
-        .json({ message: "You're not allowed to see this information." });
+        .json({ message: "No tiene permiso para ver esta información" });
     }
 
     const { dayOfWeek, startTime, endTime } = req.body;
@@ -130,15 +132,13 @@ export const postAttendantAvailability = async (
     if (!validateAvailability(dayOfWeek, startTime, endTime)) {
       return res
         .status(400)
-        .json({ message: "Not all fields contains a value." });
+        .json({ message: "No todos los campos contienen un valor" });
     }
 
     const attendantID = user.id;
     const availability = { attendantID, dayOfWeek, startTime, endTime };
     await Availability.create(availability);
-    return res
-      .status(200)
-      .json({ message: "availability created successfully" });
+    return res.status(200).json({ message: "Disponibilidad creada con exito" });
   } catch (error) {
     return res.status(500).json({ message: error });
   }
@@ -161,19 +161,21 @@ export const modifyAttendantAvailability = async (
     if (!user) {
       return res
         .status(401)
-        .json({ message: "You're not allowed to see this information." });
+        .json({ message: "No tiene permiso para ver esta información" });
     }
 
     if (user.role !== UserRole.ATTENDANT) {
       return res
         .status(401)
-        .json({ message: "You're not allowed to see this information." });
+        .json({ message: "No tiene permiso para ver esta información" });
     }
 
     const { id, dayOfWeek, startTime, endTime } = req.body;
 
     if (!dayOfWeek && !startTime && !endTime) {
-      return res.status(400).json({ message: "Nothing sent to modify" });
+      return res
+        .status(400)
+        .json({ message: "No se ha enviado nada para modificar" });
     }
 
     const availabilityToModify = await Availability.findByPk(id);
@@ -181,7 +183,7 @@ export const modifyAttendantAvailability = async (
     if (!availabilityToModify) {
       return res
         .status(404)
-        .json({ message: "Cannot modify: we didn't found this availability" });
+        .json({ message: "No se encontró la disponibilidad" });
     }
 
     if (dayOfWeek) {
@@ -197,7 +199,7 @@ export const modifyAttendantAvailability = async (
     await availabilityToModify.save();
     return res
       .status(200)
-      .json({ message: "Availability modificated successfully" });
+      .json({ message: "Disponibilidad modificada con exito" });
   } catch (error) {
     return res.status(500).json({ message: error });
   }
@@ -213,13 +215,13 @@ export const deleteAttendantAvailability = async (
     if (!user) {
       return res
         .status(401)
-        .json({ message: "You're not allowed to see this information." });
+        .json({ message: "No tiene permiso para ver esta información" });
     }
 
     if (user.role !== UserRole.ATTENDANT) {
       return res
         .status(401)
-        .json({ message: "You're not allowed to see this information." });
+        .json({ message: "No tiene permiso para ver esta información" });
     }
 
     const { id } = req.params;
@@ -227,7 +229,7 @@ export const deleteAttendantAvailability = async (
     if (!id) {
       return res
         .status(400)
-        .json({ message: "Not all fields contains a value." });
+        .json({ message: "No todos los campos contienen un valor" });
     }
 
     const availabilityToDelete = await Availability.findByPk(id);
@@ -235,13 +237,13 @@ export const deleteAttendantAvailability = async (
     if (!availabilityToDelete) {
       return res
         .status(404)
-        .json({ message: "Cannot delete: we didn't found this availability" });
+        .json({ message: "No se encontró la disponibilidad" });
     }
 
     await availabilityToDelete.destroy();
     return res
       .status(200)
-      .json({ message: "Availability deleted successfully" });
+      .json({ message: "Disponibilidad eliminada con exito" });
   } catch (error) {
     return res.status(500).json({ message: error });
   }

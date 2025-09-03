@@ -14,7 +14,7 @@ export const getAttendantReviews = async (req: Request, res: Response) => {
     if (!attendantID) {
       return res
         .status(400)
-        .json({ message: "Not all fields contains a value" });
+        .json({ message: "No todos los campos contienen un valor" });
     }
 
     const reviewsAux = await Reviews.findAll({
@@ -29,7 +29,9 @@ export const getAttendantReviews = async (req: Request, res: Response) => {
     });
 
     if (!reviewsAux) {
-      return res.status(404).json({ message: "No reviews found" });
+      return res
+        .status(404)
+        .json({ message: "No se encontraron calificaciones" });
     }
     return res.json(reviewsAux);
   } catch (error) {
@@ -44,7 +46,7 @@ export const getUserReviews = async (req: Request, res: Response) => {
     if (!userID) {
       return res
         .status(400)
-        .json({ message: "Not all fields contains a value" });
+        .json({ message: "No todos los campos contienen un valor" });
     }
 
     const reviewsAux = await Reviews.findAll({
@@ -64,7 +66,9 @@ export const getUserReviews = async (req: Request, res: Response) => {
     });
 
     if (!reviewsAux) {
-      return res.status(404).json({ message: "No reviews found" });
+      return res
+        .status(404)
+        .json({ message: "No se encontraron calificaciones" });
     }
     return res.json(reviewsAux);
   } catch (error) {
@@ -79,7 +83,7 @@ export const getUserReview = async (req: Request, res: Response) => {
     if (!userID || !attendantID) {
       return res
         .status(400)
-        .json({ message: "Not all fields contains a value" });
+        .json({ message: "No todos los campos contienen un valor" });
     }
 
     const reviewsAux = await Reviews.findOne({
@@ -87,7 +91,9 @@ export const getUserReview = async (req: Request, res: Response) => {
     });
 
     if (!reviewsAux) {
-      return res.status(404).json({ message: "No review found" });
+      return res
+        .status(404)
+        .json({ message: "No se encontró la calificación" });
     }
     return res.json(reviewsAux);
   } catch (error) {
@@ -102,7 +108,7 @@ export const setAttendantReview = async (req: Request, res: Response) => {
     if (!user) {
       return res
         .status(401)
-        .json({ message: "You're not allowed to see this information." });
+        .json({ message: "No tiene permiso para ver esta información" });
     }
 
     const { attendantID, rating, comment } = req.body;
@@ -110,13 +116,13 @@ export const setAttendantReview = async (req: Request, res: Response) => {
     if (!validateReview(attendantID, rating, comment)) {
       return res
         .status(400)
-        .json({ message: "Not all fields contains a value" });
+        .json({ message: "No todos los campos contienen un valor" });
     }
 
     if (user.role !== UserRole.CLIENT) {
-      return res
-        .status(304)
-        .json({ message: "Cannot set a review if you are admin or attendant" });
+      return res.status(304).json({
+        message: "No podes agregar una calificación si sos parte del personal",
+      });
     }
 
     const userID = user.id;
@@ -142,7 +148,7 @@ export const modifyReview = async (req: Request, res: Response) => {
     if (!user) {
       return res
         .status(401)
-        .json({ message: "You're not allowed to see this information." });
+        .json({ message: "No tiene permiso para ver esta información" });
     }
 
     const review = req.body;
@@ -158,7 +164,8 @@ export const modifyReview = async (req: Request, res: Response) => {
 
     if (user.role !== UserRole.CLIENT) {
       return res.status(304).json({
-        message: "Cannot modify a review if you are admin or attendant",
+        message:
+          "No podes modificar una calificación si sos parte del personal",
       });
     }
 
@@ -205,7 +212,7 @@ export const deleteAttendantReview = async (req: Request, res: Response) => {
     if (!user) {
       return res
         .status(401)
-        .json({ message: "You're not allowed to see this information." });
+        .json({ message: "No tiene permiso para ver esta información" });
     }
 
     const { id } = req.params;
@@ -213,24 +220,26 @@ export const deleteAttendantReview = async (req: Request, res: Response) => {
     if (!id) {
       return res
         .status(400)
-        .json({ message: "Not all fields contains a value." });
+        .json({ message: "No todos los campos contienen un valor." });
     }
 
     const reviewToDelete = await Reviews.findByPk(id);
 
     if (!reviewToDelete) {
-      return res.status(404).json({ message: "Review not found" });
+      return res
+        .status(404)
+        .json({ message: "No se encontró la calificación" });
     }
     if (reviewToDelete.getDataValue("userID") !== user.id) {
       return res
         .status(401)
-        .json({ message: "You're not allowed to see this information." });
+        .json({ message: "No tiene permiso para ver esta información" });
     }
 
     await reviewToDelete.destroy();
     return res
       .status(200)
-      .send({ message: "Review successfully deleted by user" });
+      .send({ message: "Calificación eliminada con exito" });
   } catch (error) {
     return res.status(500).json({ message: error });
   }

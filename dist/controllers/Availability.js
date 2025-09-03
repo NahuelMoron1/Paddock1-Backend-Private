@@ -26,13 +26,15 @@ const getAttendantAvailability = (req, res) => __awaiter(void 0, void 0, void 0,
         if (!attendantID) {
             return res
                 .status(400)
-                .json({ message: "Not all fields contains a value." });
+                .json({ message: "No todos los campos contienen un valor" });
         }
         const availability = yield Availability_1.default.findAll({
             where: { attendantID: attendantID },
         });
         if (!availability) {
-            return res.status(404).json({ message: "No availability found" });
+            return res
+                .status(404)
+                .json({ message: "No se encontró la disponibilidad" });
         }
         const dayOrder = [
             "Monday",
@@ -55,7 +57,7 @@ const isAttendantAvailable = (attendantID, date) => __awaiter(void 0, void 0, vo
     if (!attendantID || !date) {
         return {
             available: false,
-            message: "Not all fields have a value",
+            message: "No todos los campos contienen un valor",
         };
     }
     try {
@@ -79,14 +81,14 @@ const isAttendantAvailable = (attendantID, date) => __awaiter(void 0, void 0, vo
         else {
             return {
                 available: false,
-                message: "No availability at that time",
+                message: "No hay disponibilidad en ese horario",
             };
         }
     }
     catch (err) {
         return {
             available: false,
-            message: "An error happened",
+            message: "Ocurrió un error",
         };
     }
 });
@@ -111,25 +113,23 @@ const postAttendantAvailability = (req, res) => __awaiter(void 0, void 0, void 0
         if (!user) {
             return res
                 .status(401)
-                .json({ message: "You're not allowed to see this information." });
+                .json({ message: "No tiene permiso para ver esta información" });
         }
         if (user.role !== UserRole_1.UserRole.ATTENDANT) {
             return res
                 .status(401)
-                .json({ message: "You're not allowed to see this information." });
+                .json({ message: "No tiene permiso para ver esta información" });
         }
         const { dayOfWeek, startTime, endTime } = req.body;
         if (!validateAvailability(dayOfWeek, startTime, endTime)) {
             return res
                 .status(400)
-                .json({ message: "Not all fields contains a value." });
+                .json({ message: "No todos los campos contienen un valor" });
         }
         const attendantID = user.id;
         const availability = { attendantID, dayOfWeek, startTime, endTime };
         yield Availability_1.default.create(availability);
-        return res
-            .status(200)
-            .json({ message: "availability created successfully" });
+        return res.status(200).json({ message: "Disponibilidad creada con exito" });
     }
     catch (error) {
         return res.status(500).json({ message: error });
@@ -148,22 +148,24 @@ const modifyAttendantAvailability = (req, res) => __awaiter(void 0, void 0, void
         if (!user) {
             return res
                 .status(401)
-                .json({ message: "You're not allowed to see this information." });
+                .json({ message: "No tiene permiso para ver esta información" });
         }
         if (user.role !== UserRole_1.UserRole.ATTENDANT) {
             return res
                 .status(401)
-                .json({ message: "You're not allowed to see this information." });
+                .json({ message: "No tiene permiso para ver esta información" });
         }
         const { id, dayOfWeek, startTime, endTime } = req.body;
         if (!dayOfWeek && !startTime && !endTime) {
-            return res.status(400).json({ message: "Nothing sent to modify" });
+            return res
+                .status(400)
+                .json({ message: "No se ha enviado nada para modificar" });
         }
         const availabilityToModify = yield Availability_1.default.findByPk(id);
         if (!availabilityToModify) {
             return res
                 .status(404)
-                .json({ message: "Cannot modify: we didn't found this availability" });
+                .json({ message: "No se encontró la disponibilidad" });
         }
         if (dayOfWeek) {
             availabilityToModify.set("dayOfWeek", dayOfWeek);
@@ -177,7 +179,7 @@ const modifyAttendantAvailability = (req, res) => __awaiter(void 0, void 0, void
         yield availabilityToModify.save();
         return res
             .status(200)
-            .json({ message: "Availability modificated successfully" });
+            .json({ message: "Disponibilidad modificada con exito" });
     }
     catch (error) {
         return res.status(500).json({ message: error });
@@ -190,29 +192,29 @@ const deleteAttendantAvailability = (req, res) => __awaiter(void 0, void 0, void
         if (!user) {
             return res
                 .status(401)
-                .json({ message: "You're not allowed to see this information." });
+                .json({ message: "No tiene permiso para ver esta información" });
         }
         if (user.role !== UserRole_1.UserRole.ATTENDANT) {
             return res
                 .status(401)
-                .json({ message: "You're not allowed to see this information." });
+                .json({ message: "No tiene permiso para ver esta información" });
         }
         const { id } = req.params;
         if (!id) {
             return res
                 .status(400)
-                .json({ message: "Not all fields contains a value." });
+                .json({ message: "No todos los campos contienen un valor" });
         }
         const availabilityToDelete = yield Availability_1.default.findByPk(id);
         if (!availabilityToDelete) {
             return res
                 .status(404)
-                .json({ message: "Cannot delete: we didn't found this availability" });
+                .json({ message: "No se encontró la disponibilidad" });
         }
         yield availabilityToDelete.destroy();
         return res
             .status(200)
-            .json({ message: "Availability deleted successfully" });
+            .json({ message: "Disponibilidad eliminada con exito" });
     }
     catch (error) {
         return res.status(500).json({ message: error });

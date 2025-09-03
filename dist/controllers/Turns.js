@@ -29,7 +29,7 @@ const getAllUserTurns = (req, res) => __awaiter(void 0, void 0, void 0, function
         if (!user) {
             return res
                 .status(401)
-                .json({ message: "No tenes permiso a realizar estas acciones." });
+                .json({ message: "No tiene permiso para ver esta información" });
         }
         const turns = yield Turns_1.default.findAll({
             where: { userID: user.id },
@@ -54,7 +54,7 @@ const getAllUserTurns = (req, res) => __awaiter(void 0, void 0, void 0, function
             ],
         });
         if (!turns) {
-            return res.status(404).json({ message: "Error, turns not found" });
+            return res.status(404).json({ message: "No se encontraron turnos" });
         }
         return res.json(turns);
     }
@@ -69,7 +69,7 @@ const getScheduledUserTurns = (req, res) => __awaiter(void 0, void 0, void 0, fu
         if (!user) {
             return res
                 .status(401)
-                .json({ message: "No tenes permiso a realizar estas acciones." });
+                .json({ message: "No tiene permiso para ver esta información" });
         }
         const turns = yield Turns_1.default.findAll({
             where: { userID: user.id, status: "scheduled" },
@@ -94,7 +94,7 @@ const getScheduledUserTurns = (req, res) => __awaiter(void 0, void 0, void 0, fu
             ],
         });
         if (!turns) {
-            return res.status(404).json({ message: "Error, turns not found" });
+            return res.status(404).json({ message: "No se encontraron turnos" });
         }
         return res.json(turns);
     }
@@ -109,7 +109,7 @@ const getCompletedUserTurns = (req, res) => __awaiter(void 0, void 0, void 0, fu
         if (!user) {
             return res
                 .status(401)
-                .json({ message: "No tenes permiso a realizar estas acciones." });
+                .json({ message: "No tiene permiso para ver esta información" });
         }
         const turns = yield Turns_1.default.findAll({
             where: { userID: user.id, status: "completed" },
@@ -134,7 +134,7 @@ const getCompletedUserTurns = (req, res) => __awaiter(void 0, void 0, void 0, fu
             ],
         });
         if (!turns) {
-            return res.status(404).json({ message: "Error, turns not found" });
+            return res.status(404).json({ message: "No se encontraron turnos" });
         }
         return res.json(turns);
     }
@@ -149,7 +149,7 @@ const getCanceledUserTurns = (req, res) => __awaiter(void 0, void 0, void 0, fun
         if (!user) {
             return res
                 .status(401)
-                .json({ message: "No tenes permiso a realizar estas acciones." });
+                .json({ message: "No tiene permiso para ver esta información" });
         }
         const turns = yield Turns_1.default.findAll({
             where: { userID: user.id, status: "canceled" },
@@ -174,7 +174,7 @@ const getCanceledUserTurns = (req, res) => __awaiter(void 0, void 0, void 0, fun
             ],
         });
         if (!turns) {
-            return res.status(404).json({ message: "Error, turns not found" });
+            return res.status(404).json({ message: "No se encontraron turnos" });
         }
         return res.json(turns);
     }
@@ -189,7 +189,7 @@ const getNotScheduledUserTurns = (req, res) => __awaiter(void 0, void 0, void 0,
         if (!user) {
             return res
                 .status(401)
-                .json({ message: "No tenes permiso a realizar estas acciones." });
+                .json({ message: "No tiene permiso para ver esta información" });
         }
         const turns = yield Turns_1.default.findAll({
             where: {
@@ -217,7 +217,7 @@ const getNotScheduledUserTurns = (req, res) => __awaiter(void 0, void 0, void 0,
             ],
         });
         if (!turns) {
-            return res.status(404).json({ message: "Error, turns not found" });
+            return res.status(404).json({ message: "No se encontraron turnos" });
         }
         return res.json(turns);
     }
@@ -232,7 +232,7 @@ const getScheduledAdminTurns = (req, res) => __awaiter(void 0, void 0, void 0, f
         if (!user || user.role !== UserRole_1.UserRole.ADMIN) {
             return res
                 .status(401)
-                .json({ message: "No tenes permiso a realizar estas acciones." });
+                .json({ message: "No tiene permiso para ver esta información" });
         }
         const turns = yield Turns_1.default.findAll({
             where: { status: "scheduled" },
@@ -257,7 +257,7 @@ const getScheduledAdminTurns = (req, res) => __awaiter(void 0, void 0, void 0, f
             ],
         });
         if (!turns) {
-            return res.status(404).json({ message: "Error, turns not found" });
+            return res.status(404).json({ message: "No se encontraron turnos" });
         }
         return res.json(turns);
     }
@@ -272,7 +272,7 @@ const getCompletedAdminTurns = (req, res) => __awaiter(void 0, void 0, void 0, f
         if (!user || user.role !== UserRole_1.UserRole.ADMIN) {
             return res
                 .status(401)
-                .json({ message: "No tenes permiso a realizar estas acciones." });
+                .json({ message: "No tiene permiso para ver esta información" });
         }
         const turns = yield Turns_1.default.findAll({
             where: { status: "completed" },
@@ -297,7 +297,7 @@ const getCompletedAdminTurns = (req, res) => __awaiter(void 0, void 0, void 0, f
             ],
         });
         if (!turns) {
-            return res.status(404).json({ message: "Error, turns not found" });
+            return res.status(404).json({ message: "No se encontraron turnos" });
         }
         return res.json(turns);
     }
@@ -312,7 +312,7 @@ const getCanceledAdminTurns = (req, res) => __awaiter(void 0, void 0, void 0, fu
         if (!user || user.role !== UserRole_1.UserRole.ADMIN) {
             return res
                 .status(401)
-                .json({ message: "No tenes permiso a realizar estas acciones." });
+                .json({ message: "No tiene permiso para ver esta información" });
         }
         const turns = yield Turns_1.default.findAll({
             where: { status: "canceled" },
@@ -337,7 +337,7 @@ const getCanceledAdminTurns = (req, res) => __awaiter(void 0, void 0, void 0, fu
             ],
         });
         if (!turns) {
-            return res.status(404).json({ message: "Error, turns not found" });
+            return res.status(404).json({ message: "No se encontraron turnos" });
         }
         return res.json(turns);
     }
@@ -352,7 +352,7 @@ const getAllAttendantTurns = (req, res) => __awaiter(void 0, void 0, void 0, fun
         if (!user) {
             return res
                 .status(401)
-                .json({ message: "No tenes permiso a realizar estas acciones." });
+                .json({ message: "No tiene permiso para ver esta información" });
         }
         const turns = yield Turns_1.default.findAll({
             where: { attendantID: user.id },
@@ -377,7 +377,7 @@ const getAllAttendantTurns = (req, res) => __awaiter(void 0, void 0, void 0, fun
             ],
         });
         if (!turns) {
-            return res.status(404).json({ message: "Error, turns not found" });
+            return res.status(404).json({ message: "No se encontraron turnos" });
         }
         return res.json(turns);
     }
@@ -409,24 +409,16 @@ function validateParametersAvailability(startHour, endHour, date) {
     }
     return true;
 }
-/*function parseHourToNumber(hourStr: string): number {
-  if (typeof hourStr !== "string") return NaN;
-  const [hours, minutes] = hourStr.split(":").map(Number);
-  if (isNaN(hours) || isNaN(minutes)) return NaN;
-  return hours + minutes / 60;
-}*/
 const getAttendantTurnsByDate = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const user = yield getUserLogged(req);
         if (!user) {
             return res
                 .status(401)
-                .json({ message: "No tenes permiso a realizar estas acciones." });
+                .json({ message: "No tiene permiso para ver esta información" });
         }
         const { attendantID } = req.params;
         let { startHour, endHour, date } = req.body;
-        //startHour = parseHourToNumber(startHour); // → 8
-        //endHour = parseHourToNumber(endHour); // → 17
         date = new Date(date);
         if (!attendantID || !startHour || !endHour || !date) {
             return res.status(400).json({ message: "Faltan datos en la petición" });
@@ -449,7 +441,7 @@ const getAttendantTurnsByDate = (req, res) => __awaiter(void 0, void 0, void 0, 
             order: [["date", "DESC"]],
         });
         if (!turns) {
-            return res.status(404).json({ message: "Error, turns not found" });
+            return res.status(404).json({ message: "No se encontraron turnos" });
         }
         const availableHours = hasAvailableHour(startHour, endHour, turns);
         return res
@@ -467,7 +459,7 @@ const getScheduledAttendantTurns = (req, res) => __awaiter(void 0, void 0, void 
         if (!user) {
             return res
                 .status(401)
-                .json({ message: "No tenes permiso a realizar estas acciones." });
+                .json({ message: "No tiene permiso para ver esta información" });
         }
         const turns = yield Turns_1.default.findAll({
             where: { attendantID: user.id, status: "scheduled" },
@@ -492,7 +484,7 @@ const getScheduledAttendantTurns = (req, res) => __awaiter(void 0, void 0, void 
             ],
         });
         if (!turns) {
-            return res.status(404).json({ message: "Error, turns not found" });
+            return res.status(404).json({ message: "No se encontraron turnos" });
         }
         return res.json(turns);
     }
@@ -507,7 +499,7 @@ const getCompletedAttendantTurns = (req, res) => __awaiter(void 0, void 0, void 
         if (!user) {
             return res
                 .status(401)
-                .json({ message: "No tenes permiso a realizar estas acciones." });
+                .json({ message: "No tiene permiso para ver esta información" });
         }
         const turns = yield Turns_1.default.findAll({
             where: { attendantID: user.id, status: "completed" },
@@ -532,7 +524,7 @@ const getCompletedAttendantTurns = (req, res) => __awaiter(void 0, void 0, void 
             ],
         });
         if (!turns) {
-            return res.status(404).json({ message: "Error, turns not found" });
+            return res.status(404).json({ message: "No se encontraron turnos" });
         }
         return res.json(turns);
     }
@@ -547,7 +539,7 @@ const getCanceledAttendantTurns = (req, res) => __awaiter(void 0, void 0, void 0
         if (!user) {
             return res
                 .status(401)
-                .json({ message: "No tenes permiso a realizar estas acciones." });
+                .json({ message: "No tiene permiso para ver esta información" });
         }
         const turns = yield Turns_1.default.findAll({
             where: { attendantID: user.id, status: "canceled" },
@@ -572,7 +564,7 @@ const getCanceledAttendantTurns = (req, res) => __awaiter(void 0, void 0, void 0
             ],
         });
         if (!turns) {
-            return res.status(404).json({ message: "Error, turns not found" });
+            return res.status(404).json({ message: "No se encontraron turnos" });
         }
         return res.json(turns);
     }
@@ -587,13 +579,13 @@ const createTurn = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         if (!user) {
             return res
                 .status(401)
-                .json({ message: "No tenes permiso a realizar estas acciones." });
+                .json({ message: "No tiene permiso para ver esta información" });
         }
         let { attendantID, date, place, comments } = req.body;
         if (!validateTurn(attendantID, date, place)) {
             return res
                 .status(400)
-                .json({ message: "No todos los campos contienen un valor." });
+                .json({ message: "No todos los campos contienen un valor" });
         }
         const userID = user.id;
         const isAvailable = yield (0, Availability_1.isAttendantAvailable)(attendantID, date);
@@ -604,7 +596,7 @@ const createTurn = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         }
         const turns = { date, place, userID, attendantID, comments };
         yield Turns_1.default.create(turns);
-        return res.status(200).json("Turn created successfully");
+        return res.status(200).json("Turno creado con exito");
     }
     catch (error) {
         return res.status(500).json({ message: error });
@@ -617,23 +609,22 @@ const attendantCreateTurn = (req, res) => __awaiter(void 0, void 0, void 0, func
         if (!user) {
             return res
                 .status(401)
-                .json({ message: "No tenes permiso a realizar estas acciones." });
+                .json({ message: "No tiene permiso para ver esta información" });
         }
         let { userID, date, place, comments } = req.body;
         if (!validateTurn(userID, date, place)) {
             return res
                 .status(400)
-                .json({ message: "No todos los campos contienen un valor." });
+                .json({ message: "No todos los campos contienen un valor" });
         }
         const attendantID = user.id;
-        const localDate = new Date(date.getFullYear(), date.getMonth(), date.getDate(), date.getHours(), date.getMinutes());
         const isAvailable = yield (0, Availability_1.isAttendantAvailable)(attendantID, date);
         if (!(isAvailable === null || isAvailable === void 0 ? void 0 : isAvailable.available)) {
             return res.status(304).json((isAvailable === null || isAvailable === void 0 ? void 0 : isAvailable.message) || "Not available");
         }
         const turns = { date, place, userID, attendantID, comments };
         yield Turns_1.default.create(turns);
-        return res.status(200).json("Turn created successfully");
+        return res.status(200).json("Turno creado con exito");
     }
     catch (error) {
         return res.status(500).json({ message: error });
@@ -660,18 +651,18 @@ const addCommentsAdmin = (req, res) => __awaiter(void 0, void 0, void 0, functio
         if (!user) {
             return res
                 .status(401)
-                .json({ message: "No tenes permiso a realizar estas acciones." });
+                .json({ message: "No tiene permiso para ver esta información" });
         }
         const { comments } = req.body;
         const { turnID } = req.params;
         if (!turnID) {
             return res
                 .status(400)
-                .json({ message: "No todos los campos contienen un valor." });
+                .json({ message: "No todos los campos contienen un valor" });
         }
         let turn = yield Turns_1.default.findByPk(turnID);
         if (!turn) {
-            return res.status(404).json({ message: "Turno no encontrado." });
+            return res.status(404).json({ message: "No se encontró el turno" });
         }
         if (typeof comments !== "string") {
             return res
@@ -680,7 +671,7 @@ const addCommentsAdmin = (req, res) => __awaiter(void 0, void 0, void 0, functio
         }
         turn.comments = comments;
         yield turn.save();
-        return res.status(200).json("Turn created successfully");
+        return res.status(200).json("Turno creado con exito");
     }
     catch (error) {
         return res.status(500).json({ message: error });
@@ -693,18 +684,18 @@ const cancelTurn = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         if (!user) {
             return res
                 .status(401)
-                .json({ message: "No tenes permiso a realizar estas acciones." });
+                .json({ message: "No tiene permiso para ver esta información" });
         }
         if (user.role === UserRole_1.UserRole.CLIENT) {
             return res
                 .status(401)
-                .json({ message: "No tenes permiso a realizar estas acciones." });
+                .json({ message: "No tiene permiso para ver esta información" });
         }
         let { id } = req.params;
         if (!id) {
             return res
                 .status(400)
-                .json({ message: "No todos los campos contienen un valor." });
+                .json({ message: "No todos los campos contienen un valor" });
         }
         const turn = yield Turns_1.default.findByPk(id);
         if (!turn) {
@@ -716,8 +707,8 @@ const cancelTurn = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
             });
         }
         turn.set("status", "canceled");
-        yield turn.save(); // No olvides guardar los cambios
-        return res.status(200).json({ message: "Canceled successfully" });
+        yield turn.save();
+        return res.status(200).json({ message: "Turno cancelado con exito" });
     }
     catch (error) {
         return res.status(500).json({ message: error });
@@ -730,22 +721,22 @@ const completeTurn = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         if (!user) {
             return res
                 .status(401)
-                .json({ message: "No tenes permiso a realizar estas acciones." });
+                .json({ message: "No tiene permiso para ver esta información" });
         }
         if (user.role === UserRole_1.UserRole.CLIENT) {
             return res
                 .status(401)
-                .json({ message: "No tenes permiso a realizar estas acciones." });
+                .json({ message: "No tiene permiso para ver esta información" });
         }
         let { id } = req.params;
         if (!id) {
             return res
                 .status(400)
-                .json({ message: "No todos los campos contienen un valor." });
+                .json({ message: "No todos los campos contienen un valor" });
         }
         const turn = yield Turns_1.default.findByPk(id);
         if (!turn) {
-            return res.status(404).json({ message: "Turn not found." });
+            return res.status(404).json({ message: "No se encontró el turno" });
         }
         if (turn.getDataValue("status") !== "scheduled") {
             return res.status(401).json({
@@ -754,7 +745,7 @@ const completeTurn = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         }
         turn.set("status", "completed");
         yield turn.save();
-        return res.status(200).json({ message: "completed successfully" });
+        return res.status(200).json({ message: "Turno completado con exito" });
     }
     catch (error) {
         return res.status(500).json({ message: error });

@@ -30,13 +30,13 @@ const getUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         if (userAux) {
             return res
                 .status(401)
-                .json({ message: "You are not allowed to enter here." });
+                .json({ message: "No tiene permiso para ver esta información" });
         }
         const { id } = req.params;
         // Paso 1: obtenemos el usuario sin relaciones para saber su rol
         const user = yield associations_1.Users.findByPk(id);
         if (!user) {
-            return res.status(404).json({ message: "Usuario no encontrado" });
+            return res.status(404).json({ message: "No se encontró el usuario" });
         }
         // Paso 2: armamos el include según su rol
         const include = [
@@ -99,7 +99,7 @@ const getActiveAttendants = (req, res) => __awaiter(void 0, void 0, void 0, func
         if (!activeAttendants || activeAttendants.length === 0) {
             return res
                 .status(404)
-                .json({ message: "No active attendants at the moment" });
+                .json({ message: "No se encontraron doctores activos" });
         }
         return res.json(activeAttendants);
     }
@@ -116,7 +116,7 @@ const getInactiveAttendants = (req, res) => __awaiter(void 0, void 0, void 0, fu
         if (!inactiveAttendants) {
             return res
                 .status(404)
-                .json({ message: "No inactive attendants at the moment" });
+                .json({ message: "No se encontraron doctores inactivos" });
         }
         return res.json(inactiveAttendants);
     }
@@ -131,7 +131,7 @@ const getAllAttendants = (req, res) => __awaiter(void 0, void 0, void 0, functio
             where: { role: UserRole_1.UserRole.ATTENDANT },
         });
         if (!allAttendants) {
-            return res.status(404).json({ message: "No attendants at the moment" });
+            return res.status(404).json({ message: "No se encontraron doctores" });
         }
         return res.json(allAttendants);
     }
@@ -146,17 +146,17 @@ const getUsersByAdmin = (req, res) => __awaiter(void 0, void 0, void 0, function
         if ((userLogged === null || userLogged === void 0 ? void 0 : userLogged.role) !== UserRole_1.UserRole.ADMIN) {
             return res
                 .status(401)
-                .json({ message: "No tiene autorización para acceder a estos datos" });
+                .json({ message: "No tiene permiso para ver esta información" });
         }
         const { userRole, userStatus } = req.params;
         if (!userRole) {
             return res
                 .status(400)
-                .json({ message: "Faltan parametros en la petición" });
+                .json({ message: "No todos los campos contienen un valor" });
         }
         if (typeof userRole !== "string" ||
             (userStatus && typeof userStatus !== "string")) {
-            return res.status(400).json({ message: "Parametros mal formulados" });
+            return res.status(400).json({ message: "Error en la carga de datos" });
         }
         const where = { role: userRole };
         const include = [
@@ -175,7 +175,7 @@ const getUsersByAdmin = (req, res) => __awaiter(void 0, void 0, void 0, function
             include,
         });
         if (!users) {
-            return res.status(404).json({ message: "No users found at the moment" });
+            return res.status(404).json({ message: "No se encontraron usuarios" });
         }
         return res.json(users);
     }
@@ -190,18 +190,18 @@ const SetActiveAttendants = (req, res) => __awaiter(void 0, void 0, void 0, func
         if (!user) {
             return res
                 .status(401)
-                .json({ message: "You're not allowed to see this information." });
+                .json({ message: "No tiene permiso para ver esta información" });
         }
         if (user.role !== UserRole_1.UserRole.ADMIN) {
             return res
                 .status(401)
-                .json({ message: "You're not allowed to see this information." });
+                .json({ message: "No tiene permiso para ver esta información" });
         }
         const { id } = req.params;
         if (!id) {
             return res
                 .status(400)
-                .json({ message: "Not all fields contains a value" });
+                .json({ message: "No todos los campos contienen un valor" });
         }
         const activeAttendant = yield associations_1.Users.findOne({
             where: { id: id, role: UserRole_1.UserRole.ATTENDANT, status: UserStatus_1.UserStatus.INACTIVE },
@@ -209,11 +209,11 @@ const SetActiveAttendants = (req, res) => __awaiter(void 0, void 0, void 0, func
         if (!activeAttendant) {
             return res
                 .status(404)
-                .json({ message: "No attendant matches this requirements" });
+                .json({ message: "No se encontró un medico con estos parametros" });
         }
         activeAttendant.set("status", UserStatus_1.UserStatus.ACTIVE);
         yield activeAttendant.save();
-        return res.json({ message: "Attendant set to active" });
+        return res.json({ message: "El estado del médico es ahora activo" });
     }
     catch (error) {
         return res.status(500).json({ message: error });
@@ -226,18 +226,18 @@ const SetInactiveAttendants = (req, res) => __awaiter(void 0, void 0, void 0, fu
         if (!user) {
             return res
                 .status(401)
-                .json({ message: "You're not allowed to see this information." });
+                .json({ message: "No tiene permiso para ver esta información" });
         }
         if (user.role !== UserRole_1.UserRole.ADMIN) {
             return res
                 .status(401)
-                .json({ message: "You're not allowed to see this information." });
+                .json({ message: "No tiene permiso para ver esta información" });
         }
         const { id } = req.params;
         if (!id) {
             return res
                 .status(400)
-                .json({ message: "Not all fields contains a value" });
+                .json({ message: "No todos los campos contienen un valor" });
         }
         const activeAttendant = yield associations_1.Users.findOne({
             where: { id: id, role: UserRole_1.UserRole.ATTENDANT, status: UserStatus_1.UserStatus.ACTIVE },
@@ -245,11 +245,11 @@ const SetInactiveAttendants = (req, res) => __awaiter(void 0, void 0, void 0, fu
         if (!activeAttendant) {
             return res
                 .status(404)
-                .json({ message: "No attendant matches this requirements" });
+                .json({ message: "No se encontró un medico con estos parametros" });
         }
         activeAttendant.set("status", UserStatus_1.UserStatus.INACTIVE);
         yield activeAttendant.save();
-        return res.json({ message: "Attendant set to inactive" });
+        return res.json({ message: "El estado del médico es ahora inactivo" });
     }
     catch (error) {
         return res.status(500).json({ message: error });
@@ -262,18 +262,18 @@ const getUserByName = (req, res) => __awaiter(void 0, void 0, void 0, function* 
         if (!user) {
             return res
                 .status(400)
-                .json({ message: "You're not allowed to see this information." });
+                .json({ message: "No tiene permiso para ver esta información" });
         }
         if (user.role === UserRole_1.UserRole.CLIENT) {
             return res
                 .status(400)
-                .json({ message: "You're not allowed to see this information." });
+                .json({ message: "No tiene permiso para ver esta información" });
         }
         const { username } = req.params;
         const fullName = decodeURIComponent(username);
         const UserAux = yield associations_1.Users.findOne({ where: { fullName: fullName } });
         if (!UserAux) {
-            return res.status(404).json({ message: "Error, User not found" });
+            return res.status(404).json({ message: "No se encontró el usuario" });
         }
         return res.json(UserAux);
     }
@@ -288,7 +288,7 @@ const getAttendantsBySocialwork = (req, res) => __awaiter(void 0, void 0, void 0
         if (!socialworkID) {
             return res
                 .status(400)
-                .json({ message: "Not all fields contains a value" });
+                .json({ message: "No todos los campos contienen un valor" });
         }
         const attendants = yield associations_1.Users.findAll({
             where: { role: UserRole_1.UserRole.ATTENDANT, status: UserStatus_1.UserStatus.ACTIVE },
@@ -309,7 +309,7 @@ const getAttendantsBySocialwork = (req, res) => __awaiter(void 0, void 0, void 0
         });
         if (!attendants) {
             return res.status(404).json({
-                message: "No attendants at the moment with the current social work",
+                message: "No se encontraron medicos con estos parametros",
             });
         }
         return res.json(attendants);
@@ -325,10 +325,10 @@ const getAdminUsersBySocialwork = (req, res) => __awaiter(void 0, void 0, void 0
         if (!socialworkID || !userRole) {
             return res
                 .status(400)
-                .json({ message: "Not all fields contains a value" });
+                .json({ message: "No todos los campos contienen un valor" });
         }
         if (typeof socialworkID !== "string" || typeof userRole !== "string") {
-            return res.status(400).json({ message: "Parametros mal formulados" });
+            return res.status(400).json({ message: "Error en la carga de datos" });
         }
         const where = { role: userRole, socialworkID: socialworkID };
         if (userStatus !== "Todos") {
@@ -345,7 +345,7 @@ const getAdminUsersBySocialwork = (req, res) => __awaiter(void 0, void 0, void 0
         });
         if (!users) {
             return res.status(404).json({
-                message: "No users at the moment with the current social work",
+                message: "No se encontraron medicos con estos parametros",
             });
         }
         return res.json(users);
@@ -358,9 +358,7 @@ exports.getAdminUsersBySocialwork = getAdminUsersBySocialwork;
 const postUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const loggedUser = yield getUserLogged(req);
     if (loggedUser && loggedUser.role !== UserRole_1.UserRole.ADMIN) {
-        return res
-            .status(304)
-            .json({ message: "Error, user is already logged in." });
+        return res.status(304).json({ message: "Ya hay un usuario logueado" });
     }
     try {
         let newUser = JSON.parse(req.body.body);
@@ -391,7 +389,7 @@ const postUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                 imageWithoutBg = yield removeBackground(file);
                 if (!imageWithoutBg) {
                     return res.status(500).json({
-                        message: "Error removing background from the image",
+                        message: "Error eliminando el fondo de la imagen",
                     });
                 }
             }
@@ -411,7 +409,7 @@ const postUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         user.profileImage = imageUrl;
         yield associations_1.Users.create(user);
         return res.json({
-            message: `User successfully created`,
+            message: `Usuario creado con exito`,
         });
     }
     catch (err) {
@@ -451,7 +449,7 @@ const modifyUserByAdmin = (req, res) => __awaiter(void 0, void 0, void 0, functi
         let user = newUser;
         yield associations_1.Users.update({ status: user.status, role: user.role, speciality: user.speciality }, { where: { id: user.id } });
         return res.json({
-            message: `User successfully modified`,
+            message: `Usuario modificado con exito`,
         });
     }
     catch (error) {
@@ -513,7 +511,7 @@ const modifyUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
             createCookies(user, res);
         }
         return res.json({
-            message: `User successfully modified`,
+            message: `Usuario modificado con exito`,
         });
     }
     catch (err) {
@@ -533,7 +531,7 @@ function uploadProfilePicture(file, isRemoveBackground) {
             if (removeBackgroundFilter) {
                 imageWithoutBg = yield removeBackground(file);
                 if (!imageWithoutBg) {
-                    throw new Error("Error removing background from the image");
+                    throw new Error("Error quitando fondo de la imagen");
                 }
             }
             imageUrl = imageWithoutBg
@@ -641,7 +639,7 @@ const recoverPassword = (req, res) => __awaiter(void 0, void 0, void 0, function
     try {
         const { email } = req.params;
         if (!email) {
-            return res.status(400).json("Not all fields contains a value");
+            return res.status(400).json("No todos los campos contienen un valor");
         }
         const UserAux = yield associations_1.Users.scope("withAll").findOne({
             where: { email: email },
@@ -650,7 +648,7 @@ const recoverPassword = (req, res) => __awaiter(void 0, void 0, void 0, function
             return res.json(UserAux);
         }
         else {
-            return res.status(404).json({ message: "Error, User not found" });
+            return res.status(404).json({ message: "No se encontró el usuario" });
         }
     }
     catch (error) {
@@ -662,7 +660,7 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { email, password } = req.body;
         if (!email || !password) {
-            return res.status(400).json("Not all fields contains a value");
+            return res.status(400).json("No todos los campos contienen un valor");
         }
         const userAux = yield loginCheck(email, password);
         if (userAux != null) {

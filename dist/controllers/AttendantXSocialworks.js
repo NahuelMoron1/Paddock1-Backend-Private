@@ -25,12 +25,12 @@ const postAttendantXSocialwork = (req, res) => __awaiter(void 0, void 0, void 0,
         if (!user) {
             return res
                 .status(401)
-                .json({ message: "You're not allowed to see this information." });
+                .json({ message: "No tiene permiso para ver esta información" });
         }
         if (user.role !== UserRole_1.UserRole.ATTENDANT) {
             return res
                 .status(401)
-                .json({ message: "You're not allowed to see this information." });
+                .json({ message: "No tiene permiso para ver esta información" });
         }
         const body = req.body;
         if (!body.attendantID ||
@@ -62,12 +62,12 @@ const deleteAttendantXSocialwork = (req, res) => __awaiter(void 0, void 0, void 
         if (!user) {
             return res
                 .status(401)
-                .json({ message: "You're not allowed to see this information." });
+                .json({ message: "No tiene permiso para ver esta información" });
         }
         if (user.role !== UserRole_1.UserRole.ATTENDANT) {
             return res
                 .status(401)
-                .json({ message: "You're not allowed to see this information." });
+                .json({ message: "No tiene permiso para ver esta información" });
         }
         const { attendantID, socialworkID } = req.params;
         if (!attendantID ||
@@ -76,20 +76,20 @@ const deleteAttendantXSocialwork = (req, res) => __awaiter(void 0, void 0, void 
             typeof socialworkID !== "string") {
             return res
                 .status(400)
-                .json({ message: "Not all fields contains a value." });
+                .json({ message: "No todos los campos contienen un valor" });
         }
         const attendantXSocialworkToDelete = yield associations_1.AttendantXSocialworks.findOne({
             where: { attendantID: attendantID, socialworkID: socialworkID },
         });
         if (!attendantXSocialworkToDelete) {
             return res.status(404).json({
-                message: "Cannot delete: we didn't found this attendantXSocialwork",
+                message: "No se encontró esta información",
             });
         }
         yield attendantXSocialworkToDelete.destroy();
         return res
             .status(200)
-            .json({ message: "attendantXSocialwork deleted successfully" });
+            .json({ message: "Información borrada correctamente" });
     }
     catch (error) {
         return res.status(500).json({ message: error });

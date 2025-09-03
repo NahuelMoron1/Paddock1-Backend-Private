@@ -26,7 +26,7 @@ const getAttendantReviews = (req, res) => __awaiter(void 0, void 0, void 0, func
         if (!attendantID) {
             return res
                 .status(400)
-                .json({ message: "Not all fields contains a value" });
+                .json({ message: "No todos los campos contienen un valor" });
         }
         const reviewsAux = yield Reviews_1.default.findAll({
             where: { attendantID: attendantID },
@@ -39,7 +39,9 @@ const getAttendantReviews = (req, res) => __awaiter(void 0, void 0, void 0, func
             ],
         });
         if (!reviewsAux) {
-            return res.status(404).json({ message: "No reviews found" });
+            return res
+                .status(404)
+                .json({ message: "No se encontraron calificaciones" });
         }
         return res.json(reviewsAux);
     }
@@ -54,7 +56,7 @@ const getUserReviews = (req, res) => __awaiter(void 0, void 0, void 0, function*
         if (!userID) {
             return res
                 .status(400)
-                .json({ message: "Not all fields contains a value" });
+                .json({ message: "No todos los campos contienen un valor" });
         }
         const reviewsAux = yield Reviews_1.default.findAll({
             where: { userID: userID },
@@ -72,7 +74,9 @@ const getUserReviews = (req, res) => __awaiter(void 0, void 0, void 0, function*
             ],
         });
         if (!reviewsAux) {
-            return res.status(404).json({ message: "No reviews found" });
+            return res
+                .status(404)
+                .json({ message: "No se encontraron calificaciones" });
         }
         return res.json(reviewsAux);
     }
@@ -87,13 +91,15 @@ const getUserReview = (req, res) => __awaiter(void 0, void 0, void 0, function* 
         if (!userID || !attendantID) {
             return res
                 .status(400)
-                .json({ message: "Not all fields contains a value" });
+                .json({ message: "No todos los campos contienen un valor" });
         }
         const reviewsAux = yield Reviews_1.default.findOne({
             where: { userID: userID, attendantID: attendantID },
         });
         if (!reviewsAux) {
-            return res.status(404).json({ message: "No review found" });
+            return res
+                .status(404)
+                .json({ message: "No se encontró la calificación" });
         }
         return res.json(reviewsAux);
     }
@@ -108,18 +114,18 @@ const setAttendantReview = (req, res) => __awaiter(void 0, void 0, void 0, funct
         if (!user) {
             return res
                 .status(401)
-                .json({ message: "You're not allowed to see this information." });
+                .json({ message: "No tiene permiso para ver esta información" });
         }
         const { attendantID, rating, comment } = req.body;
         if (!validateReview(attendantID, rating, comment)) {
             return res
                 .status(400)
-                .json({ message: "Not all fields contains a value" });
+                .json({ message: "No todos los campos contienen un valor" });
         }
         if (user.role !== UserRole_1.UserRole.CLIENT) {
-            return res
-                .status(304)
-                .json({ message: "Cannot set a review if you are admin or attendant" });
+            return res.status(304).json({
+                message: "No podes agregar una calificación si sos parte del personal",
+            });
         }
         const userID = user.id;
         const date = new Date();
@@ -144,7 +150,7 @@ const modifyReview = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         if (!user) {
             return res
                 .status(401)
-                .json({ message: "You're not allowed to see this information." });
+                .json({ message: "No tiene permiso para ver esta información" });
         }
         const review = req.body;
         if (!validateReview(review.attendantID, review.rating, review.comment) ||
@@ -155,7 +161,7 @@ const modifyReview = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         }
         if (user.role !== UserRole_1.UserRole.CLIENT) {
             return res.status(304).json({
-                message: "Cannot modify a review if you are admin or attendant",
+                message: "No podes modificar una calificación si sos parte del personal",
             });
         }
         const reviewToDelete = yield Reviews_1.default.findByPk(review.id);
@@ -198,27 +204,29 @@ const deleteAttendantReview = (req, res) => __awaiter(void 0, void 0, void 0, fu
         if (!user) {
             return res
                 .status(401)
-                .json({ message: "You're not allowed to see this information." });
+                .json({ message: "No tiene permiso para ver esta información" });
         }
         const { id } = req.params;
         if (!id) {
             return res
                 .status(400)
-                .json({ message: "Not all fields contains a value." });
+                .json({ message: "No todos los campos contienen un valor." });
         }
         const reviewToDelete = yield Reviews_1.default.findByPk(id);
         if (!reviewToDelete) {
-            return res.status(404).json({ message: "Review not found" });
+            return res
+                .status(404)
+                .json({ message: "No se encontró la calificación" });
         }
         if (reviewToDelete.getDataValue("userID") !== user.id) {
             return res
                 .status(401)
-                .json({ message: "You're not allowed to see this information." });
+                .json({ message: "No tiene permiso para ver esta información" });
         }
         yield reviewToDelete.destroy();
         return res
             .status(200)
-            .send({ message: "Review successfully deleted by user" });
+            .send({ message: "Calificación eliminada con exito" });
     }
     catch (error) {
         return res.status(500).json({ message: error });

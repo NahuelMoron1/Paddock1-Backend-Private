@@ -25,9 +25,9 @@ const getActiveSocialworks = (req, res) => __awaiter(void 0, void 0, void 0, fun
             where: { active: true },
         });
         if (!activeSocialworks) {
-            return res
-                .status(404)
-                .json({ message: "No active attendants at the moment" });
+            return res.status(404).json({
+                message: "No hay obras sociales para mostrar hasta el momento",
+            });
         }
         return res.json(activeSocialworks);
     }
@@ -42,9 +42,9 @@ const getinActiveSocialworks = (req, res) => __awaiter(void 0, void 0, void 0, f
             where: { active: false },
         });
         if (!inactiveSocialworks) {
-            return res
-                .status(404)
-                .json({ message: "No active attendants at the moment" });
+            return res.status(404).json({
+                message: "No hay obras sociales para mostrar hasta el momento",
+            });
         }
         return res.json(inactiveSocialworks);
     }
@@ -62,9 +62,9 @@ const getAllSocialworks = (req, res) => __awaiter(void 0, void 0, void 0, functi
             ],
         });
         if (!allSocialworks) {
-            return res
-                .status(404)
-                .json({ message: "No active attendants at the moment" });
+            return res.status(404).json({
+                message: "No hay obras sociales para mostrar hasta el momento",
+            });
         }
         return res.json(allSocialworks);
     }
@@ -79,30 +79,28 @@ const SetActiveSocialwork = (req, res) => __awaiter(void 0, void 0, void 0, func
         if (!user) {
             return res
                 .status(401)
-                .json({ message: "You're not allowed to see this information." });
+                .json({ message: "No tiene permiso para ver esta información" });
         }
         if (user.role !== UserRole_1.UserRole.ADMIN) {
             return res
                 .status(401)
-                .json({ message: "You're not allowed to see this information." });
+                .json({ message: "No tiene permiso para ver esta información" });
         }
         const { id } = req.params;
         if (!id) {
             return res.status(400).json({
-                message: "Not all fields contains a value.",
+                message: "No todos los campos contienen un valor",
             });
         }
         const activeSocialwork = yield associations_1.Socialworks.findOne({
             where: { id: id, active: false },
         });
         if (!activeSocialwork) {
-            return res
-                .status(404)
-                .json({ message: "No social work matches this requirements" });
+            return res.status(404).json({ message: "No se encontró la obra social" });
         }
         activeSocialwork.set("active", true);
         yield activeSocialwork.save();
-        return res.json({ message: "Social work set to active" });
+        return res.json({ message: "El estado de la obra social es ahora activo" });
     }
     catch (error) {
         return res.status(500).json({ message: error });
@@ -115,30 +113,30 @@ const SetinActiveSocialwork = (req, res) => __awaiter(void 0, void 0, void 0, fu
         if (!user) {
             return res
                 .status(401)
-                .json({ message: "You're not allowed to see this information." });
+                .json({ message: "No tiene permiso para ver esta información" });
         }
         if (user.role !== UserRole_1.UserRole.ADMIN) {
             return res
                 .status(401)
-                .json({ message: "You're not allowed to see this information." });
+                .json({ message: "No tiene permiso para ver esta información" });
         }
         const { id } = req.params;
         if (!id) {
             return res.status(400).json({
-                message: "Not all fields contains a value.",
+                message: "No todos los campos contienen un valor",
             });
         }
         const inactiveSocialwork = yield associations_1.Socialworks.findOne({
             where: { id: id, active: true },
         });
         if (!inactiveSocialwork) {
-            return res
-                .status(404)
-                .json({ message: "No social work matches this requirements" });
+            return res.status(404).json({ message: "No se encontró la obra social" });
         }
         inactiveSocialwork.set("active", false);
         yield inactiveSocialwork.save();
-        return res.json({ message: "Social work set to active" });
+        return res.json({
+            message: "El estado de la obra social es ahora inactivo",
+        });
     }
     catch (error) {
         return res.status(500).json({ message: error });
@@ -150,7 +148,7 @@ const getSocialworkByAttendant = (req, res) => __awaiter(void 0, void 0, void 0,
         const { attendantID } = req.params;
         if (!attendantID) {
             return res.status(400).json({
-                message: "Not all fields contains a value.",
+                message: "No todos los campos contienen un valor",
             });
         }
         const socialworks = yield associations_1.Socialworks.findAll({
@@ -164,7 +162,7 @@ const getSocialworkByAttendant = (req, res) => __awaiter(void 0, void 0, void 0,
         });
         if (!socialworks) {
             return res.status(404).json({
-                message: "No attendants at the moment with the current social work",
+                message: "No se encontró esta información",
             });
         }
         return res.json(socialworks);
@@ -179,7 +177,7 @@ const getSocialworkByAttendantModify = (req, res) => __awaiter(void 0, void 0, v
         const { attendantID } = req.params;
         if (!attendantID) {
             return res.status(400).json({
-                message: "Not all fields contains a value.",
+                message: "No todos los campos contienen un valor",
             });
         }
         const socialworks = yield associations_1.Socialworks.findAll({
@@ -192,7 +190,7 @@ const getSocialworkByAttendantModify = (req, res) => __awaiter(void 0, void 0, v
         });
         if (!socialworks) {
             return res.status(404).json({
-                message: "No attendants at the moment with the current social work",
+                message: "No se encontró esta información",
             });
         }
         return res.json(socialworks);
@@ -208,12 +206,12 @@ const postSocialwork = (req, res) => __awaiter(void 0, void 0, void 0, function*
         if (!user) {
             return res
                 .status(401)
-                .json({ message: "You're not allowed to see this information." });
+                .json({ message: "No tiene permiso para ver esta información" });
         }
         if (user.role !== UserRole_1.UserRole.ADMIN) {
             return res
                 .status(401)
-                .json({ message: "You're not allowed to see this information." });
+                .json({ message: "No tiene permiso para ver esta información" });
         }
         const body = req.body;
         if (!body.name ||

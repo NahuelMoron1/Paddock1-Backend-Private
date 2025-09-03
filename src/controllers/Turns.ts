@@ -17,7 +17,7 @@ export const getAllUserTurns = async (req: Request, res: Response) => {
     if (!user) {
       return res
         .status(401)
-        .json({ message: "No tenes permiso a realizar estas acciones." });
+        .json({ message: "No tiene permiso para ver esta información" });
     }
 
     const turns = await Turns.findAll({
@@ -44,7 +44,7 @@ export const getAllUserTurns = async (req: Request, res: Response) => {
     });
 
     if (!turns) {
-      return res.status(404).json({ message: "Error, turns not found" });
+      return res.status(404).json({ message: "No se encontraron turnos" });
     }
 
     return res.json(turns);
@@ -60,7 +60,7 @@ export const getScheduledUserTurns = async (req: Request, res: Response) => {
     if (!user) {
       return res
         .status(401)
-        .json({ message: "No tenes permiso a realizar estas acciones." });
+        .json({ message: "No tiene permiso para ver esta información" });
     }
 
     const turns = await Turns.findAll({
@@ -87,7 +87,7 @@ export const getScheduledUserTurns = async (req: Request, res: Response) => {
     });
 
     if (!turns) {
-      return res.status(404).json({ message: "Error, turns not found" });
+      return res.status(404).json({ message: "No se encontraron turnos" });
     }
 
     return res.json(turns);
@@ -103,7 +103,7 @@ export const getCompletedUserTurns = async (req: Request, res: Response) => {
     if (!user) {
       return res
         .status(401)
-        .json({ message: "No tenes permiso a realizar estas acciones." });
+        .json({ message: "No tiene permiso para ver esta información" });
     }
 
     const turns = await Turns.findAll({
@@ -130,7 +130,7 @@ export const getCompletedUserTurns = async (req: Request, res: Response) => {
     });
 
     if (!turns) {
-      return res.status(404).json({ message: "Error, turns not found" });
+      return res.status(404).json({ message: "No se encontraron turnos" });
     }
 
     return res.json(turns);
@@ -146,7 +146,7 @@ export const getCanceledUserTurns = async (req: Request, res: Response) => {
     if (!user) {
       return res
         .status(401)
-        .json({ message: "No tenes permiso a realizar estas acciones." });
+        .json({ message: "No tiene permiso para ver esta información" });
     }
 
     const turns = await Turns.findAll({
@@ -173,7 +173,7 @@ export const getCanceledUserTurns = async (req: Request, res: Response) => {
     });
 
     if (!turns) {
-      return res.status(404).json({ message: "Error, turns not found" });
+      return res.status(404).json({ message: "No se encontraron turnos" });
     }
 
     return res.json(turns);
@@ -189,7 +189,7 @@ export const getNotScheduledUserTurns = async (req: Request, res: Response) => {
     if (!user) {
       return res
         .status(401)
-        .json({ message: "No tenes permiso a realizar estas acciones." });
+        .json({ message: "No tiene permiso para ver esta información" });
     }
 
     const turns = await Turns.findAll({
@@ -219,7 +219,7 @@ export const getNotScheduledUserTurns = async (req: Request, res: Response) => {
     });
 
     if (!turns) {
-      return res.status(404).json({ message: "Error, turns not found" });
+      return res.status(404).json({ message: "No se encontraron turnos" });
     }
 
     return res.json(turns);
@@ -235,7 +235,7 @@ export const getScheduledAdminTurns = async (req: Request, res: Response) => {
     if (!user || user.role !== UserRole.ADMIN) {
       return res
         .status(401)
-        .json({ message: "No tenes permiso a realizar estas acciones." });
+        .json({ message: "No tiene permiso para ver esta información" });
     }
 
     const turns = await Turns.findAll({
@@ -262,7 +262,7 @@ export const getScheduledAdminTurns = async (req: Request, res: Response) => {
     });
 
     if (!turns) {
-      return res.status(404).json({ message: "Error, turns not found" });
+      return res.status(404).json({ message: "No se encontraron turnos" });
     }
 
     return res.json(turns);
@@ -278,7 +278,7 @@ export const getCompletedAdminTurns = async (req: Request, res: Response) => {
     if (!user || user.role !== UserRole.ADMIN) {
       return res
         .status(401)
-        .json({ message: "No tenes permiso a realizar estas acciones." });
+        .json({ message: "No tiene permiso para ver esta información" });
     }
 
     const turns = await Turns.findAll({
@@ -305,7 +305,7 @@ export const getCompletedAdminTurns = async (req: Request, res: Response) => {
     });
 
     if (!turns) {
-      return res.status(404).json({ message: "Error, turns not found" });
+      return res.status(404).json({ message: "No se encontraron turnos" });
     }
 
     return res.json(turns);
@@ -321,7 +321,7 @@ export const getCanceledAdminTurns = async (req: Request, res: Response) => {
     if (!user || user.role !== UserRole.ADMIN) {
       return res
         .status(401)
-        .json({ message: "No tenes permiso a realizar estas acciones." });
+        .json({ message: "No tiene permiso para ver esta información" });
     }
 
     const turns = await Turns.findAll({
@@ -348,7 +348,7 @@ export const getCanceledAdminTurns = async (req: Request, res: Response) => {
     });
 
     if (!turns) {
-      return res.status(404).json({ message: "Error, turns not found" });
+      return res.status(404).json({ message: "No se encontraron turnos" });
     }
 
     return res.json(turns);
@@ -364,7 +364,7 @@ export const getAllAttendantTurns = async (req: Request, res: Response) => {
     if (!user) {
       return res
         .status(401)
-        .json({ message: "No tenes permiso a realizar estas acciones." });
+        .json({ message: "No tiene permiso para ver esta información" });
     }
 
     const turns = await Turns.findAll({
@@ -391,7 +391,7 @@ export const getAllAttendantTurns = async (req: Request, res: Response) => {
     });
 
     if (!turns) {
-      return res.status(404).json({ message: "Error, turns not found" });
+      return res.status(404).json({ message: "No se encontraron turnos" });
     }
 
     return res.json(turns);
@@ -436,13 +436,6 @@ function validateParametersAvailability(
   return true;
 }
 
-/*function parseHourToNumber(hourStr: string): number {
-  if (typeof hourStr !== "string") return NaN;
-  const [hours, minutes] = hourStr.split(":").map(Number);
-  if (isNaN(hours) || isNaN(minutes)) return NaN;
-  return hours + minutes / 60;
-}*/
-
 export const getAttendantTurnsByDate = async (req: Request, res: Response) => {
   try {
     const user = await getUserLogged(req);
@@ -450,14 +443,12 @@ export const getAttendantTurnsByDate = async (req: Request, res: Response) => {
     if (!user) {
       return res
         .status(401)
-        .json({ message: "No tenes permiso a realizar estas acciones." });
+        .json({ message: "No tiene permiso para ver esta información" });
     }
 
     const { attendantID } = req.params;
     let { startHour, endHour, date } = req.body;
 
-    //startHour = parseHourToNumber(startHour); // → 8
-    //endHour = parseHourToNumber(endHour); // → 17
     date = new Date(date);
 
     if (!attendantID || !startHour || !endHour || !date) {
@@ -485,7 +476,7 @@ export const getAttendantTurnsByDate = async (req: Request, res: Response) => {
     });
 
     if (!turns) {
-      return res.status(404).json({ message: "Error, turns not found" });
+      return res.status(404).json({ message: "No se encontraron turnos" });
     }
 
     const availableHours = hasAvailableHour(startHour, endHour, turns);
@@ -507,7 +498,7 @@ export const getScheduledAttendantTurns = async (
     if (!user) {
       return res
         .status(401)
-        .json({ message: "No tenes permiso a realizar estas acciones." });
+        .json({ message: "No tiene permiso para ver esta información" });
     }
 
     const turns = await Turns.findAll({
@@ -534,7 +525,7 @@ export const getScheduledAttendantTurns = async (
     });
 
     if (!turns) {
-      return res.status(404).json({ message: "Error, turns not found" });
+      return res.status(404).json({ message: "No se encontraron turnos" });
     }
 
     return res.json(turns);
@@ -553,7 +544,7 @@ export const getCompletedAttendantTurns = async (
     if (!user) {
       return res
         .status(401)
-        .json({ message: "No tenes permiso a realizar estas acciones." });
+        .json({ message: "No tiene permiso para ver esta información" });
     }
 
     const turns = await Turns.findAll({
@@ -580,7 +571,7 @@ export const getCompletedAttendantTurns = async (
     });
 
     if (!turns) {
-      return res.status(404).json({ message: "Error, turns not found" });
+      return res.status(404).json({ message: "No se encontraron turnos" });
     }
 
     return res.json(turns);
@@ -599,7 +590,7 @@ export const getCanceledAttendantTurns = async (
     if (!user) {
       return res
         .status(401)
-        .json({ message: "No tenes permiso a realizar estas acciones." });
+        .json({ message: "No tiene permiso para ver esta información" });
     }
 
     const turns = await Turns.findAll({
@@ -626,7 +617,7 @@ export const getCanceledAttendantTurns = async (
     });
 
     if (!turns) {
-      return res.status(404).json({ message: "Error, turns not found" });
+      return res.status(404).json({ message: "No se encontraron turnos" });
     }
 
     return res.json(turns);
@@ -642,7 +633,7 @@ export const createTurn = async (req: Request, res: Response) => {
     if (!user) {
       return res
         .status(401)
-        .json({ message: "No tenes permiso a realizar estas acciones." });
+        .json({ message: "No tiene permiso para ver esta información" });
     }
 
     let { attendantID, date, place, comments } = req.body;
@@ -650,7 +641,7 @@ export const createTurn = async (req: Request, res: Response) => {
     if (!validateTurn(attendantID, date, place)) {
       return res
         .status(400)
-        .json({ message: "No todos los campos contienen un valor." });
+        .json({ message: "No todos los campos contienen un valor" });
     }
 
     const userID = user.id;
@@ -666,7 +657,7 @@ export const createTurn = async (req: Request, res: Response) => {
     const turns = { date, place, userID, attendantID, comments };
 
     await Turns.create(turns);
-    return res.status(200).json("Turn created successfully");
+    return res.status(200).json("Turno creado con exito");
   } catch (error) {
     return res.status(500).json({ message: error });
   }
@@ -679,7 +670,7 @@ export const attendantCreateTurn = async (req: Request, res: Response) => {
     if (!user) {
       return res
         .status(401)
-        .json({ message: "No tenes permiso a realizar estas acciones." });
+        .json({ message: "No tiene permiso para ver esta información" });
     }
 
     let { userID, date, place, comments } = req.body;
@@ -687,17 +678,10 @@ export const attendantCreateTurn = async (req: Request, res: Response) => {
     if (!validateTurn(userID, date, place)) {
       return res
         .status(400)
-        .json({ message: "No todos los campos contienen un valor." });
+        .json({ message: "No todos los campos contienen un valor" });
     }
 
     const attendantID = user.id;
-    const localDate = new Date(
-      date.getFullYear(),
-      date.getMonth(),
-      date.getDate(),
-      date.getHours(),
-      date.getMinutes()
-    );
 
     const isAvailable = await isAttendantAvailable(attendantID, date);
 
@@ -707,7 +691,7 @@ export const attendantCreateTurn = async (req: Request, res: Response) => {
 
     const turns = { date, place, userID, attendantID, comments };
     await Turns.create(turns);
-    return res.status(200).json("Turn created successfully");
+    return res.status(200).json("Turno creado con exito");
   } catch (error) {
     return res.status(500).json({ message: error });
   }
@@ -740,7 +724,7 @@ export const addCommentsAdmin = async (req: Request, res: Response) => {
     if (!user) {
       return res
         .status(401)
-        .json({ message: "No tenes permiso a realizar estas acciones." });
+        .json({ message: "No tiene permiso para ver esta información" });
     }
 
     const { comments } = req.body;
@@ -749,13 +733,13 @@ export const addCommentsAdmin = async (req: Request, res: Response) => {
     if (!turnID) {
       return res
         .status(400)
-        .json({ message: "No todos los campos contienen un valor." });
+        .json({ message: "No todos los campos contienen un valor" });
     }
 
     let turn = await Turns.findByPk(turnID);
 
     if (!turn) {
-      return res.status(404).json({ message: "Turno no encontrado." });
+      return res.status(404).json({ message: "No se encontró el turno" });
     }
 
     if (typeof comments !== "string") {
@@ -767,7 +751,7 @@ export const addCommentsAdmin = async (req: Request, res: Response) => {
     (turn as any).comments = comments;
     await turn.save();
 
-    return res.status(200).json("Turn created successfully");
+    return res.status(200).json("Turno creado con exito");
   } catch (error) {
     return res.status(500).json({ message: error });
   }
@@ -780,13 +764,13 @@ export const cancelTurn = async (req: Request, res: Response) => {
     if (!user) {
       return res
         .status(401)
-        .json({ message: "No tenes permiso a realizar estas acciones." });
+        .json({ message: "No tiene permiso para ver esta información" });
     }
 
     if (user.role === UserRole.CLIENT) {
       return res
         .status(401)
-        .json({ message: "No tenes permiso a realizar estas acciones." });
+        .json({ message: "No tiene permiso para ver esta información" });
     }
 
     let { id } = req.params;
@@ -794,7 +778,7 @@ export const cancelTurn = async (req: Request, res: Response) => {
     if (!id) {
       return res
         .status(400)
-        .json({ message: "No todos los campos contienen un valor." });
+        .json({ message: "No todos los campos contienen un valor" });
     }
 
     const turn = await Turns.findByPk(id);
@@ -809,8 +793,8 @@ export const cancelTurn = async (req: Request, res: Response) => {
     }
 
     turn.set("status", "canceled");
-    await turn.save(); // No olvides guardar los cambios
-    return res.status(200).json({ message: "Canceled successfully" });
+    await turn.save();
+    return res.status(200).json({ message: "Turno cancelado con exito" });
   } catch (error) {
     return res.status(500).json({ message: error });
   }
@@ -822,13 +806,13 @@ export const completeTurn = async (req: Request, res: Response) => {
     if (!user) {
       return res
         .status(401)
-        .json({ message: "No tenes permiso a realizar estas acciones." });
+        .json({ message: "No tiene permiso para ver esta información" });
     }
 
     if (user.role === UserRole.CLIENT) {
       return res
         .status(401)
-        .json({ message: "No tenes permiso a realizar estas acciones." });
+        .json({ message: "No tiene permiso para ver esta información" });
     }
 
     let { id } = req.params;
@@ -836,13 +820,13 @@ export const completeTurn = async (req: Request, res: Response) => {
     if (!id) {
       return res
         .status(400)
-        .json({ message: "No todos los campos contienen un valor." });
+        .json({ message: "No todos los campos contienen un valor" });
     }
 
     const turn = await Turns.findByPk(id);
 
     if (!turn) {
-      return res.status(404).json({ message: "Turn not found." });
+      return res.status(404).json({ message: "No se encontró el turno" });
     }
 
     if (turn.getDataValue("status") !== "scheduled") {
@@ -853,7 +837,7 @@ export const completeTurn = async (req: Request, res: Response) => {
 
     turn.set("status", "completed");
     await turn.save();
-    return res.status(200).json({ message: "completed successfully" });
+    return res.status(200).json({ message: "Turno completado con exito" });
   } catch (error) {
     return res.status(500).json({ message: error });
   }
