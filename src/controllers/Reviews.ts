@@ -111,7 +111,7 @@ export const setAttendantReview = async (req: Request, res: Response) => {
         .json({ message: "No tiene permiso para ver esta información" });
     }
 
-    const { attendantID, rating, comment } = req.body;
+    const { attendantID, rating, comment } = req.body.body;
 
     if (!validateReview(attendantID, rating, comment)) {
       return res
@@ -196,15 +196,10 @@ export const modifyReview = async (req: Request, res: Response) => {
 };
 
 function validateReview(attendantID: string, rating: number, comment: string) {
-  console.log(attendantID, rating, comment);
-
   if (!attendantID || !rating) {
-    console.log("HERE 1");
-
     return false;
   }
   if (comment && typeof comment !== "string") {
-    console.log("HERE 2");
     return false;
   }
   return true;

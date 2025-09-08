@@ -116,7 +116,7 @@ const setAttendantReview = (req, res) => __awaiter(void 0, void 0, void 0, funct
                 .status(401)
                 .json({ message: "No tiene permiso para ver esta información" });
         }
-        const { attendantID, rating, comment } = req.body;
+        const { attendantID, rating, comment } = req.body.body;
         if (!validateReview(attendantID, rating, comment)) {
             return res
                 .status(400)
@@ -190,13 +190,10 @@ const modifyReview = (req, res) => __awaiter(void 0, void 0, void 0, function* (
 });
 exports.modifyReview = modifyReview;
 function validateReview(attendantID, rating, comment) {
-    console.log(attendantID, rating, comment);
     if (!attendantID || !rating) {
-        console.log("HERE 1");
         return false;
     }
     if (comment && typeof comment !== "string") {
-        console.log("HERE 2");
         return false;
     }
     return true;
