@@ -505,7 +505,7 @@
  *                     type: string
  *                     example: may need to re-schedule
  *                 required:
- *                   - attendantID
+ *                   - userID
  *                   - date
  *                   - place
  *     responses:
