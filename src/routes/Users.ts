@@ -1,5 +1,4 @@
 import { Router } from "express";
-import upload from "../middlewares/multer";
 import {
   getActiveAttendants,
   getAdminUsersBySocialwork,
@@ -18,6 +17,7 @@ import {
   SetInactiveAttendants,
   validatePasswordModal,
 } from "../controllers/Users";
+import upload from "../middlewares/multer";
 
 const router = Router();
 

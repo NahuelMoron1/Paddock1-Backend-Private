@@ -5,6 +5,7 @@ import morgan from "morgan";
 import path from "path";
 
 //routes
+import swaggerUi from "swagger-ui-express";
 import FEwebhookRouter from "../FEwebhook";
 import attendantXSocialworkRouter from "../routes/AttendantXSocialworks";
 import availabilityRouter from "../routes/Availability";
@@ -17,6 +18,7 @@ import usersRouter from "../routes/Users";
 import webhookRouter from "../webhook";
 
 //database settings
+import { specs } from "../controllers/Swagger";
 import db from "../db/connection";
 import { DB_NAME, MAINTENANCE, PORT } from "./config";
 
@@ -51,6 +53,7 @@ class Server {
     this.app.use("/fewebhook", FEwebhookRouter);
     this.app.use("/webhook", webhookRouter);
     this.app.use("/webhook", webhookRouter);
+    this.app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
   }
   middlewares() {
     const allowedOrigins = [

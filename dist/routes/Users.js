@@ -4,8 +4,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
-const multer_1 = __importDefault(require("../middlewares/multer"));
 const Users_1 = require("../controllers/Users");
+const multer_1 = __importDefault(require("../middlewares/multer"));
 const router = (0, express_1.Router)();
 router.get("/:id", Users_1.getUser);
 router.get("/attendants/active", Users_1.getActiveAttendants);

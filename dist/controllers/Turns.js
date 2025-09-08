@@ -56,7 +56,7 @@ const getAllUserTurns = (req, res) => __awaiter(void 0, void 0, void 0, function
         if (!turns) {
             return res.status(404).json({ message: "No se encontraron turnos" });
         }
-        return res.json(turns);
+        return res.status(200).json(turns);
     }
     catch (error) {
         return res.status(500).json({ message: error });
@@ -671,7 +671,7 @@ const addCommentsAdmin = (req, res) => __awaiter(void 0, void 0, void 0, functio
         }
         turn.comments = comments;
         yield turn.save();
-        return res.status(200).json("Turno creado con exito");
+        return res.status(200).json("Turno modificado con exito");
     }
     catch (error) {
         return res.status(500).json({ message: error });
@@ -699,7 +699,9 @@ const cancelTurn = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         }
         const turn = yield Turns_1.default.findByPk(id);
         if (!turn) {
-            return res.status(404).json({ message: "Turn not found" });
+            return res
+                .status(404)
+                .json({ message: "No se encontró un turno con estos parametros" });
         }
         if (turn.getDataValue("status") !== "scheduled") {
             return res.status(401).json({

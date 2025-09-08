@@ -261,12 +261,12 @@ const getUserByName = (req, res) => __awaiter(void 0, void 0, void 0, function* 
         const user = yield getUserLogged(req);
         if (!user) {
             return res
-                .status(400)
+                .status(401)
                 .json({ message: "No tiene permiso para ver esta información" });
         }
         if (user.role === UserRole_1.UserRole.CLIENT) {
             return res
-                .status(400)
+                .status(401)
                 .json({ message: "No tiene permiso para ver esta información" });
         }
         const { username } = req.params;
@@ -369,7 +369,7 @@ const postUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         }
         const passwordValidated = validatePassword(newUser.password);
         if (!passwordValidated.status) {
-            return res.status(401).json({ message: passwordValidated.message });
+            return res.status(400).json({ message: passwordValidated.message });
         }
         const isRemoveBackground = req.body.removeBackground;
         let removeBackgroundFilter;
@@ -380,7 +380,7 @@ const postUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         if (!loggedUser) {
             const file = req.file;
             if (!file) {
-                return res.status(500).json({
+                return res.status(400).json({
                     message: "No puede dejar la foto de perfil vacía",
                 });
             }
@@ -408,13 +408,13 @@ const postUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         let user = newUser;
         user.profileImage = imageUrl;
         yield associations_1.Users.create(user);
-        return res.json({
+        return res.status(200).json({
             message: `Usuario creado con exito`,
         });
     }
     catch (err) {
         return res
-            .status(401)
+            .status(304)
             .json({ message: "El email ya se encuentra registrado" });
     }
 });
@@ -477,7 +477,7 @@ const modifyUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         }
         const passwordValidated = validatePassword(newUser.password);
         if (!passwordValidated.status) {
-            return res.status(401).json({ message: passwordValidated.message });
+            return res.status(400).json({ message: passwordValidated.message });
         }
         const file = req.file;
         if (!file && !newUser.profileImage) {
@@ -510,7 +510,7 @@ const modifyUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         if (loggedUser.id === user.id) {
             createCookies(user, res);
         }
-        return res.json({
+        return res.status(200).json({
             message: `Usuario modificado con exito`,
         });
     }
@@ -744,7 +744,7 @@ const logout = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                 domain: config_1.DOMAIN,
                 maxAge: 0,
             });
-            return res.send("finish");
+            return res.status(200).json({ message: "Logged out" });
         }
     }
     catch (error) {

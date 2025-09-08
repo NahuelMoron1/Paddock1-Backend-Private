@@ -18,6 +18,7 @@ const express_1 = __importDefault(require("express"));
 const morgan_1 = __importDefault(require("morgan"));
 const path_1 = __importDefault(require("path"));
 //routes
+const swagger_ui_express_1 = __importDefault(require("swagger-ui-express"));
 const FEwebhook_1 = __importDefault(require("../FEwebhook"));
 const AttendantXSocialworks_1 = __importDefault(require("../routes/AttendantXSocialworks"));
 const Availability_1 = __importDefault(require("../routes/Availability"));
@@ -29,6 +30,7 @@ const Turns_1 = __importDefault(require("../routes/Turns"));
 const Users_1 = __importDefault(require("../routes/Users"));
 const webhook_1 = __importDefault(require("../webhook"));
 //database settings
+const Swagger_1 = require("../controllers/Swagger");
 const connection_1 = __importDefault(require("../db/connection"));
 const config_1 = require("./config");
 class Server {
@@ -60,6 +62,7 @@ class Server {
         this.app.use("/fewebhook", FEwebhook_1.default);
         this.app.use("/webhook", webhook_1.default);
         this.app.use("/webhook", webhook_1.default);
+        this.app.use("/api-docs", swagger_ui_express_1.default.serve, swagger_ui_express_1.default.setup(Swagger_1.specs));
     }
     middlewares() {
         const allowedOrigins = [

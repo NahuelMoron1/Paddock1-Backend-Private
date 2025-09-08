@@ -279,13 +279,13 @@ export const getUserByName = async (req: Request, res: Response) => {
 
     if (!user) {
       return res
-        .status(400)
+        .status(401)
         .json({ message: "No tiene permiso para ver esta información" });
     }
 
     if (user.role === UserRole.CLIENT) {
       return res
-        .status(400)
+        .status(401)
         .json({ message: "No tiene permiso para ver esta información" });
     }
 
@@ -415,7 +415,7 @@ export const postUser = async (req: Request, res: Response) => {
     const passwordValidated = validatePassword(newUser.password);
 
     if (!passwordValidated.status) {
-      return res.status(401).json({ message: passwordValidated.message });
+      return res.status(400).json({ message: passwordValidated.message });
     }
 
     const isRemoveBackground = req.body.removeBackground;
@@ -430,7 +430,7 @@ export const postUser = async (req: Request, res: Response) => {
       const file = req.file;
 
       if (!file) {
-        return res.status(500).json({
+        return res.status(400).json({
           message: "No puede dejar la foto de perfil vacía",
         });
       }
@@ -461,12 +461,12 @@ export const postUser = async (req: Request, res: Response) => {
     user.profileImage = imageUrl;
 
     await Users.create(user);
-    return res.json({
+    return res.status(200).json({
       message: `Usuario creado con exito`,
     });
   } catch (err: any) {
     return res
-      .status(401)
+      .status(304)
       .json({ message: "El email ya se encuentra registrado" });
   }
 };
@@ -558,7 +558,7 @@ export const modifyUser = async (req: Request, res: Response) => {
     const passwordValidated = validatePassword(newUser.password);
 
     if (!passwordValidated.status) {
-      return res.status(401).json({ message: passwordValidated.message });
+      return res.status(400).json({ message: passwordValidated.message });
     }
 
     const file = req.file;
@@ -604,7 +604,7 @@ export const modifyUser = async (req: Request, res: Response) => {
       createCookies(user, res);
     }
 
-    return res.json({
+    return res.status(200).json({
       message: `Usuario modificado con exito`,
     });
   } catch (err: any) {
@@ -874,7 +874,7 @@ export const logout = async (req: Request, res: Response) => {
         domain: DOMAIN,
         maxAge: 0,
       });
-      return res.send("finish");
+      return res.status(200).json({ message: "Logged out" });
     }
   } catch (error) {
     return res.status(500).json({ message: error });
