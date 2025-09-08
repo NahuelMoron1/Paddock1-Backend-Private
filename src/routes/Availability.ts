@@ -1,5 +1,4 @@
 import { Router } from "express";
-import upload from "../middlewares/multer";
 import {
   checkAttendantAvailability,
   deleteAttendantAvailability,

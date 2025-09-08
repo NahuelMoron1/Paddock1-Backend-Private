@@ -230,7 +230,7 @@
  *         description: No tiene permiso para ver esta información
  */
 
-/** MODIFY REVIEW
+/** DELETE REVIEW
  * @swagger
  * /api/reviews/{id}:
  *   delete:
@@ -247,7 +247,7 @@
  *       200:
  *         description: Calificación eliminada con exito
  *       304:
- *         description: No podes agregar una calificación si sos parte del personal
+ *         description: No podes eliminar una calificación si sos parte del personal
  *       400:
  *         description: No todos los campos contienen un valor
  *       401:
