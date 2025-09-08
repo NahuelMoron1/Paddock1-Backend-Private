@@ -160,7 +160,7 @@
  *       304:
  *         description: "false"
  */
-/** DELETE REVIEW
+/** DELETE AVAILABILITY
  * @swagger
  * /api/availability/{id}:
  *   delete:
