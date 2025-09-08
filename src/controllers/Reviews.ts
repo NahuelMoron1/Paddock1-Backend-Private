@@ -196,10 +196,15 @@ export const modifyReview = async (req: Request, res: Response) => {
 };
 
 function validateReview(attendantID: string, rating: number, comment: string) {
+  console.log(attendantID, rating, comment);
+
   if (!attendantID || !rating) {
+    console.log("HERE 1");
+
     return false;
   }
   if (comment && typeof comment !== "string") {
+    console.log("HERE 2");
     return false;
   }
   return true;

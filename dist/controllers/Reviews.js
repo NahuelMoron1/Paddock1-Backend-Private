@@ -190,10 +190,13 @@ const modifyReview = (req, res) => __awaiter(void 0, void 0, void 0, function* (
 });
 exports.modifyReview = modifyReview;
 function validateReview(attendantID, rating, comment) {
+    console.log(attendantID, rating, comment);
     if (!attendantID || !rating) {
+        console.log("HERE 1");
         return false;
     }
     if (comment && typeof comment !== "string") {
+        console.log("HERE 2");
         return false;
     }
     return true;
