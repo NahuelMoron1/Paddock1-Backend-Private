@@ -19,6 +19,5 @@ router.get("/set/active/:id", SetActiveSocialwork);
 router.get("/set/inactive/:id", SetinActiveSocialwork);
 router.get("/name/:attendantID", getSocialworkByAttendant);
 router.get("/name/modify/:attendantID", getSocialworkByAttendantModify);
-router.post("/", postSocialwork); /// TO DO
-//router.post("/", upload.single("file"), postSocialwork); /// TO DO
+router.post("/", postSocialwork);
 export default router;
