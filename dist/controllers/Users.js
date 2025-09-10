@@ -361,7 +361,10 @@ const postUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         return res.status(304).json({ message: "Ya hay un usuario logueado" });
     }
     try {
-        let newUser = JSON.parse(req.body.body);
+        let newUser = safeParse(req.body.body);
+        if (!newUser) {
+            return res.status(400).json({ message: "Formato de datos mal enviado" });
+        }
         if (!validateUser(newUser.fullName, newUser.email, newUser.password, newUser.phone, newUser.userID)) {
             return res
                 .status(400)
@@ -419,6 +422,15 @@ const postUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     }
 });
 exports.postUser = postUser;
+function safeParse(body) {
+    try {
+        const data = JSON.parse(body);
+        return data;
+    }
+    catch (error) {
+        return undefined;
+    }
+}
 function validateUserByAdmin(status, role, speciality) {
     if (!role || !status) {
         return false;
@@ -439,7 +451,10 @@ const modifyUserByAdmin = (req, res) => __awaiter(void 0, void 0, void 0, functi
             .json({ message: "No ha iniciado sesión o no tiene autorización" });
     }
     try {
-        let newUser = JSON.parse(req.body.body);
+        let newUser = safeParse(req.body.body);
+        if (!newUser) {
+            return res.status(400).json({ message: "Formato de datos mal enviado" });
+        }
         const validateUserAdminChange = validateUserByAdmin(newUser.status, newUser.role, newUser.speciality);
         if (!newUser.id || !validateUserAdminChange) {
             return res
@@ -463,7 +478,10 @@ const modifyUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         return res.status(401).json({ message: "No ha iniciado sesión" });
     }
     try {
-        let newUser = JSON.parse(req.body.body);
+        let newUser = safeParse(req.body.body);
+        if (!newUser) {
+            return res.status(400).json({ message: "Formato de datos mal enviado" });
+        }
         if (!validateUser(newUser.fullName, newUser.email, newUser.password, newUser.phone, newUser.userID) ||
             !newUser.id) {
             return res

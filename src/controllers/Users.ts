@@ -396,7 +396,11 @@ export const postUser = async (req: Request, res: Response) => {
     return res.status(304).json({ message: "Ya hay un usuario logueado" });
   }
   try {
-    let newUser = JSON.parse(req.body.body);
+    let newUser = safeParse(req.body.body);
+
+    if (!newUser) {
+      return res.status(400).json({ message: "Formato de datos mal enviado" });
+    }
 
     if (
       !validateUser(
@@ -471,6 +475,15 @@ export const postUser = async (req: Request, res: Response) => {
   }
 };
 
+function safeParse(body: any) {
+  try {
+    const data = JSON.parse(body);
+    return data;
+  } catch (error) {
+    return undefined;
+  }
+}
+
 function validateUserByAdmin(
   status: string,
   role: string,
@@ -496,7 +509,11 @@ export const modifyUserByAdmin = async (req: Request, res: Response) => {
       .json({ message: "No ha iniciado sesión o no tiene autorización" });
   }
   try {
-    let newUser = JSON.parse(req.body.body);
+    let newUser = safeParse(req.body.body);
+
+    if (!newUser) {
+      return res.status(400).json({ message: "Formato de datos mal enviado" });
+    }
 
     const validateUserAdminChange = validateUserByAdmin(
       newUser.status,
@@ -532,7 +549,11 @@ export const modifyUser = async (req: Request, res: Response) => {
   }
 
   try {
-    let newUser = JSON.parse(req.body.body);
+    let newUser = safeParse(req.body.body);
+
+    if (!newUser) {
+      return res.status(400).json({ message: "Formato de datos mal enviado" });
+    }
 
     if (
       !validateUser(
