@@ -18,19 +18,18 @@ const express_1 = __importDefault(require("express"));
 const morgan_1 = __importDefault(require("morgan"));
 const path_1 = __importDefault(require("path"));
 //routes
-const swagger_ui_express_1 = __importDefault(require("swagger-ui-express"));
 const FEwebhook_1 = __importDefault(require("../FEwebhook"));
-const AttendantXSocialworks_1 = __importDefault(require("../routes/AttendantXSocialworks"));
-const Availability_1 = __importDefault(require("../routes/Availability"));
-const Cookie_1 = __importDefault(require("../routes/Cookie"));
-const Reviews_1 = __importDefault(require("../routes/Reviews"));
-const Slack_1 = __importDefault(require("../routes/Slack"));
-const Socialworks_1 = __importDefault(require("../routes/Socialworks"));
-const Turns_1 = __importDefault(require("../routes/Turns"));
-const Users_1 = __importDefault(require("../routes/Users"));
+const Best_tens_1 = __importDefault(require("../routes/Best_tens"));
+const Impostors_1 = __importDefault(require("../routes/Impostors"));
+const Season_Teams_1 = __importDefault(require("../routes/Season_Teams"));
+const Season_Teams_Drivers_1 = __importDefault(require("../routes/Season_Teams_Drivers"));
+const Season_Tracks_1 = __importDefault(require("../routes/Season_Tracks"));
+const Seasons_1 = __importDefault(require("../routes/Seasons"));
+const Teams_1 = __importDefault(require("../routes/Teams"));
+const Tracks_1 = __importDefault(require("../routes/Tracks"));
+const Wordle_1 = __importDefault(require("../routes/Wordle"));
 const webhook_1 = __importDefault(require("../webhook"));
 //database settings
-const Swagger_1 = require("../controllers/Swagger");
 const connection_1 = __importDefault(require("../db/connection"));
 const config_1 = require("./config");
 class Server {
@@ -51,25 +50,18 @@ class Server {
         this.app.get("/", (req, res) => {
             res.json({ msg: "api working" });
         });
-        this.app.use("/api/users", Users_1.default);
-        this.app.use("/api/availability", Availability_1.default);
-        this.app.use("/api/turns", Turns_1.default);
-        this.app.use("/api/reviews", Reviews_1.default);
-        this.app.use("/api/cookie", Cookie_1.default);
-        this.app.use("/api/socialworks", Socialworks_1.default);
-        this.app.use("/api/attendantXSocialwork", AttendantXSocialworks_1.default);
-        this.app.use("/api/slack", Slack_1.default);
-        this.app.use("/fewebhook", FEwebhook_1.default);
-        this.app.use("/webhook", webhook_1.default);
-        this.app.use("/webhook", webhook_1.default);
-        this.app.use("/api-docs", swagger_ui_express_1.default.serve, swagger_ui_express_1.default.setup(Swagger_1.specs));
+        this.app.use("/api/seasons", Seasons_1.default);
+        this.app.use("/api/tracks", Tracks_1.default);
+        this.app.use("/api/teams", Teams_1.default);
+        this.app.use("/api/seasons_tracks", Season_Tracks_1.default);
+        this.app.use("/api/seasons_teams", Season_Teams_1.default);
+        this.app.use("/api/seasons_teams_drivers", Season_Teams_Drivers_1.default);
+        this.app.use("/api/wordle", Wordle_1.default);
+        this.app.use("/api/best10", Best_tens_1.default);
+        this.app.use("/api/impostor", Impostors_1.default);
     }
     middlewares() {
-        const allowedOrigins = [
-            "http://localhost:4200",
-            "https://www.safe-365.online",
-            "https://api.safe-365.online",
-        ];
+        const allowedOrigins = ["http://localhost:57637", "http://localhost:4000"];
         this.app.use("/uploads", express_1.default.static(path_1.default.join(__dirname, "../../uploads")));
         this.app.use("/backups", express_1.default.static(path_1.default.join(__dirname, "../../backups")));
         this.app.use(express_1.default.json());

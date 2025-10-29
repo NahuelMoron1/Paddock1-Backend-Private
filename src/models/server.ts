@@ -5,20 +5,19 @@ import morgan from "morgan";
 import path from "path";
 
 //routes
-import swaggerUi from "swagger-ui-express";
 import FEwebhookRouter from "../FEwebhook";
-import attendantXSocialworkRouter from "../routes/AttendantXSocialworks";
-import availabilityRouter from "../routes/Availability";
-import cookieRouter from "../routes/Cookie";
-import reviewsRouter from "../routes/Reviews";
-import slackRouter from "../routes/Slack";
-import socialworkRouter from "../routes/Socialworks";
-import turnsRouter from "../routes/Turns";
-import usersRouter from "../routes/Users";
+import best10Router from "../routes/Best_tens";
+import impostorRouter from "../routes/Impostors";
+import Seasons_TeamsRouter from "../routes/Season_Teams";
+import Seasons_Teams_DriversRouter from "../routes/Season_Teams_Drivers";
+import Seasons_TracksRouter from "../routes/Season_Tracks";
+import SeasonsRouter from "../routes/Seasons";
+import TeamsRouter from "../routes/Teams";
+import TracksRouter from "../routes/Tracks";
+import wordleRouter from "../routes/Wordle";
 import webhookRouter from "../webhook";
 
 //database settings
-import { specs } from "../controllers/Swagger";
 import db from "../db/connection";
 import { DB_NAME, MAINTENANCE, PORT } from "./config";
 
@@ -42,25 +41,18 @@ class Server {
     this.app.get("/", (req: Request, res: Response) => {
       res.json({ msg: "api working" });
     });
-    this.app.use("/api/users", usersRouter);
-    this.app.use("/api/availability", availabilityRouter);
-    this.app.use("/api/turns", turnsRouter);
-    this.app.use("/api/reviews", reviewsRouter);
-    this.app.use("/api/cookie", cookieRouter);
-    this.app.use("/api/socialworks", socialworkRouter);
-    this.app.use("/api/attendantXSocialwork", attendantXSocialworkRouter);
-    this.app.use("/api/slack", slackRouter);
-    this.app.use("/fewebhook", FEwebhookRouter);
-    this.app.use("/webhook", webhookRouter);
-    this.app.use("/webhook", webhookRouter);
-    this.app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
+    this.app.use("/api/seasons", SeasonsRouter);
+    this.app.use("/api/tracks", TracksRouter);
+    this.app.use("/api/teams", TeamsRouter);
+    this.app.use("/api/seasons_tracks", Seasons_TracksRouter);
+    this.app.use("/api/seasons_teams", Seasons_TeamsRouter);
+    this.app.use("/api/seasons_teams_drivers", Seasons_Teams_DriversRouter);
+    this.app.use("/api/wordle", wordleRouter);
+    this.app.use("/api/best10", best10Router);
+    this.app.use("/api/impostor", impostorRouter);
   }
   middlewares() {
-    const allowedOrigins = [
-      "http://localhost:4200",
-      "https://www.safe-365.online",
-      "https://api.safe-365.online",
-    ];
+    const allowedOrigins = ["http://localhost:57637", "http://localhost:4000"];
     this.app.use(
       "/uploads",
       express.static(path.join(__dirname, "../../uploads"))

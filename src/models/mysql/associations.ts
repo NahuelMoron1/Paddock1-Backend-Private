@@ -1,60 +1,79 @@
-// models/index.js
-import Users from "./Users.js";
-import Socialworks from "./Socialworks.js";
-import AttendantXSocialworks from "./AttendantXSocialworks.js";
-import Turns from "./Turns.js";
-import Reviews from "./Reviews.js";
+import Drivers from "./Drivers.js";
+import Impostors from "./Impostors.js";
+import Impostors_Results from "./Impostors_Results.js";
+import Season_Teams from "./Season_Teams.js";
+import Season_Teams_Drivers from "./Season_Teams_Drivers.js"; // Importa la nueva tabla
+import Seasons from "./Seasons.js";
+import Season_Tracks from "./Seasons_Tracks.js";
+import Teams from "./Teams.js";
+import Tracks from "./Tracks.js";
 
-// Asociaciones
-Users.hasMany(AttendantXSocialworks, { foreignKey: "attendantID" });
-AttendantXSocialworks.belongsTo(Users, {
-  foreignKey: "attendantID",
+// --- Asociaciones de muchos a muchos ---
+
+// Asociación entre Seasons y Teams (a través de la tabla Season_Teams)
+Seasons.hasMany(Season_Teams, { foreignKey: "seasonID" });
+Season_Teams.belongsTo(Seasons, {
+  foreignKey: "seasonID",
   targetKey: "id",
 });
 
-Socialworks.hasMany(AttendantXSocialworks, { foreignKey: "socialworkID" });
-AttendantXSocialworks.belongsTo(Socialworks, {
-  foreignKey: "socialworkID",
+Teams.hasMany(Season_Teams, { foreignKey: "teamID" });
+Season_Teams.belongsTo(Teams, {
+  foreignKey: "teamID",
   targetKey: "id",
 });
 
-// Asociación directa entre Users y Socialworks (usuario tiene 1 obra social)
-Users.belongsTo(Socialworks, {
-  foreignKey: "socialworkID",
-  targetKey: "id", // opcional si tu clave primaria es `id`
-});
-Socialworks.hasMany(Users, {
-  foreignKey: "socialworkID",
+// Asociación entre Seasons y Tracks (a través de la tabla Season_Tracks)
+Seasons.hasMany(Season_Tracks, { foreignKey: "seasonID" });
+Season_Tracks.belongsTo(Seasons, {
+  foreignKey: "seasonID",
+  targetKey: "id",
 });
 
-// Un turno pertenece a un usuario (cliente)
-Turns.belongsTo(Users, {
-  foreignKey: "userID",
-  as: "User", // ← alias obligatorio
+Tracks.hasMany(Season_Tracks, { foreignKey: "trackID" });
+Season_Tracks.belongsTo(Tracks, {
+  foreignKey: "trackID",
+  targetKey: "id",
 });
 
-// Un turno pertenece a un atendedor (médico)
-Turns.belongsTo(Users, {
-  foreignKey: "attendantID",
-  as: "Attendant", // ← alias obligatorio
+// --- Asociaciones para la nueva tabla Season_Teams_Drivers ---
+
+// Asociación entre Seasons y Season_Teams_Drivers
+Seasons.hasMany(Season_Teams_Drivers, { foreignKey: "seasonID" });
+Season_Teams_Drivers.belongsTo(Seasons, {
+  foreignKey: "seasonID",
+  targetKey: "id",
 });
 
-Users.hasMany(Turns, {
-  foreignKey: "userID",
-  as: "ClientTurns",
+// Asociación entre Teams y Season_Teams_Drivers
+Teams.hasMany(Season_Teams_Drivers, { foreignKey: "teamID" });
+Season_Teams_Drivers.belongsTo(Teams, {
+  foreignKey: "teamID",
+  targetKey: "id",
 });
 
-Users.hasMany(Turns, {
-  foreignKey: "attendantID",
-  as: "AttendedTurns",
+// Asociación entre Drivers y Season_Teams_Drivers
+Drivers.hasMany(Season_Teams_Drivers, { foreignKey: "driverID" });
+Season_Teams_Drivers.belongsTo(Drivers, {
+  foreignKey: "driverID",
+  targetKey: "id",
 });
 
-// Una review pertenece a un usuario (cliente)
-Reviews.belongsTo(Users, {
-  foreignKey: "userID",
-  as: "User", // ← alias obligatorio
+// Asociación entre Impostors y Impostors_Results
+Impostors.hasMany(Impostors_Results, { foreignKey: "gameID" });
+Impostors_Results.belongsTo(Impostors, {
+  foreignKey: "gameID",
+  targetKey: "id",
 });
 
-Reviews.belongsTo(Users, { as: "Attendant", foreignKey: "attendantID" });
-
-export { Users, Socialworks, AttendantXSocialworks };
+export {
+  Drivers,
+  Impostors,
+  Impostors_Results,
+  Season_Teams,
+  Season_Teams_Drivers,
+  Season_Tracks,
+  Seasons,
+  Teams,
+  Tracks,
+};
