@@ -178,17 +178,16 @@ export const createBest10Game = async (req: Request, res: Response) => {
       return res.status(400).json({ message: "Bad request" });
     }
 
-    const id = gamedata.id;
-    const year = gamedata.year;
-    const table = gamedata.table; //Table could be standings, points, podiums, etc.
-    const title = gamedata.title;
-    const fromYear = gamedata.fromYear;
-    const toYear = gamedata.toYear;
-    const nationality = gamedata.nationality;
-    const date = gamedata.date;
-    const team = gamedata.team;
-    const sqlTable = gamedata.sqlTable;
-    const type = gamedata.type; //Type refers to if it's driver/team/track
+    const year = gamedata.gamedata.year;
+    const table = gamedata.gamedata.table; //Table could be standings, points, podiums, etc.
+    const title = gamedata.gamedata.title;
+    const fromYear = gamedata.gamedata.fromYear;
+    const toYear = gamedata.gamedata.toYear;
+    const nationality = gamedata.gamedata.nationality;
+    const date = gamedata.gamedata.date;
+    const team = gamedata.gamedata.team;
+    const sqlTable = gamedata.gamedata.sqlTable;
+    const type = gamedata.gamedata.type; //Type refers to if it's driver/team/track
 
     if (!title || !table || !sqlTable) {
       return res
@@ -197,11 +196,11 @@ export const createBest10Game = async (req: Request, res: Response) => {
     }
 
     const game = {
-      id: id,
+      id: uuidv4(),
       title,
-      year,
-      fromYear,
-      toYear,
+      year: year || null,
+      fromYear: fromYear || null,
+      toYear: toYear || null,
       nationality,
       table,
       date,
@@ -211,7 +210,26 @@ export const createBest10Game = async (req: Request, res: Response) => {
       creation: Top10Creation.AUTOMATIC,
     };
 
-    await Best_tens.create(game);
+    const result = await Best_tens.create(game);
+
+    if (!result) {
+      return res.status(304).json({
+        message:
+          "Something failed on creating automatic game, please contact support",
+      });
+    }
+
+    const gameID = await result.getDataValue("id");
+
+    const validated = updateAutomaticResults(gameID, result, true);
+
+    if (!validated) {
+      await Best_tens.truncate({ where: { id: gameID } });
+      return res.status(400).json({
+        message:
+          "Cannot create this challenge: Not enough data to complete the top 10",
+      });
+    }
 
     return res.status(200).json({ message: "Game created successfully" });
   } catch (err: any) {
@@ -235,143 +253,6 @@ export const getGameData = async (req: Request, res: Response) => {
     type: challenge.getDataValue("type"),
     table: challenge.getDataValue("table"),
   });
-};
-
-export const playBest10Game = async (req: Request, res: Response) => {
-  try {
-    const { input, type, gameID } = req.params; ///type means driver/team/track, input means the name the user types
-
-    if (
-      !input ||
-      typeof input !== "string" ||
-      !type ||
-      typeof type !== "string" ||
-      !gameID ||
-      typeof gameID !== "string"
-    ) {
-      return res
-        .status(400)
-        .json({ message: "Bad request on typing the driver" });
-    }
-
-    const today = new Date().toISOString().split("T")[0]; // YYYY-MM-DD
-
-    const challenge = await Best_tens.findOne({
-      where: { id: gameID, date: today },
-    });
-
-    if (!challenge) {
-      return res.status(404).json({ message: "No challenge found for today" });
-    }
-
-    const resultInGame = await Best_tens_results.findOne({
-      where: { gameID: gameID, resultID: input },
-    });
-
-    if (!resultInGame) {
-      return res.status(404).json({ message: "Incorrect guess" });
-    }
-
-    switch (type) {
-      case "driver":
-        const driver = await Drivers.findByPk(input);
-        const driverResult = {
-          Driver: driver,
-          totalStat: resultInGame.getDataValue("totalStat"),
-          position: resultInGame.getDataValue("position"),
-        };
-        return res.status(200).json(driverResult);
-      case "team":
-        const team = await Teams.findByPk(input);
-        const totalStat = resultInGame.getDataValue("totalStat") || 0;
-        const position = resultInGame.getDataValue("position") || 0;
-        const teamResult = {
-          Team: team,
-          totalStat: totalStat,
-          position: position,
-        };
-        return res.status(200).json(teamResult);
-      case "track":
-        const track = await Tracks.findByPk(input);
-        const trackResult = {
-          Track: track,
-          totalStat: resultInGame.getDataValue("totalStat"),
-          position: resultInGame.getDataValue("position"),
-        };
-        return res.status(200).json(trackResult);
-    }
-  } catch (error) {
-    return res.status(500).json({ message: error });
-  }
-};
-
-export const surrenderBest10Game = async (req: Request, res: Response) => {
-  try {
-    const { gameID, type } = req.params;
-
-    if (
-      !gameID ||
-      typeof gameID !== "string" ||
-      !type ||
-      typeof type !== "string"
-    ) {
-      return res.status(400).json({ message: "Bad request on surrender" });
-    }
-
-    const today = new Date().toISOString().split("T")[0];
-
-    const challenge = await Best_tens.findOne({
-      where: { id: gameID, date: today },
-    });
-
-    if (!challenge) {
-      return res.status(404).json({ message: "No challenge found for today" });
-    }
-
-    const results = await Best_tens_results.findAll({
-      where: { gameID: gameID },
-      order: [["position", "ASC"]],
-    });
-
-    let fullList = [];
-
-    for (const result of results) {
-      const resultID = result.getDataValue("resultID");
-      const totalStat = result.getDataValue("totalStat") || 0;
-      const position = result.getDataValue("position");
-
-      switch (type) {
-        case "driver":
-          const driver = await Drivers.findByPk(resultID);
-          fullList.push({
-            Driver: driver,
-            totalStat,
-            position,
-          });
-          break;
-        case "team":
-          const team = await Teams.findByPk(resultID);
-          fullList.push({
-            Team: team,
-            totalStat,
-            position,
-          });
-          break;
-        case "track":
-          const track = await Tracks.findByPk(resultID);
-          fullList.push({
-            Track: track,
-            totalStat,
-            position,
-          });
-          break;
-      }
-    }
-
-    return res.status(200).json(fullList);
-  } catch (error) {
-    return res.status(500).json({ message: error });
-  }
 };
 
 export const updateBest10GameResults = async (req: Request, res: Response) => {
@@ -423,7 +304,11 @@ export const updateBest10GameResults = async (req: Request, res: Response) => {
   }
 };
 
-async function updateAutomaticResults(id: string, challenge: any) {
+async function updateAutomaticResults(
+  id: string,
+  challenge: any,
+  validation?: boolean
+) {
   const year = challenge.getDataValue("year");
   const fromYear = challenge.getDataValue("fromYear");
   const toYear = challenge.getDataValue("toYear");
@@ -463,7 +348,11 @@ async function updateAutomaticResults(id: string, challenge: any) {
       position: index + 1,
     };
 
-    await Best_tens_results.create(best10);
+    if (!validation) {
+      await Best_tens_results.create(best10);
+    } else if (validation === true) {
+      return topStats.length === 10;
+    }
   });
 
   return true;
