@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { col, fn, literal, Op, Sequelize } from "sequelize";
 import { v4 as uuidv4 } from "uuid";
+import { Top10Creation } from "../models/enums/Top10Creation";
 import { StatQueryOptions } from "../models/IStatQueryOptions";
 import {
   Season_Teams,
@@ -290,6 +291,7 @@ export const surrenderBest10Game = async (req: Request, res: Response) => {
 };
 
 export const getBest10Game = async (req: Request, res: Response) => {
+  ///THIS IS TO UPDATE RESULTS EACH DAY
   try {
     const today = new Date().toISOString().split("T")[0]; // YYYY-MM-DD
 
@@ -299,6 +301,16 @@ export const getBest10Game = async (req: Request, res: Response) => {
 
     if (!challenge) {
       return res.status(404).json({ error: "No challenge found" });
+    }
+
+    const creation = challenge.getDataValue("creation");
+
+    if (!creation || creation === Top10Creation.MANUAL) {
+      return res
+        .status(200)
+        .json({
+          error: "Nothing to update because the method created is manual",
+        });
     }
 
     await Best_tens_results.truncate();

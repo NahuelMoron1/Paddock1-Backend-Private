@@ -52,7 +52,7 @@ class Server {
     this.app.use("/api/impostor", impostorRouter);
   }
   middlewares() {
-    const allowedOrigins = ["http://localhost:57637", "http://localhost:4000"];
+    const allowedOrigins = ["http://localhost:63665", "http://localhost:4000"];
     this.app.use(
       "/uploads",
       express.static(path.join(__dirname, "../../uploads"))

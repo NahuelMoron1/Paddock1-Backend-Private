@@ -61,7 +61,7 @@ class Server {
         this.app.use("/api/impostor", Impostors_1.default);
     }
     middlewares() {
-        const allowedOrigins = ["http://localhost:57637", "http://localhost:4000"];
+        const allowedOrigins = ["http://localhost:63665", "http://localhost:4000"];
         this.app.use("/uploads", express_1.default.static(path_1.default.join(__dirname, "../../uploads")));
         this.app.use("/backups", express_1.default.static(path_1.default.join(__dirname, "../../backups")));
         this.app.use(express_1.default.json());

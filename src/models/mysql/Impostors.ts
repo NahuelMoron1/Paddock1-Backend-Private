@@ -26,7 +26,7 @@ const Impostors = db.define(
       allowNull: false,
     },
     type: {
-      type: DataTypes.STRING,
+      type: DataTypes.ENUM("driver", "team", "track"),
       allowNull: false,
     },
   },

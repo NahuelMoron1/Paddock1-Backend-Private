@@ -26,10 +26,10 @@ const Best_tens = db.define(
     },
     table: {
       type: DataTypes.STRING,
-      allowNull: false,
     },
     date: {
       type: DataTypes.DATEONLY,
+      allowNull: false,
     },
     team: {
       type: DataTypes.STRING,
@@ -38,8 +38,12 @@ const Best_tens = db.define(
       type: DataTypes.STRING,
     },
     type: {
-      //this refers to if it's driver/team/track
-      type: DataTypes.STRING,
+      type: DataTypes.ENUM("driver", "team", "track"),
+      allowNull: false,
+    },
+    creation: {
+      type: DataTypes.ENUM("manual", "automatic"),
+      allowNull: false,
     },
   },
   {
