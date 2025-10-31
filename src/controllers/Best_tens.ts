@@ -11,6 +11,7 @@ import {
 import Best_tens from "../models/mysql/Best_tens";
 import Best_tens_results from "../models/mysql/Best_tens_results";
 import Drivers from "../models/mysql/Drivers";
+import Manual_Best_tens_results from "../models/mysql/Manual_Best_Tens_Results";
 import Season_Teams_Drivers from "../models/mysql/Season_Teams_Drivers";
 import Seasons from "../models/mysql/Seasons";
 import Teams from "../models/mysql/Teams";
@@ -87,6 +88,88 @@ export const getSuggestions = async (req: Request, res: Response) => {
   }
 };
 
+export const createBest10GameManual = async (req: Request, res: Response) => {
+  try {
+    const gamedata = req.body;
+
+    if (!gamedata) {
+      return res.status(400).json({ message: "Bad request" });
+    }
+
+    const title = gamedata.gamedata.title;
+    const date = gamedata.gamedata.date;
+    const type = gamedata.gamedata.type;
+    const statType = gamedata.gamedata.statType; //Table could be standings, points, podiums, etc.
+    const results = gamedata.gamedata.results;
+
+    if (!title || !date || !type || !results || !statType) {
+      return res
+        .status(400)
+        .json({ message: "Not all fields contains a value" });
+    }
+
+    if (
+      typeof title !== "string" ||
+      typeof type !== "string" ||
+      typeof statType !== "string" ||
+      !Array.isArray(results) ||
+      !results.every(
+        (item) =>
+          typeof item === "object" &&
+          item !== null &&
+          typeof item.resultID === "string" &&
+          typeof item.totalStat === "number" &&
+          typeof item.position === "number"
+      )
+    ) {
+      return res
+        .status(400)
+        .json({ message: "Something failed on the format to create game" });
+    }
+
+    if (results.length !== 10) {
+      return res.status(400).json({
+        message: `You need to have exactly 10 results, currently you have ${results.length}`,
+      });
+    }
+
+    const game = {
+      id: uuidv4(),
+      title,
+      date,
+      type,
+      table: statType,
+      creation: Top10Creation.MANUAL,
+    };
+
+    const gameCreated = await Best_tens.create(game);
+
+    if (!gameCreated) {
+      return res
+        .status(500)
+        .json({ message: "There was an error while creating the game" });
+    }
+
+    const gameID = gameCreated.getDataValue("id");
+
+    for (let result of results) {
+      const top10Result = {
+        id: uuidv4(),
+        gameID: gameID,
+        resultID: result.resultID,
+        totalStat: result.totalStat,
+        position: result.position,
+      };
+
+      await Manual_Best_tens_results.create(top10Result);
+    }
+
+    return res.status(200).json({ message: "Game created successfully" });
+  } catch (err: any) {
+    res.status(500).json({ error: "Server error", details: err });
+  }
+};
+
 export const createBest10Game = async (req: Request, res: Response) => {
   try {
     const gamedata = req.body;
@@ -125,6 +208,7 @@ export const createBest10Game = async (req: Request, res: Response) => {
       team,
       sqlTable,
       type,
+      creation: Top10Creation.AUTOMATIC,
     };
 
     await Best_tens.create(game);
@@ -290,7 +374,7 @@ export const surrenderBest10Game = async (req: Request, res: Response) => {
   }
 };
 
-export const getBest10Game = async (req: Request, res: Response) => {
+export const updateBest10GameResults = async (req: Request, res: Response) => {
   ///THIS IS TO UPDATE RESULTS EACH DAY
   try {
     const today = new Date().toISOString().split("T")[0]; // YYYY-MM-DD
@@ -305,58 +389,31 @@ export const getBest10Game = async (req: Request, res: Response) => {
 
     const creation = challenge.getDataValue("creation");
 
-    if (!creation || creation === Top10Creation.MANUAL) {
-      return res
-        .status(200)
-        .json({
-          error: "Nothing to update because the method created is manual",
-        });
+    if (!creation) {
+      return res.status(200).json({
+        error: "Nothing to update because the method is not selected",
+      });
     }
 
     await Best_tens_results.truncate();
-
     const id = challenge.getDataValue("id");
-    const year = challenge.getDataValue("year");
-    const fromYear = challenge.getDataValue("fromYear");
-    const toYear = challenge.getDataValue("toYear");
-    ///const type = gamedata.type; ///Type refers to: drivers/teams
-    const nationality = challenge.getDataValue("nationality");
-    const table = challenge.getDataValue("table"); ///Table refers to: points/podiums/wins/laps_led/race_Starts/standings
-    const team = challenge.getDataValue("team");
-    const sqlTable = challenge.getDataValue("sqlTable");
 
-    let topStats;
-
-    if (year && !nationality && !team) {
-      topStats = await getWithoutParams(year, sqlTable, table);
-    } else {
-      topStats = await getWithParams(
-        table,
-        nationality,
-        fromYear,
-        toYear,
-        year,
-        team,
-        sqlTable
-      );
+    if (creation === Top10Creation.MANUAL) {
+      const updated = await updateManualResults(id);
+      if (!updated) {
+        return res.status(500).json({
+          message:
+            "Something happened while getting results, unexpected amount of results",
+        });
+      }
+    } else if (creation === Top10Creation.AUTOMATIC) {
+      const updated = await updateAutomaticResults(id, challenge);
+      if (!updated) {
+        return res
+          .status(404)
+          .json({ message: "No info found for that search" });
+      }
     }
-
-    if (!topStats) {
-      return res.status(404).json({ message: "No info found for that search" });
-    }
-
-    topStats.forEach(async (result, index) => {
-      const resultID = getID(sqlTable, result);
-      const best10 = {
-        id: uuidv4(),
-        gameID: id,
-        resultID: resultID,
-        totalStat: result.getDataValue("totalStat"),
-        position: index,
-      };
-
-      await Best_tens_results.create(best10);
-    });
 
     return res.status(200).json({ message: "Game updated successfully" });
   } catch (err: any) {
@@ -365,6 +422,67 @@ export const getBest10Game = async (req: Request, res: Response) => {
       .json({ error: "Server error", details: err.message });
   }
 };
+
+async function updateAutomaticResults(id: string, challenge: any) {
+  const year = challenge.getDataValue("year");
+  const fromYear = challenge.getDataValue("fromYear");
+  const toYear = challenge.getDataValue("toYear");
+  ///const type = gamedata.type; ///Type refers to: drivers/teams
+  const nationality = challenge.getDataValue("nationality");
+  const table = challenge.getDataValue("table"); ///Table refers to: points/podiums/wins/laps_led/race_Starts/standings
+  const team = challenge.getDataValue("team");
+  const sqlTable = challenge.getDataValue("sqlTable");
+
+  let topStats;
+
+  if (year && !nationality && !team) {
+    topStats = await getWithoutParams(year, sqlTable, table);
+  } else {
+    topStats = await getWithParams(
+      table,
+      nationality,
+      fromYear,
+      toYear,
+      year,
+      team,
+      sqlTable
+    );
+  }
+
+  if (!topStats) {
+    return false;
+  }
+
+  topStats.forEach(async (result, index) => {
+    const resultID = getID(sqlTable, result);
+    const best10 = {
+      id: uuidv4(),
+      gameID: id,
+      resultID: resultID,
+      totalStat: result.getDataValue("totalStat"),
+      position: index + 1,
+    };
+
+    await Best_tens_results.create(best10);
+  });
+
+  return true;
+}
+
+async function updateManualResults(id: string) {
+  const results = await Manual_Best_tens_results.findAll({
+    where: { gameid: id },
+  });
+
+  if (results.length !== 10) {
+    return false;
+  }
+
+  for (let result of results) {
+    await Best_tens_results.create(result.toJSON());
+  }
+  return true;
+}
 
 function getID(sqlTable: string, result: any) {
   let resultID = "";
