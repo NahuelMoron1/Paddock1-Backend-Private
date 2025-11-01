@@ -1,3 +1,6 @@
+import Connections from "./Connections.js";
+import Connections_Groups from "./Connections_Groups.js";
+import Connections_Groups_Results from "./Connections_Groups_Results.js";
 import Drivers from "./Drivers.js";
 import Impostors from "./Impostors.js";
 import Impostors_Results from "./Impostors_Results.js";
@@ -66,7 +69,26 @@ Impostors_Results.belongsTo(Impostors, {
   targetKey: "id",
 });
 
+// --- Asociación: Connections → Connections_Groups (1:N)
+Connections.hasMany(Connections_Groups, { foreignKey: "gameID" });
+Connections_Groups.belongsTo(Connections, {
+  foreignKey: "gameID",
+  targetKey: "id",
+});
+
+// --- Asociación: Connections_Groups → Connections_Groups_Results (1:N)
+Connections_Groups.hasMany(Connections_Groups_Results, {
+  foreignKey: "groupID",
+});
+Connections_Groups_Results.belongsTo(Connections_Groups, {
+  foreignKey: "groupID",
+  targetKey: "id",
+});
+
 export {
+  Connections,
+  Connections_Groups,
+  Connections_Groups_Results,
   Drivers,
   Impostors,
   Impostors_Results,

@@ -3,7 +3,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Tracks = exports.Teams = exports.Seasons = exports.Season_Tracks = exports.Season_Teams_Drivers = exports.Season_Teams = exports.Impostors_Results = exports.Impostors = exports.Drivers = void 0;
+exports.Tracks = exports.Teams = exports.Seasons = exports.Season_Tracks = exports.Season_Teams_Drivers = exports.Season_Teams = exports.Impostors_Results = exports.Impostors = exports.Drivers = exports.Connections_Groups_Results = exports.Connections_Groups = exports.Connections = void 0;
+const Connections_js_1 = __importDefault(require("./Connections.js"));
+exports.Connections = Connections_js_1.default;
+const Connections_Groups_js_1 = __importDefault(require("./Connections_Groups.js"));
+exports.Connections_Groups = Connections_Groups_js_1.default;
+const Connections_Groups_Results_js_1 = __importDefault(require("./Connections_Groups_Results.js"));
+exports.Connections_Groups_Results = Connections_Groups_Results_js_1.default;
 const Drivers_js_1 = __importDefault(require("./Drivers.js"));
 exports.Drivers = Drivers_js_1.default;
 const Impostors_js_1 = __importDefault(require("./Impostors.js"));
@@ -68,5 +74,19 @@ Season_Teams_Drivers_js_1.default.belongsTo(Drivers_js_1.default, {
 Impostors_js_1.default.hasMany(Impostors_Results_js_1.default, { foreignKey: "gameID" });
 Impostors_Results_js_1.default.belongsTo(Impostors_js_1.default, {
     foreignKey: "gameID",
+    targetKey: "id",
+});
+// --- Asociación: Connections → Connections_Groups (1:N)
+Connections_js_1.default.hasMany(Connections_Groups_js_1.default, { foreignKey: "gameID" });
+Connections_Groups_js_1.default.belongsTo(Connections_js_1.default, {
+    foreignKey: "gameID",
+    targetKey: "id",
+});
+// --- Asociación: Connections_Groups → Connections_Groups_Results (1:N)
+Connections_Groups_js_1.default.hasMany(Connections_Groups_Results_js_1.default, {
+    foreignKey: "groupID",
+});
+Connections_Groups_Results_js_1.default.belongsTo(Connections_Groups_js_1.default, {
+    foreignKey: "groupID",
     targetKey: "id",
 });
