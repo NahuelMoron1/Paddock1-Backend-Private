@@ -187,7 +187,7 @@ export const createResults = async (req: Request, res: Response) => {
   try {
     const results = req.body;
 
-    if (!results || !results.groupID || !results.resultID) {
+    if (!results || !results.gameID || !results.groupID || !results.resultID) {
       return res
         .status(400)
         .json({ message: "Not all fields contains a value" });
@@ -195,8 +195,13 @@ export const createResults = async (req: Request, res: Response) => {
 
     const groupID = results.groupID;
     const resultID = results.resultID;
+    const gameID = results.gameID;
 
-    if (typeof groupID !== "string" || typeof resultID !== "string") {
+    if (
+      typeof gameID !== "string" ||
+      typeof groupID !== "string" ||
+      typeof resultID !== "string"
+    ) {
       return res.status(400).json({
         message:
           "There's a mistake on your try to create a group for game connections, please check every information you wrote.",
@@ -206,6 +211,7 @@ export const createResults = async (req: Request, res: Response) => {
     const id = uuidv4();
     const newResult = {
       id: id,
+      gameID: gameID,
       groupID: groupID,
       resultID: resultID,
     };

@@ -8,6 +8,10 @@ const Connections_Groups_Results = db.define(
       type: DataTypes.CHAR,
       primaryKey: true,
     },
+    gameID: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
     groupID: {
       type: DataTypes.STRING,
       allowNull: false,
