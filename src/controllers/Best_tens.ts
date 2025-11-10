@@ -333,7 +333,6 @@ async function updateAutomaticResults(
       sqlTable
     );
   }
-
   if (!topStats) {
     return false;
   }
@@ -393,6 +392,7 @@ function getID(sqlTable: string, result: any) {
 async function getWithoutParams(year: number, sqlTable: string, table: string) {
   let topStats;
   const seasonID = await findSeason(year);
+
   switch (sqlTable) {
     case "Season_Teams_Drivers":
       topStats = await findStdBySeason(seasonID, table, "DESC");
@@ -468,14 +468,16 @@ async function findStdBySeason(seasonID: string, table: string, type: string) {
   ///Type means DESC or ASC
   try {
     const std = await Season_Teams_Drivers.findAll({
-      where: { seasonID: seasonID },
+      where: { seasonID },
       include: [
         {
           model: Drivers,
           attributes: ["firstname", "lastname", "nationality", "image"],
         },
       ],
-      order: [[table, type]], // o 'ASC' si querés orden ascendente
+      attributes: ["driverID", [fn("SUM", col(table)), "totalStat"]],
+      group: ["Season_Teams_Drivers.driverID"], // ← agrupás por driver
+      order: [[literal("totalStat"), type]], // ← ordenás por el alias
       limit: 10,
     });
 
@@ -604,6 +606,8 @@ async function getTopDriversByStat(options: StatQueryOptions) {
       order: [[literal("totalStat"), order]],
       limit,
     });
+
+    console.log("RESULTS: ", results);
 
     return results;
   } catch (error) {

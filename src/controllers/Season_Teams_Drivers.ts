@@ -2,6 +2,7 @@ import csv from "csv-parser";
 import { Request, Response } from "express";
 import * as fs from "fs";
 import { Op } from "sequelize";
+import { DriverStats } from "../models/IDriverStats";
 import {
   Drivers,
   Season_Teams_Drivers,
@@ -118,13 +119,13 @@ export const getBySeason_Teams_Drivers = async (
 };
 
 export const createSeason = async (req: Request, res: Response) => {
-  //TO DO 1996, 1995, 1994, 1991, 1990, 89, 88, 87, 86, 85, 84, 82, 81, 80, 79, 78, 76, 75, 74, 73, 72, 71, 70, 69, 68, 67, 65, 63,62,61,60,59
-  const filePath = "../zSeasons/Season2001.csv"; // Asegúrate de que la ruta sea correcta
-  //const filePath = "../stdLeft.csv"; // Asegúrate de que la ruta sea correcta
+  //const filePath = "../zSeasons/Season2001 - Sheet1.csv"; // Asegúrate de que la ruta sea correcta
+  const filePath = "../stdLeft.csv"; // Asegúrate de que la ruta sea correcta
   readCsvData(filePath)
     .then(async (data) => {
-      for (let i = 0; i < data.length; i++) {
-        const std = await createData(data[i]);
+      const transformed = transformDriverData(data, 2000);
+      for (let i = 0; i < transformed.length; i++) {
+        const std = await createData(transformed[i]);
         if (std) {
           await Season_Teams_Drivers.create(std);
         }
@@ -137,7 +138,53 @@ export const createSeason = async (req: Request, res: Response) => {
     });
 };
 
-async function createData(data: CsvRow) {
+function transformDriverData(rawData: any[], seasonID: number): DriverStats[] {
+  return rawData.map((entry) => {
+    const [firstname, ...rest] = entry.Piloto.split(" ");
+    const lastname = rest.join(" ");
+
+    return {
+      seasonID,
+      teamID: entry["Escudería"],
+      car_number: 0,
+      laps_led: extractNumericValue(entry["Vueltas lideradas"]),
+      race_starts: extractRaceStarts(entry["Grandes Premios"]),
+      fastest_laps: extractNumericValue(entry["Vueltas rápidas"]),
+      poles: extractNumericValue(entry["*Poles*"]),
+      points: extractNumericValue(entry["Puntos"]),
+      podiums: extractNumericValue(entry["Podios"]),
+      wins: extractNumericValue(entry["Victorias"]),
+      standings: extractNumericValue(entry["Pos."]),
+      firstname,
+      lastname,
+    };
+  });
+}
+
+function safeLowerCase(value: any): string {
+  return typeof value === "string" ? value.toLowerCase() : "";
+}
+
+function extractRaceStarts(value: string): number {
+  if (!value) {
+    return 0;
+  }
+  const match = value.match(/\((\d+)\)/);
+  if (match) {
+    return parseInt(match[1]); // número dentro de los paréntesis
+  }
+  return parseInt(value) || 0; // si no hay paréntesis, usa el número directo
+}
+
+function extractNumericValue(value: any): number {
+  if (typeof value !== "string") {
+    return 0;
+  }
+  const cleaned = value.replace(/[^\d]/g, "");
+  return parseInt(cleaned) || 0;
+}
+
+async function createData(data: DriverStats) {
   const driver = await Drivers.findOne({
     where: { firstname: data.firstname, lastname: data.lastname },
   });
