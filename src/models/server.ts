@@ -8,6 +8,7 @@ import path from "path";
 import FEwebhookRouter from "../FEwebhook";
 import best10Router from "../routes/Best_tens";
 import connectionsRouter from "../routes/Connections";
+import guessTeamsRouter from "../routes/GuessTeams";
 import impostorRouter from "../routes/Impostors";
 import Seasons_TeamsRouter from "../routes/Season_Teams";
 import Seasons_Teams_DriversRouter from "../routes/Season_Teams_Drivers";
@@ -52,6 +53,7 @@ class Server {
     this.app.use("/api/best10", best10Router);
     this.app.use("/api/impostor", impostorRouter);
     this.app.use("/api/connections", connectionsRouter);
+    this.app.use("/api/guessTeams", guessTeamsRouter);
   }
   middlewares() {
     const allowedOrigins = ["http://localhost:4200", "http://localhost:4000"];

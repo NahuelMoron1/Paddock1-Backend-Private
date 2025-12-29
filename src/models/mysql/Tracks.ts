@@ -32,6 +32,9 @@ const Tracks = db.define(
     popularity: {
       type: DataTypes.INTEGER,
     },
+    flag: {
+      type: DataTypes.STRING,
+    },
   },
   {
     timestamps: false,

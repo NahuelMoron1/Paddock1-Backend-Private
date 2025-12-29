@@ -26,6 +26,8 @@ export const getSuggestions = async (req: Request, res: Response) => {
   const normalized = input.trim().toLowerCase();
   let results: any[] = [];
 
+  console.log(type);
+
   try {
     switch (type) {
       case "driver":
@@ -65,6 +67,14 @@ export const getSuggestions = async (req: Request, res: Response) => {
           ),
         });
         break;
+      case "season":
+        results = await Seasons.findAll({
+          where: Sequelize.where(Sequelize.fn("lower", Sequelize.col("year")), {
+            [Op.like]: `%${normalized}%`,
+          }),
+        });
+
+        break;
 
       default:
         return res.status(400).json({ message: "Invalid type" });
@@ -77,6 +87,8 @@ export const getSuggestions = async (req: Request, res: Response) => {
           ? `${r.firstname} ${r.lastname}`
           : type === "team"
           ? r.name
+          : type === "season"
+          ? r.year
           : r.track_name,
     }));
 

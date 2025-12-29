@@ -1,40 +1,41 @@
 import { DataTypes } from "sequelize";
 import db from "../../db/connection";
 
-const Teams = db.define(
-  "Teams",
+const GuessTeams = db.define(
+  "GuessTeams",
   {
     id: {
       type: DataTypes.STRING,
       primaryKey: true,
       defaultValue: DataTypes.UUIDV4, // Genera UUID automáticamente
     },
-    name: {
+    date: {
+      type: DataTypes.DATE,
+      allowNull: false,
+    },
+    team_id: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    common_name: {
+    team_principal: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    championships: {
-      type: DataTypes.INTEGER,
-      defaultValue: 0,
-    },
-    base: {
+    tp_flag: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    logo: {
+    driver1_id: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    popularity: {
-      type: DataTypes.INTEGER,
+    driver2_id: {
+      type: DataTypes.STRING,
       allowNull: false,
     },
-    flag: {
+    season_id: {
       type: DataTypes.STRING,
+      allowNull: false,
     },
   },
   {
@@ -42,4 +43,4 @@ const Teams = db.define(
   }
 );
 
-export default Teams;
+export default GuessTeams;

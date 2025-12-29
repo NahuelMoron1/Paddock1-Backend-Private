@@ -2,6 +2,7 @@ import Connections from "./Connections.js";
 import Connections_Groups from "./Connections_Groups.js";
 import Connections_Groups_Results from "./Connections_Groups_Results.js";
 import Drivers from "./Drivers.js";
+import GuessTeams from "./GuessTeams.js";
 import Impostors from "./Impostors.js";
 import Impostors_Results from "./Impostors_Results.js";
 import Season_Teams from "./Season_Teams.js";
@@ -85,11 +86,22 @@ Connections_Groups_Results.belongsTo(Connections_Groups, {
   targetKey: "id",
 });
 
+Teams.hasMany(GuessTeams, { foreignKey: "team_id" });
+Drivers.hasMany(GuessTeams, { foreignKey: "driver1_id", as: "GuessDriver1" });
+Drivers.hasMany(GuessTeams, { foreignKey: "driver2_id", as: "GuessDriver2" });
+Seasons.hasMany(GuessTeams, { foreignKey: "season_id" });
+
+GuessTeams.belongsTo(Teams, { foreignKey: "team_id" });
+GuessTeams.belongsTo(Drivers, { foreignKey: "driver1_id", as: "Driver1" });
+GuessTeams.belongsTo(Drivers, { foreignKey: "driver2_id", as: "Driver2" });
+GuessTeams.belongsTo(Seasons, { foreignKey: "season_id" });
+
 export {
   Connections,
   Connections_Groups,
   Connections_Groups_Results,
   Drivers,
+  GuessTeams,
   Impostors,
   Impostors_Results,
   Season_Teams,

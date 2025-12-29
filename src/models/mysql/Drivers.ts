@@ -33,6 +33,9 @@ const Drivers = db.define(
       type: DataTypes.INTEGER,
       allowNull: false,
     },
+    flag: {
+      type: DataTypes.STRING,
+    },
   },
   {
     timestamps: false,
