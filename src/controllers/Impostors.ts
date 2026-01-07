@@ -16,24 +16,131 @@ import {
 import Drivers from "../models/mysql/Drivers";
 import Teams from "../models/mysql/Teams";
 
+// Archivo para guardar el progreso del procesamiento
+const PROGRESS_FILE = path.join(__dirname, '../../../drivers_progress.json');
+
+// Función para cargar el progreso guardado
+function loadProgress(): { processed: string[], remaining: string[] } {
+  try {
+    if (fs.existsSync(PROGRESS_FILE)) {
+      const data = fs.readFileSync(PROGRESS_FILE, 'utf8');
+      return JSON.parse(data);
+    }
+  } catch (error) {
+    console.error("Error loading progress file:", error);
+  }
+  return { processed: [], remaining: [] };
+}
+
+// Función para guardar el progreso
+function saveProgress(processed: string[], remaining: string[]): void {
+  try {
+    fs.writeFileSync(PROGRESS_FILE, JSON.stringify({ processed, remaining }));
+  } catch (error) {
+    console.error("Error saving progress file:", error);
+  }
+}
+
 export const removeBackgroundForImages = async (
   req: Request,
   res: Response
 ) => {
   try {
-    const file = req.file;
-    if (!file) {
-      return res.status(400).json({ message: "No file" });
+    // Path to the drivers folder (one level up from server)
+    const driversPath = path.join(__dirname, '../../../drivers');
+    
+    // Cargar progreso anterior si existe
+    let progress = loadProgress();
+    let processedFiles = progress.processed || [];
+    
+    // Read all files from the drivers directory
+    const files = fs.readdirSync(driversPath);
+    
+    // Filter for image files (assuming jpg/jpeg/png)
+    const imageFiles = files.filter(file => 
+      /\.(jpg|jpeg|png)$/i.test(file)
+    );
+    
+    if (imageFiles.length === 0) {
+      return res.status(400).json({ message: "No image files found in drivers folder" });
     }
-    const imageWithoutBg = await removeBackground(file);
-    if (!imageWithoutBg) {
-      return res.status(500).json({ message: "Error removing background" });
+    
+    // Filtrar archivos ya procesados
+    const remainingFiles = imageFiles.filter(file => !processedFiles.includes(file));
+    
+    if (remainingFiles.length === 0) {
+      return res.status(200).json({ 
+        message: "All images have been processed already",
+        processed: processedFiles.length,
+        remaining: 0
+      });
     }
-    const url = postImage(imageWithoutBg, file.originalname);
-    console.log("URL: ", url);
-
-    return res.status(200).json({ message: "saved" });
+    
+    const results = [];
+    const errors = [];
+    const MAX_IMAGES = 10; // Límite de 10 imágenes por ejecución para evitar límites de API
+    
+    // Process each image file (up to MAX_IMAGES)
+    for (let i = 0; i < Math.min(remainingFiles.length, MAX_IMAGES); i++) {
+      const fileName = remainingFiles[i];
+      try {
+        const filePath = path.join(driversPath, fileName);
+        const fileBuffer = fs.readFileSync(filePath);
+        
+        // Create a file-like object that removeBackground can process
+        const fileObj = {
+          buffer: fileBuffer,
+          originalname: fileName
+        } as Express.Multer.File;
+        
+        // Remove background
+        const imageWithoutBg = await removeBackground(fileObj);
+        if (!imageWithoutBg) {
+          errors.push({ file: fileName, error: "Error removing background" });
+          continue;
+        }
+        
+        // Save processed image
+        const url = postImage(imageWithoutBg, fileName);
+        console.log(`Processed ${fileName}, saved to: ${url}`);
+        results.push({ file: fileName, url });
+        
+        // Añadir a la lista de procesados
+        processedFiles.push(fileName);
+        
+        // Eliminar la imagen original después de procesarla correctamente
+        try {
+          fs.unlinkSync(filePath);
+          console.log(`Deleted original file: ${fileName}`);
+        } catch (deleteErr) {
+          console.error(`Error deleting original file ${fileName}:`, deleteErr);
+          // No añadimos esto a los errores porque el procesamiento fue exitoso
+        }
+      } catch (err) {
+        console.error(`Error processing ${fileName}:`, err);
+        errors.push({ file: fileName, error: err });
+        // No eliminamos la imagen original si hubo un error en el procesamiento
+      }
+      
+      // Guardar progreso después de cada imagen para evitar pérdidas
+      saveProgress(processedFiles, remainingFiles.slice(i + 1));
+    }
+    
+    // Guardar progreso final de esta ejecución
+    saveProgress(processedFiles, remainingFiles.slice(Math.min(remainingFiles.length, MAX_IMAGES)));
+    
+    // Información sobre imágenes restantes
+    const remainingImagesCount = remainingFiles.length - Math.min(remainingFiles.length, MAX_IMAGES);
+    
+    return res.status(200).json({ 
+      message: `Processed ${results.length} images, with ${errors.length} errors. ${remainingImagesCount} images remaining.`,
+      processed: results,
+      errors: errors,
+      total_processed: processedFiles.length,
+      remainingImages: remainingImagesCount
+    });
   } catch (error) {
+    console.error("Error in batch processing:", error);
     return res.status(500).json({ message: error });
   }
 };
@@ -664,33 +771,88 @@ async function findByTracks(
     .filter((d: any) => d);
 }
 
-const REMOVE_BG_API_KEY = "8h7vtT5EomgjNXiSFm4xQGWs"; // Reemplázala con tu API key
+// API keys para servicios de eliminación de fondos (rotar si se alcanza el límite)
+const REMOVE_BG_API_KEYS = [
+  "bi8UFJaED5QXAPrXmYNwmFc3", // Clave original
+  "kAswswSZTQMJPDXPz2qNQb9P", // Segunda clave
+  "6oQf7SLkKvNPxQpVDnPGsUJP"  // Tercera clave (puedes añadir más)
+];
 
+// Índice para la rotación de API keys
+let currentKeyIndex = 0;
+
+// Función para obtener la siguiente API key
+function getNextApiKey(): string {
+  const key = REMOVE_BG_API_KEYS[currentKeyIndex];
+  currentKeyIndex = (currentKeyIndex + 1) % REMOVE_BG_API_KEYS.length;
+  return key;
+}
+
+// Función que utiliza la API de remove.bg para eliminar el fondo
 async function removeBackground(
   file: Express.Multer.File
 ): Promise<Buffer | null> {
   const formData = new FormData();
   formData.append("image_file", file.buffer, { filename: file.originalname });
   formData.append("size", "auto");
-
-  try {
-    const response = await axios.post(
-      "https://api.remove.bg/v1.0/removebg",
-      formData,
-      {
-        headers: {
-          "X-Api-Key": REMOVE_BG_API_KEY,
-          ...formData.getHeaders(),
-        },
-        responseType: "arraybuffer", // Devuelve la imagen en binario
+  
+  // Intentar hasta 3 veces con diferentes API keys si hay error
+  for (let attempt = 0; attempt < 3; attempt++) {
+    try {
+      const apiKey = getNextApiKey();
+      console.log(`Intento ${attempt + 1} con API key: ${apiKey.substring(0, 5)}...`);
+      
+      const response = await axios.post(
+        "https://api.remove.bg/v1.0/removebg",
+        formData,
+        {
+          headers: {
+            "X-Api-Key": apiKey,
+            ...formData.getHeaders(),
+          },
+          responseType: "arraybuffer", // Devuelve la imagen en binario
+        }
+      );
+      
+      // Verificar si la respuesta es un error (a veces viene como JSON)
+      if (response.headers['content-type']?.includes('application/json')) {
+        const errorText = Buffer.from(response.data).toString('utf8');
+        if (errorText.includes('error')) {
+          console.log(`Error en API: ${errorText}`);
+          continue; // Probar con la siguiente API key
+        }
       }
-    );
-
-    return Buffer.from(response.data); // Retorna la imagen procesada como buffer
-  } catch (error) {
-    console.error("Error removiendo el fondo:", error);
-    return null;
+      
+      return Buffer.from(response.data); // Retorna la imagen procesada como buffer
+    } catch (error: any) {
+      console.error(`Error con API key ${attempt + 1}:`, error.message);
+      
+      // Si es el último intento, fallar
+      if (attempt === 2) {
+        console.error("Todos los intentos fallaron. Usando procesamiento local como respaldo.");
+        
+        // Usar Sharp como respaldo
+        try {
+          const sharp = require('sharp');
+          return await sharp(file.buffer)
+            .png()
+            .trim()
+            .resize({
+              width: 800,
+              height: 800,
+              fit: 'inside',
+              withoutEnlargement: true
+            })
+            .toBuffer();
+        } catch (sharpError) {
+          console.error("Error con procesamiento local:", sharpError);
+          return null;
+        }
+      }
+    }
   }
+  
+  return null;
 }
 
 export const postImage = (
@@ -699,15 +861,29 @@ export const postImage = (
 ): string | undefined => {
   if (!file) return undefined;
 
-  const uploadPath = path.join("uploads/drivers", originalName!);
-
-  // 🔹 Si `file` es un Buffer (imagen procesada), lo guarda como un archivo
-  if (file instanceof Buffer) {
-    fs.writeFileSync(uploadPath, file as Uint8Array); // si es Buffer directo
-  } else {
-    // 🔹 Si es un archivo Multer, guarda el buffer
-    fs.writeFileSync(uploadPath, file.buffer as Uint8Array); // si es Multer
+  // Asegurarse de que la carpeta de destino existe
+  const uploadDir = path.join("uploads/drivers");
+  if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
   }
 
-  return uploadPath;
+  // Generar un nombre de archivo consistente
+  const fileName = originalName || `image_${Date.now()}.png`;
+  const uploadPath = path.join(uploadDir, fileName);
+
+  try {
+    // Si `file` es un Buffer (imagen procesada), lo guarda como un archivo
+    if (file instanceof Buffer) {
+      fs.writeFileSync(uploadPath, file as unknown as Uint8Array);
+    } else {
+      // Si es un archivo Multer, guarda el buffer
+      fs.writeFileSync(uploadPath, file.buffer as unknown as Uint8Array);
+    }
+    
+    console.log(`Imagen guardada exitosamente en: ${uploadPath}`);
+    return uploadPath;
+  } catch (error) {
+    console.error(`Error guardando la imagen en ${uploadPath}:`, error);
+    return undefined;
+  }
 };

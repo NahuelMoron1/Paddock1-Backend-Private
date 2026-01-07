@@ -7,6 +7,9 @@ import {
   getGameByID,
   getGroupsByGameID,
   getResultsByGroupID,
+  deleteGroup,
+  deleteGameResults,
+  updateGame,
 } from "../controllers/Connections";
 
 const router = Router();
@@ -18,4 +21,8 @@ router.get("/all/results/:groupID/:type", getResultsByGroupID);
 router.post("/create/game", createGame);
 router.post("/create/group", createGroup);
 router.post("/create/result", createResults);
+router.post("/update/game/:gameID", updateGame);
+router.delete("/delete/group/:groupID", deleteGroup);
+router.delete("/delete/result/:groupID/:resultID", deleteGameResults);
+
 export default router;

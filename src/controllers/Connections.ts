@@ -151,6 +151,7 @@ export const createGroup = async (req: Request, res: Response) => {
         .json({ message: "Not all fields contains a value" });
     }
 
+    const id = group.id;
     const title = group.title;
     const gameID = group.gameID;
     const results = group.results;
@@ -165,8 +166,6 @@ export const createGroup = async (req: Request, res: Response) => {
           "There's a mistake on your try to create a group for game connections, please check every information you wrote.",
       });
     }
-
-    const id = uuidv4();
 
     const newGroup = {
       id: id,
@@ -222,6 +221,101 @@ export const createResults = async (req: Request, res: Response) => {
       return res.status(304).json({
         message:
           "Something failed while creating connections results in game. Please contact support",
+      });
+    }
+
+    return res.status(200).json(true);
+  } catch (error) {
+    return res.status(500).json({ message: error });
+  }
+};
+
+export const deleteGroup = async (req: Request, res: Response) => {
+  try {
+    const { groupID } = req.params;
+    if (!groupID) {
+      return res.status(400).json({ message: "No ID Provided" });
+    }
+
+    const deleted = await Connections_Groups.destroy({
+      where: { id: groupID },
+    });
+
+    if (!deleted) {
+      return res.status(304).json({
+        message:
+          "Something failed while deleting group. Please contact support",
+      });
+    }
+
+    return res.status(200).json(true);
+  } catch (error) {
+    return res.status(500).json({ message: error });
+  }
+};
+
+export const deleteGameResults = async (req: Request, res: Response) => {
+  try {
+    const { groupID, resultID } = req.params;
+    if (!groupID || !resultID) {
+      return res.status(400).json({ message: "No ID Provided" });
+    }
+
+    const deleted = await Connections_Groups_Results.destroy({
+      where: { groupID: groupID, resultID: resultID },
+    });
+
+    if (!deleted) {
+      return res.status(304).json({
+        message:
+          "Something failed while deleting results. Please contact support",
+      });
+    }
+
+    return res.status(200).json(true);
+  } catch (error) {
+    return res.status(500).json({ message: error });
+  }
+};
+
+export const updateGame = async (req: Request, res: Response) => {
+  try {
+    const { gameID } = req.params;
+    if (!gameID) {
+      return res.status(400).json({ message: "No ID Provided" });
+    }
+
+    const game = req.body;
+
+    if (!game || !game.date || !game.type || !game.amount_groups) {
+      return res
+        .status(400)
+        .json({ message: "Not all fields contains a value" });
+    }
+
+    const date = game.date;
+    const type = game.type;
+    const amount_groups = game.amount_groups;
+
+    if (
+      typeof date !== "string" ||
+      typeof type !== "string" ||
+      typeof amount_groups !== "number"
+    ) {
+      return res.status(400).json({
+        message:
+          "There's a mistake on your try to update the game, please check every information you wrote.",
+      });
+    }
+
+    const updated = await Connections.update(
+      { date: date, type: type, amount_groups: amount_groups },
+      { where: { id: gameID } }
+    );
+
+    if (!updated) {
+      return res.status(304).json({
+        message: "Something failed while updating game. Please contact support",
       });
     }
 
