@@ -17,13 +17,13 @@ import Drivers from "../models/mysql/Drivers";
 import Teams from "../models/mysql/Teams";
 
 // Archivo para guardar el progreso del procesamiento
-const PROGRESS_FILE = path.join(__dirname, '../../../drivers_progress.json');
+const PROGRESS_FILE = path.join(__dirname, "../../../drivers_progress.json");
 
 // Función para cargar el progreso guardado
-function loadProgress(): { processed: string[], remaining: string[] } {
+function loadProgress(): { processed: string[]; remaining: string[] } {
   try {
     if (fs.existsSync(PROGRESS_FILE)) {
-      const data = fs.readFileSync(PROGRESS_FILE, 'utf8');
+      const data = fs.readFileSync(PROGRESS_FILE, "utf8");
       return JSON.parse(data);
     }
   } catch (error) {
@@ -47,67 +47,69 @@ export const removeBackgroundForImages = async (
 ) => {
   try {
     // Path to the drivers folder (one level up from server)
-    const driversPath = path.join(__dirname, '../../../drivers');
-    
+    const driversPath = path.join(__dirname, "../../../drivers");
+
     // Cargar progreso anterior si existe
     let progress = loadProgress();
     let processedFiles = progress.processed || [];
-    
+
     // Read all files from the drivers directory
     const files = fs.readdirSync(driversPath);
-    
+
     // Filter for image files (assuming jpg/jpeg/png)
-    const imageFiles = files.filter(file => 
-      /\.(jpg|jpeg|png)$/i.test(file)
-    );
-    
+    const imageFiles = files.filter((file) => /\.(jpg|jpeg|png)$/i.test(file));
+
     if (imageFiles.length === 0) {
-      return res.status(400).json({ message: "No image files found in drivers folder" });
+      return res
+        .status(400)
+        .json({ message: "No image files found in drivers folder" });
     }
-    
+
     // Filtrar archivos ya procesados
-    const remainingFiles = imageFiles.filter(file => !processedFiles.includes(file));
-    
+    const remainingFiles = imageFiles.filter(
+      (file) => !processedFiles.includes(file)
+    );
+
     if (remainingFiles.length === 0) {
-      return res.status(200).json({ 
+      return res.status(200).json({
         message: "All images have been processed already",
         processed: processedFiles.length,
-        remaining: 0
+        remaining: 0,
       });
     }
-    
+
     const results = [];
     const errors = [];
     const MAX_IMAGES = 10; // Límite de 10 imágenes por ejecución para evitar límites de API
-    
+
     // Process each image file (up to MAX_IMAGES)
     for (let i = 0; i < Math.min(remainingFiles.length, MAX_IMAGES); i++) {
       const fileName = remainingFiles[i];
       try {
         const filePath = path.join(driversPath, fileName);
         const fileBuffer = fs.readFileSync(filePath);
-        
+
         // Create a file-like object that removeBackground can process
         const fileObj = {
           buffer: fileBuffer,
-          originalname: fileName
+          originalname: fileName,
         } as Express.Multer.File;
-        
+
         // Remove background
         const imageWithoutBg = await removeBackground(fileObj);
         if (!imageWithoutBg) {
           errors.push({ file: fileName, error: "Error removing background" });
           continue;
         }
-        
+
         // Save processed image
         const url = postImage(imageWithoutBg, fileName);
         console.log(`Processed ${fileName}, saved to: ${url}`);
         results.push({ file: fileName, url });
-        
+
         // Añadir a la lista de procesados
         processedFiles.push(fileName);
-        
+
         // Eliminar la imagen original después de procesarla correctamente
         try {
           fs.unlinkSync(filePath);
@@ -121,23 +123,27 @@ export const removeBackgroundForImages = async (
         errors.push({ file: fileName, error: err });
         // No eliminamos la imagen original si hubo un error en el procesamiento
       }
-      
+
       // Guardar progreso después de cada imagen para evitar pérdidas
       saveProgress(processedFiles, remainingFiles.slice(i + 1));
     }
-    
+
     // Guardar progreso final de esta ejecución
-    saveProgress(processedFiles, remainingFiles.slice(Math.min(remainingFiles.length, MAX_IMAGES)));
-    
+    saveProgress(
+      processedFiles,
+      remainingFiles.slice(Math.min(remainingFiles.length, MAX_IMAGES))
+    );
+
     // Información sobre imágenes restantes
-    const remainingImagesCount = remainingFiles.length - Math.min(remainingFiles.length, MAX_IMAGES);
-    
-    return res.status(200).json({ 
+    const remainingImagesCount =
+      remainingFiles.length - Math.min(remainingFiles.length, MAX_IMAGES);
+
+    return res.status(200).json({
       message: `Processed ${results.length} images, with ${errors.length} errors. ${remainingImagesCount} images remaining.`,
       processed: results,
       errors: errors,
       total_processed: processedFiles.length,
-      remainingImages: remainingImagesCount
+      remainingImages: remainingImagesCount,
     });
   } catch (error) {
     console.error("Error in batch processing:", error);
@@ -247,6 +253,199 @@ export const getGameData = async (req: Request, res: Response) => {
   }
 };
 
+// Obtener todos los juegos de impostor
+export const getAllImpostorGames = async (req: Request, res: Response) => {
+  try {
+    const games = await Impostors.findAll({
+      order: [["date", "DESC"]],
+    });
+
+    return res.status(200).json(games);
+  } catch (error) {
+    console.error("Error getting impostor games:", error);
+    return res.status(500).json({ message: error });
+  }
+};
+
+// Obtener un juego específico por ID con sus resultados
+export const getGameById = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    if (!id) {
+      return res.status(400).json({ message: "Game ID is required" });
+    }
+
+    const game = await Impostors.findByPk(id);
+
+    if (!game) {
+      return res.status(404).json({ message: "Game not found" });
+    }
+
+    // Obtener impostores y inocentes
+    const results = await Impostors_Results.findAll({
+      where: { gameID: id },
+    });
+
+    const impostors: any[] = [];
+    const innocents: any[] = [];
+
+    for (const result of results) {
+      const isImpostor = result.getDataValue("isImpostor");
+      const resultID = result.getDataValue("resultID");
+
+      let entity;
+      const type = game.getDataValue("type");
+
+      if (type === "driver") {
+        entity = await Drivers.findByPk(resultID);
+      } else if (type === "team") {
+        entity = await Teams.findByPk(resultID);
+      } else if (type === "track") {
+        entity = await Tracks.findByPk(resultID);
+      }
+
+      if (entity) {
+        const resultObj: any = {};
+
+        if (type === "driver") {
+          resultObj.driver = entity;
+        } else if (type === "team") {
+          resultObj.team = entity;
+        } else if (type === "track") {
+          resultObj.track = entity;
+        }
+
+        if (isImpostor) {
+          impostors.push(resultObj);
+        } else {
+          innocents.push(resultObj);
+        }
+      }
+    }
+
+    const gameData = {
+      id: game.getDataValue("id"),
+      title: game.getDataValue("title"),
+      date: game.getDataValue("date"),
+      type: game.getDataValue("type"),
+      amount_impostors: game.getDataValue("amount_impostors"),
+      amount_innocents: game.getDataValue("amount_innocents"),
+      impostors,
+      innocents,
+    };
+
+    return res.status(200).json(gameData);
+  } catch (error) {
+    console.error("Error getting impostor game:", error);
+    return res.status(500).json({ message: error });
+  }
+};
+
+// Actualizar un juego existente
+export const updateGame = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const {
+      title,
+      date,
+      amount_impostors,
+      amount_innocents,
+      impostors,
+      innocents,
+      type,
+    } = req.body;
+
+    if (!id) {
+      return res.status(400).json({ message: "Game ID is required" });
+    }
+
+    // Verificar que el juego existe
+    const game = await Impostors.findByPk(id);
+
+    if (!game) {
+      return res.status(404).json({ message: "Game not found" });
+    }
+
+    // Validar los datos
+    const validated = validateImpostorGame(
+      title,
+      date,
+      amount_impostors,
+      amount_innocents,
+      impostors,
+      innocents,
+      type
+    );
+
+    if (!validated) {
+      return res
+        .status(400)
+        .json({ message: "Validation for parameters failed" });
+    }
+
+    // Corregir el problema de zona horaria para la fecha
+    let adjustedDate = date;
+    if (date && typeof date === "string") {
+      // Asegurarse de que la fecha se mantenga como la ingresada por el usuario
+      const dateParts = date.split("-");
+      if (dateParts.length === 3) {
+        // Crear la fecha con la hora en UTC a las 12:00 para evitar problemas de zona horaria
+        const dateObj = new Date(
+          Date.UTC(
+            parseInt(dateParts[0]), // año
+            parseInt(dateParts[1]) - 1, // mes (0-11)
+            parseInt(dateParts[2]), // día
+            12,
+            0,
+            0 // mediodía UTC
+          )
+        );
+        adjustedDate = dateObj.toISOString().split("T")[0]; // YYYY-MM-DD
+      }
+    }
+
+    // Actualizar el juego
+    await Impostors.update(
+      {
+        title,
+        date: adjustedDate,
+        amount_impostors,
+        amount_innocents,
+        type,
+      },
+      { where: { id } }
+    );
+
+    // Eliminar resultados existentes
+    await Impostors_Results.destroy({ where: { gameID: id } });
+
+    // Crear nuevos resultados
+    const impostorResults: any[] = createImpostorResults(
+      impostors,
+      innocents,
+      type,
+      id
+    );
+
+    if (impostorResults.length <= 0) {
+      return res.status(500).json({
+        message:
+          "Something went wrong by adding impostor results. Please contact support",
+      });
+    }
+
+    for (let result of impostorResults) {
+      await Impostors_Results.create(result);
+    }
+
+    return res.status(200).json({ message: "Game updated successfully" });
+  } catch (error) {
+    console.error("Error updating impostor game:", error);
+    return res.status(500).json({ message: error });
+  }
+};
+
 async function getResults(results: Model<any, any>[], type: string) {
   switch (type) {
     case "driver":
@@ -318,9 +517,30 @@ export const createImpostorGame = async (req: Request, res: Response) => {
         .json({ message: "Validation for parameters failed" });
     }
 
+    // Corregir el problema de zona horaria para la fecha
+    let adjustedDate = date;
+    if (date && typeof date === "string") {
+      // Asegurarse de que la fecha se mantenga como la ingresada por el usuario
+      const dateParts = date.split("-");
+      if (dateParts.length === 3) {
+        // Crear la fecha con la hora en UTC a las 12:00 para evitar problemas de zona horaria
+        const dateObj = new Date(
+          Date.UTC(
+            parseInt(dateParts[0]), // año
+            parseInt(dateParts[1]) - 1, // mes (0-11)
+            parseInt(dateParts[2]), // día
+            12,
+            0,
+            0 // mediodía UTC
+          )
+        );
+        adjustedDate = dateObj.toISOString().split("T")[0]; // YYYY-MM-DD
+      }
+    }
+
     const impostorGame = {
       title: title,
-      date: date,
+      date: adjustedDate,
       amount_impostors: amount_impostors,
       amount_innocents: amount_innocents,
       type: type,
@@ -347,9 +567,10 @@ export const createImpostorGame = async (req: Request, res: Response) => {
       await Impostors_Results.create(result);
     }
 
-    return res
-      .status(200)
-      .json({ message: "Impostor game created successfully" });
+    return res.status(200).json({
+      message: "Impostor game created successfully",
+      gameId: gameID,
+    });
   } catch (error) {
     return res.status(500).json({ message: error });
   }
@@ -775,7 +996,7 @@ async function findByTracks(
 const REMOVE_BG_API_KEYS = [
   "bi8UFJaED5QXAPrXmYNwmFc3", // Clave original
   "kAswswSZTQMJPDXPz2qNQb9P", // Segunda clave
-  "6oQf7SLkKvNPxQpVDnPGsUJP"  // Tercera clave (puedes añadir más)
+  "6oQf7SLkKvNPxQpVDnPGsUJP", // Tercera clave (puedes añadir más)
 ];
 
 // Índice para la rotación de API keys
@@ -795,13 +1016,15 @@ async function removeBackground(
   const formData = new FormData();
   formData.append("image_file", file.buffer, { filename: file.originalname });
   formData.append("size", "auto");
-  
+
   // Intentar hasta 3 veces con diferentes API keys si hay error
   for (let attempt = 0; attempt < 3; attempt++) {
     try {
       const apiKey = getNextApiKey();
-      console.log(`Intento ${attempt + 1} con API key: ${apiKey.substring(0, 5)}...`);
-      
+      console.log(
+        `Intento ${attempt + 1} con API key: ${apiKey.substring(0, 5)}...`
+      );
+
       const response = await axios.post(
         "https://api.remove.bg/v1.0/removebg",
         formData,
@@ -813,35 +1036,37 @@ async function removeBackground(
           responseType: "arraybuffer", // Devuelve la imagen en binario
         }
       );
-      
+
       // Verificar si la respuesta es un error (a veces viene como JSON)
-      if (response.headers['content-type']?.includes('application/json')) {
-        const errorText = Buffer.from(response.data).toString('utf8');
-        if (errorText.includes('error')) {
+      if (response.headers["content-type"]?.includes("application/json")) {
+        const errorText = Buffer.from(response.data).toString("utf8");
+        if (errorText.includes("error")) {
           console.log(`Error en API: ${errorText}`);
           continue; // Probar con la siguiente API key
         }
       }
-      
+
       return Buffer.from(response.data); // Retorna la imagen procesada como buffer
     } catch (error: any) {
       console.error(`Error con API key ${attempt + 1}:`, error.message);
-      
+
       // Si es el último intento, fallar
       if (attempt === 2) {
-        console.error("Todos los intentos fallaron. Usando procesamiento local como respaldo.");
-        
+        console.error(
+          "Todos los intentos fallaron. Usando procesamiento local como respaldo."
+        );
+
         // Usar Sharp como respaldo
         try {
-          const sharp = require('sharp');
+          const sharp = require("sharp");
           return await sharp(file.buffer)
             .png()
             .trim()
             .resize({
               width: 800,
               height: 800,
-              fit: 'inside',
-              withoutEnlargement: true
+              fit: "inside",
+              withoutEnlargement: true,
             })
             .toBuffer();
         } catch (sharpError) {
@@ -851,7 +1076,7 @@ async function removeBackground(
       }
     }
   }
-  
+
   return null;
 }
 
@@ -879,7 +1104,7 @@ export const postImage = (
       // Si es un archivo Multer, guarda el buffer
       fs.writeFileSync(uploadPath, file.buffer as unknown as Uint8Array);
     }
-    
+
     console.log(`Imagen guardada exitosamente en: ${uploadPath}`);
     return uploadPath;
   } catch (error) {

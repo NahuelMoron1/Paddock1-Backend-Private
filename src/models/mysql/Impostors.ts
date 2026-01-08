@@ -14,7 +14,7 @@ const Impostors = db.define(
       allowNull: false,
     },
     date: {
-      type: DataTypes.DATE,
+      type: DataTypes.DATEONLY, // Usar DATEONLY en lugar de DATE para evitar problemas de zona horaria
       allowNull: false,
     },
     amount_impostors: {
