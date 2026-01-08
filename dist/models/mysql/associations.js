@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Tracks = exports.Teams = exports.Seasons = exports.Season_Tracks = exports.Season_Teams_Drivers = exports.Season_Teams = exports.Impostors_Results = exports.Impostors = exports.GuessTeams = exports.Drivers = exports.Connections_Groups_Results = exports.Connections_Groups = exports.Connections = void 0;
+exports.Tracks = exports.Teams = exports.Seasons = exports.Season_Tracks = exports.Season_Teams_Drivers = exports.Season_Teams = exports.Impostors_Results = exports.Impostors = exports.H2HGames = exports.GuessTeams = exports.Drivers = exports.Connections_Groups_Results = exports.Connections_Groups = exports.Connections = void 0;
 const Connections_js_1 = __importDefault(require("./Connections.js"));
 exports.Connections = Connections_js_1.default;
 const Connections_Groups_js_1 = __importDefault(require("./Connections_Groups.js"));
@@ -18,6 +18,8 @@ const Impostors_js_1 = __importDefault(require("./Impostors.js"));
 exports.Impostors = Impostors_js_1.default;
 const Impostors_Results_js_1 = __importDefault(require("./Impostors_Results.js"));
 exports.Impostors_Results = Impostors_Results_js_1.default;
+const H2HGames_js_1 = __importDefault(require("./H2HGames.js"));
+exports.H2HGames = H2HGames_js_1.default;
 const Season_Teams_js_1 = __importDefault(require("./Season_Teams.js"));
 exports.Season_Teams = Season_Teams_js_1.default;
 const Season_Teams_Drivers_js_1 = __importDefault(require("./Season_Teams_Drivers.js")); // Importa la nueva tabla
@@ -100,3 +102,10 @@ GuessTeams_js_1.default.belongsTo(Teams_js_1.default, { foreignKey: "team_id" })
 GuessTeams_js_1.default.belongsTo(Drivers_js_1.default, { foreignKey: "driver1_id", as: "Driver1" });
 GuessTeams_js_1.default.belongsTo(Drivers_js_1.default, { foreignKey: "driver2_id", as: "Driver2" });
 GuessTeams_js_1.default.belongsTo(Seasons_js_1.default, { foreignKey: "season_id" });
+// Asociaciones para H2HGames
+Teams_js_1.default.hasMany(H2HGames_js_1.default, { foreignKey: "team_id" });
+Drivers_js_1.default.hasMany(H2HGames_js_1.default, { foreignKey: "driver1_id", as: "H2HDriver1" });
+Drivers_js_1.default.hasMany(H2HGames_js_1.default, { foreignKey: "driver2_id", as: "H2HDriver2" });
+H2HGames_js_1.default.belongsTo(Teams_js_1.default, { foreignKey: "team_id" });
+H2HGames_js_1.default.belongsTo(Drivers_js_1.default, { foreignKey: "driver1_id", as: "Driver1" });
+H2HGames_js_1.default.belongsTo(Drivers_js_1.default, { foreignKey: "driver2_id", as: "Driver2" });

@@ -22,6 +22,7 @@ const FEwebhook_1 = __importDefault(require("../FEwebhook"));
 const Best_tens_1 = __importDefault(require("../routes/Best_tens"));
 const Connections_1 = __importDefault(require("../routes/Connections"));
 const GuessTeams_1 = __importDefault(require("../routes/GuessTeams"));
+const H2HGames_1 = __importDefault(require("../routes/H2HGames"));
 const Impostors_1 = __importDefault(require("../routes/Impostors"));
 const Season_Teams_1 = __importDefault(require("../routes/Season_Teams"));
 const Season_Teams_Drivers_1 = __importDefault(require("../routes/Season_Teams_Drivers"));
@@ -63,6 +64,7 @@ class Server {
         this.app.use("/api/impostor", Impostors_1.default);
         this.app.use("/api/connections", Connections_1.default);
         this.app.use("/api/guessTeams", GuessTeams_1.default);
+        this.app.use("/api/h2h", H2HGames_1.default);
     }
     middlewares() {
         const allowedOrigins = ["http://localhost:4200", "http://localhost:4000"];

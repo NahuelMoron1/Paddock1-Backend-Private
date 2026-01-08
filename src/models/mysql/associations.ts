@@ -5,6 +5,7 @@ import Drivers from "./Drivers.js";
 import GuessTeams from "./GuessTeams.js";
 import Impostors from "./Impostors.js";
 import Impostors_Results from "./Impostors_Results.js";
+import H2HGames from "./H2HGames.js";
 import Season_Teams from "./Season_Teams.js";
 import Season_Teams_Drivers from "./Season_Teams_Drivers.js"; // Importa la nueva tabla
 import Seasons from "./Seasons.js";
@@ -96,12 +97,22 @@ GuessTeams.belongsTo(Drivers, { foreignKey: "driver1_id", as: "Driver1" });
 GuessTeams.belongsTo(Drivers, { foreignKey: "driver2_id", as: "Driver2" });
 GuessTeams.belongsTo(Seasons, { foreignKey: "season_id" });
 
+// Asociaciones para H2HGames
+Teams.hasMany(H2HGames, { foreignKey: "team_id" });
+Drivers.hasMany(H2HGames, { foreignKey: "driver1_id", as: "H2HDriver1" });
+Drivers.hasMany(H2HGames, { foreignKey: "driver2_id", as: "H2HDriver2" });
+
+H2HGames.belongsTo(Teams, { foreignKey: "team_id" });
+H2HGames.belongsTo(Drivers, { foreignKey: "driver1_id", as: "Driver1" });
+H2HGames.belongsTo(Drivers, { foreignKey: "driver2_id", as: "Driver2" });
+
 export {
   Connections,
   Connections_Groups,
   Connections_Groups_Results,
   Drivers,
   GuessTeams,
+  H2HGames,
   Impostors,
   Impostors_Results,
   Season_Teams,
