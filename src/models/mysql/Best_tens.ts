@@ -2,7 +2,7 @@ import { DataTypes } from "sequelize";
 import db from "../../db/connection";
 
 const Best_tens = db.define(
-  "Best_tens",
+  "best_tens",
   {
     id: {
       type: DataTypes.CHAR,

@@ -2,7 +2,7 @@ import { DataTypes } from "sequelize";
 import db from "../../db/connection";
 
 const Manual_Best_tens_results = db.define(
-  "Manual_Best_tens_results",
+  "manual_Best_tens_results",
   {
     id: {
       type: DataTypes.STRING,

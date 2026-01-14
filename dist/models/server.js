@@ -17,6 +17,7 @@ const cors_1 = __importDefault(require("cors"));
 const express_1 = __importDefault(require("express"));
 const morgan_1 = __importDefault(require("morgan"));
 const path_1 = __importDefault(require("path"));
+const node_cron_1 = __importDefault(require("node-cron"));
 //routes
 const FEwebhook_1 = __importDefault(require("../FEwebhook"));
 const Best_tens_1 = __importDefault(require("../routes/Best_tens"));
@@ -32,6 +33,8 @@ const Teams_1 = __importDefault(require("../routes/Teams"));
 const Tracks_1 = __importDefault(require("../routes/Tracks"));
 const Wordle_1 = __importDefault(require("../routes/Wordle"));
 const webhook_1 = __importDefault(require("../webhook"));
+//functions
+const Best_tens_2 = require("../controllers/Best_tens");
 //database settings
 const connection_1 = __importDefault(require("../db/connection"));
 const config_1 = require("./config");
@@ -43,6 +46,7 @@ class Server {
         this.middlewares();
         this.routes();
         this.dbConnect();
+        this.scheduleDailyUpdates();
     }
     listen() {
         this.app.listen(this.port, () => {
@@ -95,6 +99,27 @@ class Server {
                 }
             }
         });
+    }
+    scheduleDailyUpdates() {
+        // Schedule daily update at 00:00 GMT (midnight UTC)
+        node_cron_1.default.schedule('0 0 * * *', () => __awaiter(this, void 0, void 0, function* () {
+            console.log('🕐 Running scheduled daily update for Best10 game results...');
+            try {
+                const result = yield (0, Best_tens_2.updateBest10GameResultsCore)();
+                if (result.success) {
+                    console.log('✅ Daily update completed successfully:', result.message);
+                }
+                else {
+                    console.error('❌ Daily update failed:', result.message);
+                }
+            }
+            catch (error) {
+                console.error('💥 Unexpected error during scheduled update:', error);
+            }
+        }), {
+            timezone: "GMT"
+        });
+        console.log('📅 Daily update scheduler initialized (runs at 00:00 GMT daily)');
     }
 }
 exports.default = Server;

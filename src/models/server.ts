@@ -3,6 +3,7 @@ import cors from "cors";
 import express, { Application, Request, Response } from "express";
 import morgan from "morgan";
 import path from "path";
+import cron from "node-cron";
 
 //routes
 import FEwebhookRouter from "../FEwebhook";
@@ -20,6 +21,9 @@ import TracksRouter from "../routes/Tracks";
 import wordleRouter from "../routes/Wordle";
 import webhookRouter from "../webhook";
 
+//functions
+import { updateBest10GameResultsCore } from "../controllers/Best_tens";
+
 //database settings
 import db from "../db/connection";
 import { DB_NAME, MAINTENANCE, PORT } from "./config";
@@ -34,6 +38,7 @@ class Server {
     this.middlewares();
     this.routes();
     this.dbConnect();
+    this.scheduleDailyUpdates();
   }
   listen() {
     this.app.listen(this.port, () => {
@@ -91,6 +96,29 @@ class Server {
         console.log(err);
       }
     }
+  }
+
+  private scheduleDailyUpdates() {
+    // Schedule daily update at 00:00 GMT (midnight UTC)
+    cron.schedule('0 0 * * *', async () => {
+      console.log('🕐 Running scheduled daily update for Best10 game results...');
+
+      try {
+        const result = await updateBest10GameResultsCore();
+
+        if (result.success) {
+          console.log('✅ Daily update completed successfully:', result.message);
+        } else {
+          console.error('❌ Daily update failed:', result.message);
+        }
+      } catch (error) {
+        console.error('💥 Unexpected error during scheduled update:', error);
+      }
+    }, {
+      timezone: "GMT"
+    });
+
+    console.log('📅 Daily update scheduler initialized (runs at 00:00 GMT daily)');
   }
 }
 export default Server;

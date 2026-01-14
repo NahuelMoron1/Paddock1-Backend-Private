@@ -267,8 +267,11 @@ export const getGameData = async (req: Request, res: Response) => {
   });
 };
 
-export const updateBest10GameResults = async (req: Request, res: Response) => {
-  ///THIS IS TO UPDATE RESULTS EACH DAY
+// Core function for updating Best10 game results (without HTTP dependencies)
+export const updateBest10GameResultsCore = async (): Promise<{
+  success: boolean;
+  message: string;
+}> => {
   try {
     const today = new Date().toISOString().split("T")[0]; // YYYY-MM-DD
 
@@ -277,15 +280,16 @@ export const updateBest10GameResults = async (req: Request, res: Response) => {
     });
 
     if (!challenge) {
-      return res.status(404).json({ error: "No challenge found" });
+      return { success: false, message: "No challenge found" };
     }
 
     const creation = challenge.getDataValue("creation");
 
     if (!creation) {
-      return res.status(200).json({
-        error: "Nothing to update because the method is not selected",
-      });
+      return {
+        success: true,
+        message: "Nothing to update because the method is not selected",
+      };
     }
 
     await Best_tens_results.truncate();
@@ -294,25 +298,35 @@ export const updateBest10GameResults = async (req: Request, res: Response) => {
     if (creation === Top10Creation.MANUAL) {
       const updated = await updateManualResults(id);
       if (!updated) {
-        return res.status(500).json({
+        return {
+          success: false,
           message:
             "Something happened while getting results, unexpected amount of results",
-        });
+        };
       }
     } else if (creation === Top10Creation.AUTOMATIC) {
       const updated = await updateAutomaticResults(id, challenge);
       if (!updated) {
-        return res
-          .status(404)
-          .json({ message: "No info found for that search" });
+        return { success: false, message: "No info found for that search" };
       }
     }
 
-    return res.status(200).json({ message: "Game updated successfully" });
+    return { success: true, message: "Game updated successfully" };
   } catch (err: any) {
+    return { success: false, message: `Server error: ${err.message}` };
+  }
+};
+
+export const updateBest10GameResults = async (req: Request, res: Response) => {
+  ///THIS IS TO UPDATE RESULTS EACH DAY
+  const result = await updateBest10GameResultsCore();
+
+  if (result.success) {
+    return res.status(200).json({ message: result.message });
+  } else {
     return res
-      .status(500)
-      .json({ error: "Server error", details: err.message });
+      .status(result.message.includes("No challenge found") ? 404 : 500)
+      .json({ error: result.message });
   }
 };
 
