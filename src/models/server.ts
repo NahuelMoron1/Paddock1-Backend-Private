@@ -100,25 +100,36 @@ class Server {
 
   private scheduleDailyUpdates() {
     // Schedule daily update at 00:00 GMT (midnight UTC)
-    cron.schedule('0 0 * * *', async () => {
-      console.log('🕐 Running scheduled daily update for Best10 game results...');
+    cron.schedule(
+      "0 0 * * *",
+      async () => {
+        console.log(
+          "🕐 Running scheduled daily update for Best10 game results..."
+        );
 
-      try {
-        const result = await updateBest10GameResultsCore();
+        try {
+          const result = await updateBest10GameResultsCore();
 
-        if (result.success) {
-          console.log('✅ Daily update completed successfully:', result.message);
-        } else {
-          console.error('❌ Daily update failed:', result.message);
+          if (result.success) {
+            console.log(
+              "✅ Daily update completed successfully:",
+              result.message
+            );
+          } else {
+            console.error("❌ Daily update failed:", result.message);
+          }
+        } catch (error) {
+          console.error("💥 Unexpected error during scheduled update:", error);
         }
-      } catch (error) {
-        console.error('💥 Unexpected error during scheduled update:', error);
+      },
+      {
+        timezone: "GMT",
       }
-    }, {
-      timezone: "GMT"
-    });
+    );
 
-    console.log('📅 Daily update scheduler initialized (runs at 00:00 GMT daily)');
+    console.log(
+      "📅 Daily update scheduler initialized (runs at 00:00 GMT daily)"
+    );
   }
 }
 export default Server;

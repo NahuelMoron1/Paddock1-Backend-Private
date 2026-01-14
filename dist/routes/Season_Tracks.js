@@ -1,0 +1,10 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const Season_Tracks_1 = require("../controllers/Season_Tracks");
+const router = (0, express_1.Router)();
+router.get("/season_tracks", Season_Tracks_1.getAllSeason_tracks);
+router.post("/add/season_track", Season_Tracks_1.addSeason_track);
+router.post("/modify/season_track", Season_Tracks_1.modifySeason_track);
+router.delete("/delete/season_track", Season_Tracks_1.deleteSeason_track);
+exports.default = router;

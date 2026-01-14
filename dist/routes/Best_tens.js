@@ -1,0 +1,11 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const Best_tens_1 = require("../controllers/Best_tens");
+const router = (0, express_1.Router)();
+router.post("/create/automatic", Best_tens_1.createBest10Game);
+router.post("/create/manual", Best_tens_1.createBest10GameManual);
+router.get("/gamedata", Best_tens_1.getGameData);
+router.get("/update", Best_tens_1.updateBest10GameResults);
+router.get("/suggestions/:input/:type", Best_tens_1.getSuggestions);
+exports.default = router;

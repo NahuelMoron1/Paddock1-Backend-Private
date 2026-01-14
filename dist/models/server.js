@@ -102,24 +102,24 @@ class Server {
     }
     scheduleDailyUpdates() {
         // Schedule daily update at 00:00 GMT (midnight UTC)
-        node_cron_1.default.schedule('0 0 * * *', () => __awaiter(this, void 0, void 0, function* () {
-            console.log('🕐 Running scheduled daily update for Best10 game results...');
+        node_cron_1.default.schedule("0 0 * * *", () => __awaiter(this, void 0, void 0, function* () {
+            console.log("🕐 Running scheduled daily update for Best10 game results...");
             try {
                 const result = yield (0, Best_tens_2.updateBest10GameResultsCore)();
                 if (result.success) {
-                    console.log('✅ Daily update completed successfully:', result.message);
+                    console.log("✅ Daily update completed successfully:", result.message);
                 }
                 else {
-                    console.error('❌ Daily update failed:', result.message);
+                    console.error("❌ Daily update failed:", result.message);
                 }
             }
             catch (error) {
-                console.error('💥 Unexpected error during scheduled update:', error);
+                console.error("💥 Unexpected error during scheduled update:", error);
             }
         }), {
-            timezone: "GMT"
+            timezone: "GMT",
         });
-        console.log('📅 Daily update scheduler initialized (runs at 00:00 GMT daily)');
+        console.log("📅 Daily update scheduler initialized (runs at 00:00 GMT daily)");
     }
 }
 exports.default = Server;

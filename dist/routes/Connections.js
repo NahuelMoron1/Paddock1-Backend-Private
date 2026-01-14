@@ -1,0 +1,16 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const Connections_1 = require("../controllers/Connections");
+const router = (0, express_1.Router)();
+router.get("/all/connections", Connections_1.getAllConnections);
+router.get("/one/connection/:gameID", Connections_1.getGameByID);
+router.get("/all/groups/:gameID", Connections_1.getGroupsByGameID);
+router.get("/all/results/:groupID/:type", Connections_1.getResultsByGroupID);
+router.post("/create/game", Connections_1.createGame);
+router.post("/create/group", Connections_1.createGroup);
+router.post("/create/result", Connections_1.createResults);
+router.post("/update/game/:gameID", Connections_1.updateGame);
+router.delete("/delete/group/:groupID", Connections_1.deleteGroup);
+router.delete("/delete/result/:groupID/:resultID", Connections_1.deleteGameResults);
+exports.default = router;
