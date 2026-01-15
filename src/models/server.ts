@@ -63,7 +63,10 @@ class Server {
     this.app.use("/api/h2h", h2hGamesRouter);
   }
   middlewares() {
-    const allowedOrigins = ["http://localhost:4200", "http://localhost:4000"];
+    const allowedOrigins = [
+      "https://api.pdk1gameprivate.online",
+      "https://www.pdk1gameprivate.online",
+    ];
     this.app.use(
       "/uploads",
       express.static(path.join(__dirname, "../../uploads"))

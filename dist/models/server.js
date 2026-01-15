@@ -71,7 +71,10 @@ class Server {
         this.app.use("/api/h2h", H2HGames_1.default);
     }
     middlewares() {
-        const allowedOrigins = ["http://localhost:4200", "http://localhost:4000"];
+        const allowedOrigins = [
+            "https://api.pdk1gameprivate.online",
+            "https://www.pdk1gameprivate.online",
+        ];
         this.app.use("/uploads", express_1.default.static(path_1.default.join(__dirname, "../../uploads")));
         this.app.use("/backups", express_1.default.static(path_1.default.join(__dirname, "../../backups")));
         this.app.use(express_1.default.json());
