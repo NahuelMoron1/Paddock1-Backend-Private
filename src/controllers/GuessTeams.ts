@@ -7,9 +7,17 @@ import {
   Seasons,
   Teams,
 } from "../models/mysql/associations";
+import { getUserLogged, isAdmin } from "./Users";
 
 export const createGuessTeamGame = async (req: Request, res: Response) => {
   try {
+    const user = await getUserLogged(req);
+    if (!user || !isAdmin(user)) {
+      return res
+        .status(401)
+        .json({ message: "Unauthorized to create guess team game" });
+    }
+
     const results = req.body;
 
     if (!results || !results.newGame) {

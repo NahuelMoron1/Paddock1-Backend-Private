@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.postImage = exports.findCandidates = exports.createImpostorGame = exports.updateGame = exports.getGameById = exports.getAllImpostorGames = exports.getGameData = exports.playOneByOneGame = exports.playNormalGame = exports.removeBackgroundForImages = void 0;
+exports.postImage = exports.findCandidates = exports.createImpostorGame = exports.updateGame = exports.getGameById = exports.getAllImpostorGames = exports.removeBackgroundForImages = void 0;
 const axios_1 = __importDefault(require("axios"));
 const form_data_1 = __importDefault(require("form-data"));
 const fs_1 = __importDefault(require("fs"));
@@ -21,6 +21,7 @@ const sequelize_1 = require("sequelize");
 const associations_1 = require("../models/mysql/associations");
 const Drivers_1 = __importDefault(require("../models/mysql/Drivers"));
 const Teams_1 = __importDefault(require("../models/mysql/Teams"));
+const Users_1 = require("./Users");
 // Archivo para guardar el progreso del procesamiento
 const PROGRESS_FILE = path_1.default.join(__dirname, "../../../drivers_progress.json");
 // Función para cargar el progreso guardado
@@ -132,96 +133,15 @@ const removeBackgroundForImages = (req, res) => __awaiter(void 0, void 0, void 0
     }
 });
 exports.removeBackgroundForImages = removeBackgroundForImages;
-const playNormalGame = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const { IDs, gameID } = req.body;
-        const challenge = yield associations_1.Impostors.findByPk(gameID);
-        if (!challenge) {
-            return res.status(404).json({ message: "No challenge found" });
-        }
-        if (!Array.isArray(IDs) ||
-            !IDs.every((id) => typeof id === "string") ||
-            !gameID ||
-            typeof gameID !== "string") {
-            return res
-                .status(400)
-                .json({ message: "An error happened on normal mode impostor game" });
-        }
-        let impostorIDsSelected = [];
-        let innocentsIDsSelected = [];
-        const allResults = yield associations_1.Impostors_Results.findAll({
-            where: { gameID: gameID },
-        });
-        const allInnocents = allResults
-            .filter((r) => r.getDataValue("isImpostor") !== true)
-            .map((r) => r.getDataValue("resultID"));
-        for (let id of IDs) {
-            const result = yield associations_1.Impostors_Results.findOne({
-                where: { gameID: gameID, resultID: id },
-            });
-            if (result && result.getDataValue("isImpostor") === true) {
-                impostorIDsSelected.push(id);
-            }
-            else if (result && result.getDataValue("isImpostor") !== true) {
-                innocentsIDsSelected.push(id);
-            }
-        }
-        const gameWon = impostorIDsSelected.length === 0 &&
-            innocentsIDsSelected.length ===
-                challenge.getDataValue("amount_innocents");
-        return res.status(200).json({
-            game_won: gameWon,
-            impostors_selected: impostorIDsSelected,
-            innocents_selected: innocentsIDsSelected,
-            all_innocents: allInnocents,
-        });
-    }
-    catch (error) {
-        return res.status(500).json({ message: error });
-    }
-});
-exports.playNormalGame = playNormalGame;
-const playOneByOneGame = (req, res) => __awaiter(void 0, void 0, void 0, function* () { });
-exports.playOneByOneGame = playOneByOneGame;
-const getGameData = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const today = new Date().toISOString().split("T")[0]; // YYYY-MM-DD
-        const challenge = yield associations_1.Impostors.findOne({
-            where: { date: today },
-        });
-        if (!challenge) {
-            return res
-                .status(404)
-                .json({ message: "No impostor challenge found for today" });
-        }
-        const players = yield associations_1.Impostors_Results.findAll({
-            where: { gameID: challenge.getDataValue("id") },
-        });
-        if (!players) {
-            return res
-                .status(404)
-                .json({ message: "No results found for this impostor challenge" });
-        }
-        const id = challenge.getDataValue("id");
-        const title = challenge.getDataValue("title");
-        const type = challenge.getDataValue("type");
-        const results = yield getResults(players, type);
-        console.log("RESULTS: ", results);
-        return res.status(200).json({
-            id: id,
-            title: title,
-            type: type,
-            results: results,
-        });
-    }
-    catch (error) {
-        return res.status(500).json({ message: error });
-    }
-});
-exports.getGameData = getGameData;
 // Obtener todos los juegos de impostor
 const getAllImpostorGames = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        const user = yield (0, Users_1.getUserLogged)(req);
+        if (!user || !(0, Users_1.isAdmin)(user)) {
+            return res
+                .status(401)
+                .json({ message: "Unauthorized to get all impostor games" });
+        }
         const games = yield associations_1.Impostors.findAll({
             order: [["date", "DESC"]],
         });
@@ -236,6 +156,12 @@ exports.getAllImpostorGames = getAllImpostorGames;
 // Obtener un juego específico por ID con sus resultados
 const getGameById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        const user = yield (0, Users_1.getUserLogged)(req);
+        if (!user || !(0, Users_1.isAdmin)(user)) {
+            return res
+                .status(401)
+                .json({ message: "Unauthorized to get game by ID" });
+        }
         const { id } = req.params;
         if (!id) {
             return res.status(400).json({ message: "Game ID is required" });
@@ -304,6 +230,12 @@ exports.getGameById = getGameById;
 // Actualizar un juego existente
 const updateGame = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        const user = yield (0, Users_1.getUserLogged)(req);
+        if (!user || !(0, Users_1.isAdmin)(user)) {
+            return res
+                .status(401)
+                .json({ message: "Unauthorized to update impostor game" });
+        }
         const { id } = req.params;
         const { title, date, amount_impostors, amount_innocents, impostors, innocents, type, } = req.body;
         if (!id) {
@@ -364,41 +296,14 @@ const updateGame = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     }
 });
 exports.updateGame = updateGame;
-function getResults(results, type) {
-    return __awaiter(this, void 0, void 0, function* () {
-        switch (type) {
-            case "driver":
-                const driverResults = [];
-                for (let result of results) {
-                    const driverAux = yield Drivers_1.default.findByPk(result.getDataValue("resultID"));
-                    if (driverAux) {
-                        driverResults.push(driverAux);
-                    }
-                }
-                return driverResults;
-            case "team":
-                const teamResults = [];
-                for (let result of results) {
-                    const driverAux = yield Drivers_1.default.findByPk(result.getDataValue("resultID"));
-                    if (driverAux) {
-                        teamResults.push(driverAux);
-                    }
-                }
-                return teamResults;
-            case "track":
-                const trackResults = [];
-                for (let result of results) {
-                    const driverAux = yield Drivers_1.default.findByPk(result.getDataValue("resultID"));
-                    if (driverAux) {
-                        trackResults.push(driverAux);
-                    }
-                }
-                return trackResults;
-        }
-    });
-}
 const createImpostorGame = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        const user = yield (0, Users_1.getUserLogged)(req);
+        if (!user || !(0, Users_1.isAdmin)(user)) {
+            return res
+                .status(401)
+                .json({ message: "Unauthorized to create impostor game" });
+        }
         const { title, date, amount_impostors, amount_innocents, impostors, innocents, type, } = req.body;
         const validated = validateImpostorGame(title, date, amount_impostors, amount_innocents, impostors, innocents, type);
         if (!validated) {

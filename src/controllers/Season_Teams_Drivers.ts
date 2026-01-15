@@ -10,7 +10,7 @@ import {
   Teams,
 } from "../models/mysql/associations";
 
-interface CsvRow {
+/*interface CsvRow {
   id: string;
   seasonID: string;
   teamID: string;
@@ -105,10 +105,6 @@ export const getBySeason_Teams_Drivers = async (
     if (!season_drivers_data) {
       return res.status(404).json({ message: "No season_tracks found" });
     }
-
-    /*for (let i = 0; i < season_drivers_data.length; i++) {
-      season_drivers_data[i].destroy();
-    }*/
 
     console.log(season_drivers_data.length);
 
@@ -283,3 +279,4 @@ export const readCsvData = (filePath: string): Promise<CsvRow[]> => {
       });
   });
 };
+*/

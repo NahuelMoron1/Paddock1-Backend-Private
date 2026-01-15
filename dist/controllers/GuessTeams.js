@@ -12,8 +12,15 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.createGuessTeamGame = void 0;
 const uuid_1 = require("uuid");
 const associations_1 = require("../models/mysql/associations");
+const Users_1 = require("./Users");
 const createGuessTeamGame = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        const user = yield (0, Users_1.getUserLogged)(req);
+        if (!user || !(0, Users_1.isAdmin)(user)) {
+            return res
+                .status(401)
+                .json({ message: "Unauthorized to create guess team game" });
+        }
         const results = req.body;
         if (!results || !results.newGame) {
             return res

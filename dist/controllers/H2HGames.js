@@ -11,9 +11,16 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteH2HGame = exports.updateH2HGame = exports.createH2HGame = exports.getH2HGameById = exports.getAllH2HGames = void 0;
 const associations_1 = require("../models/mysql/associations");
+const Users_1 = require("./Users");
 // Obtener todos los juegos H2H
 const getAllH2HGames = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        const user = yield (0, Users_1.getUserLogged)(req);
+        if (!user || !(0, Users_1.isAdmin)(user)) {
+            return res
+                .status(401)
+                .json({ message: "Unauthorized to get all H2H games" });
+        }
         const games = yield associations_1.H2HGames.findAll({
             order: [["date", "DESC"]],
             include: [
@@ -33,6 +40,12 @@ exports.getAllH2HGames = getAllH2HGames;
 // Obtener un juego H2H por ID
 const getH2HGameById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        const user = yield (0, Users_1.getUserLogged)(req);
+        if (!user || !(0, Users_1.isAdmin)(user)) {
+            return res
+                .status(401)
+                .json({ message: "Unauthorized to get H2H game by ID" });
+        }
         const { id } = req.params;
         if (!id) {
             return res.status(400).json({ message: "Game ID is required" });
@@ -58,6 +71,12 @@ exports.getH2HGameById = getH2HGameById;
 // Crear un nuevo juego H2H
 const createH2HGame = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        const user = yield (0, Users_1.getUserLogged)(req);
+        if (!user || !(0, Users_1.isAdmin)(user)) {
+            return res
+                .status(401)
+                .json({ message: "Unauthorized to create H2H game" });
+        }
         const { title, date, year, team_id, driver1_id, driver2_id, total_races, qualifying_driver1, qualifying_driver2, race_driver1, race_driver2, points_driver1, points_driver2, dnf_driver1, dnf_driver2, points_finishes_driver1, points_finishes_driver2, } = req.body;
         // Validaciones básicas
         if (!title ||
@@ -146,6 +165,12 @@ exports.createH2HGame = createH2HGame;
 // Actualizar un juego H2H
 const updateH2HGame = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        const user = yield (0, Users_1.getUserLogged)(req);
+        if (!user || !(0, Users_1.isAdmin)(user)) {
+            return res
+                .status(401)
+                .json({ message: "Unauthorized to update H2H game" });
+        }
         const { id } = req.params;
         const { title, date, year, team_id, driver1_id, driver2_id, total_races, qualifying_driver1, qualifying_driver2, race_driver1, race_driver2, points_driver1, points_driver2, dnf_driver1, dnf_driver2, points_finishes_driver1, points_finishes_driver2, } = req.body;
         if (!id) {
@@ -240,6 +265,12 @@ exports.updateH2HGame = updateH2HGame;
 // Eliminar un juego H2H
 const deleteH2HGame = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        const user = yield (0, Users_1.getUserLogged)(req);
+        if (!user || !(0, Users_1.isAdmin)(user)) {
+            return res
+                .status(401)
+                .json({ message: "Unauthorized to delete H2H game" });
+        }
         const { id } = req.params;
         if (!id) {
             return res.status(400).json({ message: "Game ID is required" });

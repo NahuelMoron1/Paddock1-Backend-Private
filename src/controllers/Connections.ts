@@ -4,9 +4,17 @@ import Connections from "../models/mysql/Connections";
 import Connections_Groups from "../models/mysql/Connections_Groups";
 import Connections_Groups_Results from "../models/mysql/Connections_Groups_Results";
 import { Drivers, Teams, Tracks } from "../models/mysql/associations";
+import { getUserLogged, isAdmin } from "./Users";
 
 export const getAllConnections = async (req: Request, res: Response) => {
   try {
+    const user = await getUserLogged(req);
+    if (!user || !isAdmin(user)) {
+      return res
+        .status(401)
+        .json({ message: "Unauthorized to get all connections" });
+    }
+
     const allConnections = await Connections.findAll();
     if (!allConnections) {
       return res.status(404).json({ message: "No connections found" });
@@ -20,6 +28,13 @@ export const getAllConnections = async (req: Request, res: Response) => {
 
 export const getGameByID = async (req: Request, res: Response) => {
   try {
+    const user = await getUserLogged(req);
+    if (!user || !isAdmin(user)) {
+      return res
+        .status(401)
+        .json({ message: "Unauthorized to get game by ID" });
+    }
+
     const { gameID } = req.params;
     if (!gameID) {
       return res.status(400).json({ message: "No ID Provided" });
@@ -38,6 +53,13 @@ export const getGameByID = async (req: Request, res: Response) => {
 
 export const getGroupsByGameID = async (req: Request, res: Response) => {
   try {
+    const user = await getUserLogged(req);
+    if (!user || !isAdmin(user)) {
+      return res
+        .status(401)
+        .json({ message: "Unauthorized to get groups by game ID" });
+    }
+
     const { gameID } = req.params;
     if (!gameID) {
       return res.status(400).json({ message: "No ID Provided" });
@@ -59,6 +81,13 @@ export const getGroupsByGameID = async (req: Request, res: Response) => {
 
 export const getResultsByGroupID = async (req: Request, res: Response) => {
   try {
+    const user = await getUserLogged(req);
+    if (!user || !isAdmin(user)) {
+      return res
+        .status(401)
+        .json({ message: "Unauthorized to get results by group ID" });
+    }
+
     const { groupID, type } = req.params;
     if (!groupID) {
       return res.status(400).json({ message: "No ID Provided" });
@@ -95,6 +124,13 @@ export const getResultsByGroupID = async (req: Request, res: Response) => {
 
 export const createGame = async (req: Request, res: Response) => {
   try {
+    const user = await getUserLogged(req);
+    if (!user || !isAdmin(user)) {
+      return res
+        .status(401)
+        .json({ message: "Unauthorized to create game connections" });
+    }
+
     const game = req.body;
 
     if (!game || !game.date || !game.type || !game.amount_groups) {
@@ -143,6 +179,13 @@ export const createGame = async (req: Request, res: Response) => {
 
 export const createGroup = async (req: Request, res: Response) => {
   try {
+    const user = await getUserLogged(req);
+    if (!user || !isAdmin(user)) {
+      return res
+        .status(401)
+        .json({ message: "Unauthorized to create group connections" });
+    }
+
     const group = req.body;
 
     if (!group || !group.title || !group.gameID || !group.results) {
@@ -184,6 +227,13 @@ export const createGroup = async (req: Request, res: Response) => {
 
 export const createResults = async (req: Request, res: Response) => {
   try {
+    const user = await getUserLogged(req);
+    if (!user || !isAdmin(user)) {
+      return res
+        .status(401)
+        .json({ message: "Unauthorized to create results connections" });
+    }
+
     const results = req.body;
 
     if (!results || !results.gameID || !results.groupID || !results.resultID) {
@@ -232,6 +282,13 @@ export const createResults = async (req: Request, res: Response) => {
 
 export const deleteGroup = async (req: Request, res: Response) => {
   try {
+    const user = await getUserLogged(req);
+    if (!user || !isAdmin(user)) {
+      return res
+        .status(401)
+        .json({ message: "Unauthorized to delete group connections" });
+    }
+
     const { groupID } = req.params;
     if (!groupID) {
       return res.status(400).json({ message: "No ID Provided" });
@@ -256,6 +313,13 @@ export const deleteGroup = async (req: Request, res: Response) => {
 
 export const deleteGameResults = async (req: Request, res: Response) => {
   try {
+    const user = await getUserLogged(req);
+    if (!user || !isAdmin(user)) {
+      return res
+        .status(401)
+        .json({ message: "Unauthorized to delete game results connections" });
+    }
+
     const { groupID, resultID } = req.params;
     if (!groupID || !resultID) {
       return res.status(400).json({ message: "No ID Provided" });
@@ -280,6 +344,13 @@ export const deleteGameResults = async (req: Request, res: Response) => {
 
 export const updateGame = async (req: Request, res: Response) => {
   try {
+    const user = await getUserLogged(req);
+    if (!user || !isAdmin(user)) {
+      return res
+        .status(401)
+        .json({ message: "Unauthorized to update game connections" });
+    }
+
     const { gameID } = req.params;
     if (!gameID) {
       return res.status(400).json({ message: "No ID Provided" });

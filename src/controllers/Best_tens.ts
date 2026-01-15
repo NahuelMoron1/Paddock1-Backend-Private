@@ -15,6 +15,7 @@ import Manual_Best_tens_results from "../models/mysql/Manual_Best_Tens_Results";
 import Season_Teams_Drivers from "../models/mysql/Season_Teams_Drivers";
 import Seasons from "../models/mysql/Seasons";
 import Teams from "../models/mysql/Teams";
+import { getUserLogged, isAdmin } from "./Users";
 
 export const getSuggestions = async (req: Request, res: Response) => {
   const { type, input } = req.params;
@@ -102,6 +103,13 @@ export const getSuggestions = async (req: Request, res: Response) => {
 
 export const createBest10GameManual = async (req: Request, res: Response) => {
   try {
+    const user = await getUserLogged(req);
+    if (!user || !isAdmin(user)) {
+      return res
+        .status(401)
+        .json({ message: "Unauthorized to create Top 10 game manually" });
+    }
+
     const gamedata = req.body;
 
     if (!gamedata) {
@@ -184,6 +192,13 @@ export const createBest10GameManual = async (req: Request, res: Response) => {
 
 export const createBest10Game = async (req: Request, res: Response) => {
   try {
+    const user = await getUserLogged(req);
+    if (!user || !isAdmin(user)) {
+      return res
+        .status(401)
+        .json({ message: "Unauthorized to create Top 10 game automatically" });
+    }
+
     const gamedata = req.body;
 
     if (!gamedata) {
@@ -319,6 +334,10 @@ export const updateBest10GameResultsCore = async (): Promise<{
 
 export const updateBest10GameResults = async (req: Request, res: Response) => {
   ///THIS IS TO UPDATE RESULTS EACH DAY
+  /*const user = await getUserLogged(req);
+  if (!user || !isAdmin(user)) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }*/
   const result = await updateBest10GameResultsCore();
 
   if (result.success) {

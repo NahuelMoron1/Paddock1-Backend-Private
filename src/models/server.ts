@@ -20,13 +20,15 @@ import TeamsRouter from "../routes/Teams";
 import TracksRouter from "../routes/Tracks";
 import wordleRouter from "../routes/Wordle";
 import webhookRouter from "../webhook";
+import usersRouter from "../routes/Users";
+import cookieRouter from "../routes/Cookie";
 
 //functions
 import { updateBest10GameResultsCore } from "../controllers/Best_tens";
 
 //database settings
 import db from "../db/connection";
-import { DB_NAME, MAINTENANCE, PORT } from "./config";
+import { ALLOWED_ORIGINS, DB_NAME, MAINTENANCE, PORT } from "./config";
 
 class Server {
   private app: Application;
@@ -61,12 +63,10 @@ class Server {
     this.app.use("/api/connections", connectionsRouter);
     this.app.use("/api/guessTeams", guessTeamsRouter);
     this.app.use("/api/h2h", h2hGamesRouter);
+    this.app.use("/api/users", usersRouter);
+    this.app.use("/api/cookie", cookieRouter);
   }
   middlewares() {
-    const allowedOrigins = [
-      "https://api.pdk1gameprivate.online",
-      "https://www.pdk1gameprivate.online",
-    ];
     this.app.use(
       "/uploads",
       express.static(path.join(__dirname, "../../uploads"))
@@ -83,7 +83,7 @@ class Server {
     this.app.use(morgan("dev"));
     this.app.use(
       cors({
-        origin: allowedOrigins,
+        origin: ALLOWED_ORIGINS,
         methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
         credentials: true,
       })

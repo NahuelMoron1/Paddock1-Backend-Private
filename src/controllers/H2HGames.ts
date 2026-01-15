@@ -1,9 +1,17 @@
 import { Request, Response } from "express";
 import { Drivers, H2HGames, Teams } from "../models/mysql/associations";
+import { getUserLogged, isAdmin } from "./Users";
 
 // Obtener todos los juegos H2H
 export const getAllH2HGames = async (req: Request, res: Response) => {
   try {
+    const user = await getUserLogged(req);
+    if (!user || !isAdmin(user)) {
+      return res
+        .status(401)
+        .json({ message: "Unauthorized to get all H2H games" });
+    }
+
     const games = await H2HGames.findAll({
       order: [["date", "DESC"]],
       include: [
@@ -23,6 +31,13 @@ export const getAllH2HGames = async (req: Request, res: Response) => {
 // Obtener un juego H2H por ID
 export const getH2HGameById = async (req: Request, res: Response) => {
   try {
+    const user = await getUserLogged(req);
+    if (!user || !isAdmin(user)) {
+      return res
+        .status(401)
+        .json({ message: "Unauthorized to get H2H game by ID" });
+    }
+
     const { id } = req.params;
 
     if (!id) {
@@ -51,6 +66,13 @@ export const getH2HGameById = async (req: Request, res: Response) => {
 // Crear un nuevo juego H2H
 export const createH2HGame = async (req: Request, res: Response) => {
   try {
+    const user = await getUserLogged(req);
+    if (!user || !isAdmin(user)) {
+      return res
+        .status(401)
+        .json({ message: "Unauthorized to create H2H game" });
+    }
+
     const {
       title,
       date,
@@ -173,6 +195,13 @@ export const createH2HGame = async (req: Request, res: Response) => {
 // Actualizar un juego H2H
 export const updateH2HGame = async (req: Request, res: Response) => {
   try {
+    const user = await getUserLogged(req);
+    if (!user || !isAdmin(user)) {
+      return res
+        .status(401)
+        .json({ message: "Unauthorized to update H2H game" });
+    }
+
     const { id } = req.params;
     const {
       title,
@@ -307,6 +336,13 @@ export const updateH2HGame = async (req: Request, res: Response) => {
 // Eliminar un juego H2H
 export const deleteH2HGame = async (req: Request, res: Response) => {
   try {
+    const user = await getUserLogged(req);
+    if (!user || !isAdmin(user)) {
+      return res
+        .status(401)
+        .json({ message: "Unauthorized to delete H2H game" });
+    }
+
     const { id } = req.params;
 
     if (!id) {

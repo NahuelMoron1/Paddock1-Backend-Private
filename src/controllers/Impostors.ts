@@ -15,6 +15,7 @@ import {
 } from "../models/mysql/associations";
 import Drivers from "../models/mysql/Drivers";
 import Teams from "../models/mysql/Teams";
+import { getUserLogged, isAdmin } from "./Users";
 
 // Archivo para guardar el progreso del procesamiento
 const PROGRESS_FILE = path.join(__dirname, "../../../drivers_progress.json");
@@ -151,111 +152,16 @@ export const removeBackgroundForImages = async (
   }
 };
 
-export const playNormalGame = async (req: Request, res: Response) => {
-  try {
-    const { IDs, gameID } = req.body;
-
-    const challenge = await Impostors.findByPk(gameID);
-    if (!challenge) {
-      return res.status(404).json({ message: "No challenge found" });
-    }
-
-    if (
-      !Array.isArray(IDs) ||
-      !IDs.every((id: any) => typeof id === "string") ||
-      !gameID ||
-      typeof gameID !== "string"
-    ) {
-      return res
-        .status(400)
-        .json({ message: "An error happened on normal mode impostor game" });
-    }
-
-    let impostorIDsSelected: string[] = [];
-    let innocentsIDsSelected: string[] = [];
-
-    const allResults = await Impostors_Results.findAll({
-      where: { gameID: gameID },
-    });
-
-    const allInnocents = allResults
-      .filter((r) => r.getDataValue("isImpostor") !== true)
-      .map((r) => r.getDataValue("resultID"));
-
-    for (let id of IDs) {
-      const result = await Impostors_Results.findOne({
-        where: { gameID: gameID, resultID: id },
-      });
-
-      if (result && result.getDataValue("isImpostor") === true) {
-        impostorIDsSelected.push(id);
-      } else if (result && result.getDataValue("isImpostor") !== true) {
-        innocentsIDsSelected.push(id);
-      }
-    }
-
-    const gameWon =
-      impostorIDsSelected.length === 0 &&
-      innocentsIDsSelected.length ===
-        challenge.getDataValue("amount_innocents");
-
-    return res.status(200).json({
-      game_won: gameWon,
-      impostors_selected: impostorIDsSelected,
-      innocents_selected: innocentsIDsSelected,
-      all_innocents: allInnocents,
-    });
-  } catch (error) {
-    return res.status(500).json({ message: error });
-  }
-};
-
-export const playOneByOneGame = async (req: Request, res: Response) => {};
-
-export const getGameData = async (req: Request, res: Response) => {
-  try {
-    const today = new Date().toISOString().split("T")[0]; // YYYY-MM-DD
-
-    const challenge = await Impostors.findOne({
-      where: { date: today },
-    });
-
-    if (!challenge) {
-      return res
-        .status(404)
-        .json({ message: "No impostor challenge found for today" });
-    }
-
-    const players = await Impostors_Results.findAll({
-      where: { gameID: challenge.getDataValue("id") },
-    });
-
-    if (!players) {
-      return res
-        .status(404)
-        .json({ message: "No results found for this impostor challenge" });
-    }
-
-    const id = challenge.getDataValue("id");
-    const title = challenge.getDataValue("title");
-    const type = challenge.getDataValue("type");
-    const results = await getResults(players, type);
-    console.log("RESULTS: ", results);
-
-    return res.status(200).json({
-      id: id,
-      title: title,
-      type: type,
-      results: results,
-    });
-  } catch (error) {
-    return res.status(500).json({ message: error });
-  }
-};
-
 // Obtener todos los juegos de impostor
 export const getAllImpostorGames = async (req: Request, res: Response) => {
   try {
+    const user = await getUserLogged(req);
+    if (!user || !isAdmin(user)) {
+      return res
+        .status(401)
+        .json({ message: "Unauthorized to get all impostor games" });
+    }
+
     const games = await Impostors.findAll({
       order: [["date", "DESC"]],
     });
@@ -270,6 +176,13 @@ export const getAllImpostorGames = async (req: Request, res: Response) => {
 // Obtener un juego específico por ID con sus resultados
 export const getGameById = async (req: Request, res: Response) => {
   try {
+    const user = await getUserLogged(req);
+    if (!user || !isAdmin(user)) {
+      return res
+        .status(401)
+        .json({ message: "Unauthorized to get game by ID" });
+    }
+
     const { id } = req.params;
 
     if (!id) {
@@ -345,6 +258,13 @@ export const getGameById = async (req: Request, res: Response) => {
 // Actualizar un juego existente
 export const updateGame = async (req: Request, res: Response) => {
   try {
+    const user = await getUserLogged(req);
+    if (!user || !isAdmin(user)) {
+      return res
+        .status(401)
+        .json({ message: "Unauthorized to update impostor game" });
+    }
+
     const { id } = req.params;
     const {
       title,
@@ -446,51 +366,15 @@ export const updateGame = async (req: Request, res: Response) => {
   }
 };
 
-async function getResults(results: Model<any, any>[], type: string) {
-  switch (type) {
-    case "driver":
-      const driverResults: any[] = [];
-      for (let result of results) {
-        const driverAux = await Drivers.findByPk(
-          result.getDataValue("resultID")
-        );
-
-        if (driverAux) {
-          driverResults.push(driverAux);
-        }
-      }
-      return driverResults;
-    case "team":
-      const teamResults: any[] = [];
-      for (let result of results) {
-        const driverAux = await Drivers.findByPk(
-          result.getDataValue("resultID")
-        );
-
-        if (driverAux) {
-          teamResults.push(driverAux);
-        }
-      }
-
-      return teamResults;
-    case "track":
-      const trackResults: any[] = [];
-      for (let result of results) {
-        const driverAux = await Drivers.findByPk(
-          result.getDataValue("resultID")
-        );
-
-        if (driverAux) {
-          trackResults.push(driverAux);
-        }
-      }
-
-      return trackResults;
-  }
-}
-
 export const createImpostorGame = async (req: Request, res: Response) => {
   try {
+    const user = await getUserLogged(req);
+    if (!user || !isAdmin(user)) {
+      return res
+        .status(401)
+        .json({ message: "Unauthorized to create impostor game" });
+    }
+
     const {
       title,
       date,

@@ -18,8 +18,15 @@ const Connections_1 = __importDefault(require("../models/mysql/Connections"));
 const Connections_Groups_1 = __importDefault(require("../models/mysql/Connections_Groups"));
 const Connections_Groups_Results_1 = __importDefault(require("../models/mysql/Connections_Groups_Results"));
 const associations_1 = require("../models/mysql/associations");
+const Users_1 = require("./Users");
 const getAllConnections = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        const user = yield (0, Users_1.getUserLogged)(req);
+        if (!user || !(0, Users_1.isAdmin)(user)) {
+            return res
+                .status(401)
+                .json({ message: "Unauthorized to get all connections" });
+        }
         const allConnections = yield Connections_1.default.findAll();
         if (!allConnections) {
             return res.status(404).json({ message: "No connections found" });
@@ -33,6 +40,12 @@ const getAllConnections = (req, res) => __awaiter(void 0, void 0, void 0, functi
 exports.getAllConnections = getAllConnections;
 const getGameByID = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        const user = yield (0, Users_1.getUserLogged)(req);
+        if (!user || !(0, Users_1.isAdmin)(user)) {
+            return res
+                .status(401)
+                .json({ message: "Unauthorized to get game by ID" });
+        }
         const { gameID } = req.params;
         if (!gameID) {
             return res.status(400).json({ message: "No ID Provided" });
@@ -50,6 +63,12 @@ const getGameByID = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
 exports.getGameByID = getGameByID;
 const getGroupsByGameID = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        const user = yield (0, Users_1.getUserLogged)(req);
+        if (!user || !(0, Users_1.isAdmin)(user)) {
+            return res
+                .status(401)
+                .json({ message: "Unauthorized to get groups by game ID" });
+        }
         const { gameID } = req.params;
         if (!gameID) {
             return res.status(400).json({ message: "No ID Provided" });
@@ -69,6 +88,12 @@ const getGroupsByGameID = (req, res) => __awaiter(void 0, void 0, void 0, functi
 exports.getGroupsByGameID = getGroupsByGameID;
 const getResultsByGroupID = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        const user = yield (0, Users_1.getUserLogged)(req);
+        if (!user || !(0, Users_1.isAdmin)(user)) {
+            return res
+                .status(401)
+                .json({ message: "Unauthorized to get results by group ID" });
+        }
         const { groupID, type } = req.params;
         if (!groupID) {
             return res.status(400).json({ message: "No ID Provided" });
@@ -104,6 +129,12 @@ const getResultsByGroupID = (req, res) => __awaiter(void 0, void 0, void 0, func
 exports.getResultsByGroupID = getResultsByGroupID;
 const createGame = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        const user = yield (0, Users_1.getUserLogged)(req);
+        if (!user || !(0, Users_1.isAdmin)(user)) {
+            return res
+                .status(401)
+                .json({ message: "Unauthorized to create game connections" });
+        }
         const game = req.body;
         if (!game || !game.date || !game.type || !game.amount_groups) {
             return res
@@ -142,6 +173,12 @@ const createGame = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
 exports.createGame = createGame;
 const createGroup = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        const user = yield (0, Users_1.getUserLogged)(req);
+        if (!user || !(0, Users_1.isAdmin)(user)) {
+            return res
+                .status(401)
+                .json({ message: "Unauthorized to create group connections" });
+        }
         const group = req.body;
         if (!group || !group.title || !group.gameID || !group.results) {
             return res
@@ -175,6 +212,12 @@ const createGroup = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
 exports.createGroup = createGroup;
 const createResults = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        const user = yield (0, Users_1.getUserLogged)(req);
+        if (!user || !(0, Users_1.isAdmin)(user)) {
+            return res
+                .status(401)
+                .json({ message: "Unauthorized to create results connections" });
+        }
         const results = req.body;
         if (!results || !results.gameID || !results.groupID || !results.resultID) {
             return res
@@ -213,6 +256,12 @@ const createResults = (req, res) => __awaiter(void 0, void 0, void 0, function* 
 exports.createResults = createResults;
 const deleteGroup = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        const user = yield (0, Users_1.getUserLogged)(req);
+        if (!user || !(0, Users_1.isAdmin)(user)) {
+            return res
+                .status(401)
+                .json({ message: "Unauthorized to delete group connections" });
+        }
         const { groupID } = req.params;
         if (!groupID) {
             return res.status(400).json({ message: "No ID Provided" });
@@ -234,6 +283,12 @@ const deleteGroup = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
 exports.deleteGroup = deleteGroup;
 const deleteGameResults = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        const user = yield (0, Users_1.getUserLogged)(req);
+        if (!user || !(0, Users_1.isAdmin)(user)) {
+            return res
+                .status(401)
+                .json({ message: "Unauthorized to delete game results connections" });
+        }
         const { groupID, resultID } = req.params;
         if (!groupID || !resultID) {
             return res.status(400).json({ message: "No ID Provided" });
@@ -255,6 +310,12 @@ const deleteGameResults = (req, res) => __awaiter(void 0, void 0, void 0, functi
 exports.deleteGameResults = deleteGameResults;
 const updateGame = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        const user = yield (0, Users_1.getUserLogged)(req);
+        if (!user || !(0, Users_1.isAdmin)(user)) {
+            return res
+                .status(401)
+                .json({ message: "Unauthorized to update game connections" });
+        }
         const { gameID } = req.params;
         if (!gameID) {
             return res.status(400).json({ message: "No ID Provided" });

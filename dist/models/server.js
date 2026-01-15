@@ -33,6 +33,8 @@ const Teams_1 = __importDefault(require("../routes/Teams"));
 const Tracks_1 = __importDefault(require("../routes/Tracks"));
 const Wordle_1 = __importDefault(require("../routes/Wordle"));
 const webhook_1 = __importDefault(require("../webhook"));
+const Users_1 = __importDefault(require("../routes/Users"));
+const Cookie_1 = __importDefault(require("../routes/Cookie"));
 //functions
 const Best_tens_2 = require("../controllers/Best_tens");
 //database settings
@@ -69,12 +71,10 @@ class Server {
         this.app.use("/api/connections", Connections_1.default);
         this.app.use("/api/guessTeams", GuessTeams_1.default);
         this.app.use("/api/h2h", H2HGames_1.default);
+        this.app.use("/api/users", Users_1.default);
+        this.app.use("/api/cookie", Cookie_1.default);
     }
     middlewares() {
-        const allowedOrigins = [
-            "https://api.pdk1gameprivate.online",
-            "https://www.pdk1gameprivate.online",
-        ];
         this.app.use("/uploads", express_1.default.static(path_1.default.join(__dirname, "../../uploads")));
         this.app.use("/backups", express_1.default.static(path_1.default.join(__dirname, "../../backups")));
         this.app.use(express_1.default.json());
@@ -84,7 +84,7 @@ class Server {
         this.app.use((0, cookie_parser_1.default)());
         this.app.use((0, morgan_1.default)("dev"));
         this.app.use((0, cors_1.default)({
-            origin: allowedOrigins,
+            origin: config_1.ALLOWED_ORIGINS,
             methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
             credentials: true,
         }));

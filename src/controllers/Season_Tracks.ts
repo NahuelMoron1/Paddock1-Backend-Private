@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import Season_Tracks from "../models/mysql/Seasons_Tracks";
 
-export const getAllSeason_tracks = async (req: Request, res: Response) => {
+/*export const getAllSeason_tracks = async (req: Request, res: Response) => {
   try {
     const season_tracks = await Season_Tracks.findAll();
 
@@ -112,3 +112,4 @@ function validateSeasonTrack(
   }
   return true;
 }
+*/

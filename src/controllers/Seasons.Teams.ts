@@ -4,7 +4,7 @@ import * as fs from "fs";
 import { Op } from "sequelize";
 import { Season_Teams, Seasons, Teams } from "../models/mysql/associations";
 
-interface CsvRow {
+/*interface CsvRow {
   id: string;
   seasonID: string;
   teamID: string;
@@ -278,3 +278,4 @@ export const readCsvData = (filePath: string): Promise<CsvRow[]> => {
       });
   });
 };
+*/

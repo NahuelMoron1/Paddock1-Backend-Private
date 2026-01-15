@@ -24,6 +24,7 @@ const Manual_Best_Tens_Results_1 = __importDefault(require("../models/mysql/Manu
 const Season_Teams_Drivers_1 = __importDefault(require("../models/mysql/Season_Teams_Drivers"));
 const Seasons_1 = __importDefault(require("../models/mysql/Seasons"));
 const Teams_1 = __importDefault(require("../models/mysql/Teams"));
+const Users_1 = require("./Users");
 const getSuggestions = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { type, input } = req.params;
     if (!input || !type) {
@@ -86,6 +87,12 @@ const getSuggestions = (req, res) => __awaiter(void 0, void 0, void 0, function*
 exports.getSuggestions = getSuggestions;
 const createBest10GameManual = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        const user = yield (0, Users_1.getUserLogged)(req);
+        if (!user || !(0, Users_1.isAdmin)(user)) {
+            return res
+                .status(401)
+                .json({ message: "Unauthorized to create Top 10 game manually" });
+        }
         const gamedata = req.body;
         if (!gamedata) {
             return res.status(400).json({ message: "Bad request" });
@@ -152,6 +159,12 @@ const createBest10GameManual = (req, res) => __awaiter(void 0, void 0, void 0, f
 exports.createBest10GameManual = createBest10GameManual;
 const createBest10Game = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        const user = yield (0, Users_1.getUserLogged)(req);
+        if (!user || !(0, Users_1.isAdmin)(user)) {
+            return res
+                .status(401)
+                .json({ message: "Unauthorized to create Top 10 game automatically" });
+        }
         const gamedata = req.body;
         if (!gamedata) {
             return res.status(400).json({ message: "Bad request" });
@@ -265,6 +278,10 @@ const updateBest10GameResultsCore = () => __awaiter(void 0, void 0, void 0, func
 exports.updateBest10GameResultsCore = updateBest10GameResultsCore;
 const updateBest10GameResults = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     ///THIS IS TO UPDATE RESULTS EACH DAY
+    /*const user = await getUserLogged(req);
+    if (!user || !isAdmin(user)) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }*/
     const result = yield (0, exports.updateBest10GameResultsCore)();
     if (result.success) {
         return res.status(200).json({ message: result.message });
