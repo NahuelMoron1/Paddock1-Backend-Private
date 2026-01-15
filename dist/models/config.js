@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.MAINTENANCE = exports.DB_PORT = exports.PRODUCTION = exports.URL = exports.SLACK_WEBHOOK_URL = exports.SLACK = exports.DOMAIN = exports.SECRET_JWT_KEY = exports.DB_NAME = exports.DB_PASSWORD = exports.DB_USER = exports.DB_HOST = exports.PORT = void 0;
+exports.SSH_IP = exports.SSH_PASSWORD = exports.GITHUB_USERNAME = exports.GITHUB_TOKEN = exports.MAINTENANCE = exports.DB_PORT = exports.PRODUCTION = exports.URL = exports.SLACK_WEBHOOK_URL = exports.SLACK = exports.DOMAIN = exports.SECRET_JWT_KEY = exports.DB_NAME = exports.DB_PASSWORD = exports.DB_USER = exports.DB_HOST = exports.PORT = void 0;
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
 exports.PORT = process.env.PORT;
@@ -19,3 +19,7 @@ exports.URL = process.env.URL;
 exports.PRODUCTION = process.env.PRODUCTION === "true";
 exports.DB_PORT = parseInt(process.env.DB_PORT || "0");
 exports.MAINTENANCE = process.env.MAINTENANCE === "true";
+exports.GITHUB_TOKEN = process.env.GITHUB_TOKEN;
+exports.GITHUB_USERNAME = process.env.GITHUB_USERNAME;
+exports.SSH_PASSWORD = process.env.SSH_PASSWORD;
+exports.SSH_IP = process.env.SSH_IP;
