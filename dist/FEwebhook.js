@@ -12,7 +12,7 @@ router.post("/github-webhook", (req, res) => {
     console.log("FE Webhook recibido de GitHub");
     // Comando para acceder al sitio estático desde el servidor backend
     // Usamos un script con expect para manejar la autenticación SSH
-    const gitCommand = `../src/fe_deploy.sh pdk1gameprivate ${config_1.SSH_IP} "${config_1.SSH_PASSWORD}" ${config_1.GITHUB_USERNAME} ${config_1.GITHUB_TOKEN}`;
+    const gitCommand = `./src/fe_deploy.sh pdk1gameprivate ${config_1.SSH_IP} "${config_1.SSH_PASSWORD}" ${config_1.GITHUB_USERNAME} ${config_1.GITHUB_TOKEN}`;
     // Agregamos timeout para evitar que el proceso se cuelgue
     const child = (0, child_process_1.exec)(gitCommand, { timeout: 60000 }, (err, stdout, stderr) => {
         if (stderr)
