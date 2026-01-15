@@ -15,7 +15,7 @@ router.post("/github-webhook", (req, res) => {
 
   // Comando para acceder al sitio estático desde el servidor backend
   // Usamos un script con expect para manejar la autenticación SSH
-  const gitCommand = `./src/fe_deploy.sh pdk1gameprivate ${SSH_IP} "${SSH_PASSWORD}" ${GITHUB_USERNAME} ${GITHUB_TOKEN}`;
+  const gitCommand = `../src/fe_deploy.sh pdk1gameprivate ${SSH_IP} "${SSH_PASSWORD}" ${GITHUB_USERNAME} ${GITHUB_TOKEN}`;
 
   // Agregamos timeout para evitar que el proceso se cuelgue
   const child = exec(gitCommand, { timeout: 60000 }, (err, stdout, stderr) => {
