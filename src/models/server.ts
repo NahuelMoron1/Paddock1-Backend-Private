@@ -4,6 +4,7 @@ import express, { Application, Request, Response } from "express";
 import morgan from "morgan";
 import path from "path";
 import cron from "node-cron";
+import { Op } from "sequelize";
 
 //routes
 import FEwebhookRouter from "../FEwebhook";
@@ -25,6 +26,10 @@ import cookieRouter from "../routes/Cookie";
 
 //functions
 import { updateBest10GameResultsCore } from "../controllers/Best_tens";
+
+//models
+import { Drivers } from "../models/mysql/associations";
+import WordleWord from "../models/mysql/WordleWord";
 
 //database settings
 import db from "../db/connection";
@@ -123,6 +128,55 @@ class Server {
           }
         } catch (error) {
           console.error("💥 Unexpected error during scheduled update:", error);
+        }
+
+        // Generate daily Wordle word
+        try {
+          console.log("🎯 Generating daily Wordle word...");
+
+          const count = await Drivers.count({
+            where: {
+              popularity: {
+                [Op.between]: [3, 5],
+              },
+            },
+          });
+
+          const offset = Math.floor(Math.random() * count);
+
+          const recentWords = await WordleWord.findAll({
+            order: [["date", "DESC"]],
+            limit: 7,
+          });
+
+          const excluded = recentWords.map((w) => w.getDataValue("word"));
+
+          const driver = await Drivers.findOne({
+            where: {
+              popularity: {
+                [Op.between]: [3, 5],
+              },
+              lastname: {
+                [Op.notIn]: excluded,
+              },
+            },
+            offset,
+          });
+
+          if (driver) {
+            const today = new Date().toISOString().split("T")[0]; // YYYY-MM-DD
+
+            await WordleWord.upsert({
+              date: today,
+              word: driver.getDataValue("lastname").toLowerCase(),
+            });
+
+            console.log(`✅ Wordle actualizado: ${driver.getDataValue("lastname")}`);
+          } else {
+            console.log("⚠️ No suitable driver found for Wordle word generation");
+          }
+        } catch (error) {
+          console.error("💥 Error generating daily Wordle word:", error);
         }
       },
       {

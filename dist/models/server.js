@@ -18,6 +18,7 @@ const express_1 = __importDefault(require("express"));
 const morgan_1 = __importDefault(require("morgan"));
 const path_1 = __importDefault(require("path"));
 const node_cron_1 = __importDefault(require("node-cron"));
+const sequelize_1 = require("sequelize");
 //routes
 const FEwebhook_1 = __importDefault(require("../FEwebhook"));
 const Best_tens_1 = __importDefault(require("../routes/Best_tens"));
@@ -37,6 +38,9 @@ const Users_1 = __importDefault(require("../routes/Users"));
 const Cookie_1 = __importDefault(require("../routes/Cookie"));
 //functions
 const Best_tens_2 = require("../controllers/Best_tens");
+//models
+const associations_1 = require("../models/mysql/associations");
+const WordleWord_1 = __importDefault(require("../models/mysql/WordleWord"));
 //database settings
 const connection_1 = __importDefault(require("../db/connection"));
 const config_1 = require("./config");
@@ -118,6 +122,48 @@ class Server {
             }
             catch (error) {
                 console.error("💥 Unexpected error during scheduled update:", error);
+            }
+            // Generate daily Wordle word
+            try {
+                console.log("🎯 Generating daily Wordle word...");
+                const count = yield associations_1.Drivers.count({
+                    where: {
+                        popularity: {
+                            [sequelize_1.Op.between]: [3, 5],
+                        },
+                    },
+                });
+                const offset = Math.floor(Math.random() * count);
+                const recentWords = yield WordleWord_1.default.findAll({
+                    order: [["date", "DESC"]],
+                    limit: 7,
+                });
+                const excluded = recentWords.map((w) => w.getDataValue("word"));
+                const driver = yield associations_1.Drivers.findOne({
+                    where: {
+                        popularity: {
+                            [sequelize_1.Op.between]: [3, 5],
+                        },
+                        lastname: {
+                            [sequelize_1.Op.notIn]: excluded,
+                        },
+                    },
+                    offset,
+                });
+                if (driver) {
+                    const today = new Date().toISOString().split("T")[0]; // YYYY-MM-DD
+                    yield WordleWord_1.default.upsert({
+                        date: today,
+                        word: driver.getDataValue("lastname").toLowerCase(),
+                    });
+                    console.log(`✅ Wordle actualizado: ${driver.getDataValue("lastname")}`);
+                }
+                else {
+                    console.log("⚠️ No suitable driver found for Wordle word generation");
+                }
+            }
+            catch (error) {
+                console.error("💥 Error generating daily Wordle word:", error);
             }
         }), {
             timezone: "GMT",
