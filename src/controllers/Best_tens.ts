@@ -264,6 +264,224 @@ export const createBest10Game = async (req: Request, res: Response) => {
   }
 };
 
+export const getAllGames = async (req: Request, res: Response) => {
+  try {
+    const games = await Best_tens.findAll({
+      order: [['date', 'DESC']],
+    });
+
+    const gamesWithResults = await Promise.all(
+      games.map(async (game) => {
+        const results = await Best_tens_results.findAll({
+          where: { gameID: game.getDataValue("id") },
+          order: [['position', 'ASC']],
+        });
+
+        return {
+          id: game.getDataValue("id"),
+          title: game.getDataValue("title"),
+          date: game.getDataValue("date"),
+          type: game.getDataValue("type"),
+          table: game.getDataValue("table"),
+          creation: game.getDataValue("creation"),
+          resultsCount: results.length,
+        };
+      })
+    );
+
+    return res.status(200).json(gamesWithResults);
+  } catch (error) {
+    return res.status(500).json({ message: "Error fetching games", error });
+  }
+};
+
+export const deleteGame = async (req: Request, res: Response) => {
+  try {
+    const user = await getUserLogged(req);
+    if (!user || !isAdmin(user)) {
+      return res.status(401).json({ message: "Unauthorized to delete Top 10 game" });
+    }
+
+    const { gameID } = req.params;
+
+    if (!gameID) {
+      return res.status(400).json({ message: "Game ID is required" });
+    }
+
+    // Delete results first due to foreign key constraint
+    await Best_tens_results.destroy({
+      where: { gameID: gameID },
+    });
+
+    // Delete manual results if they exist
+    await Manual_Best_tens_results.destroy({
+      where: { gameid: gameID },
+    });
+
+    // Delete the game
+    const deletedCount = await Best_tens.destroy({
+      where: { id: gameID },
+    });
+
+    if (deletedCount === 0) {
+      return res.status(404).json({ message: "Game not found" });
+    }
+
+    return res.status(200).json({ message: "Game deleted successfully" });
+  } catch (error) {
+    return res.status(500).json({ message: "Error deleting game", error });
+  }
+};
+
+export const updateGame = async (req: Request, res: Response) => {
+  try {
+    const user = await getUserLogged(req);
+    if (!user || !isAdmin(user)) {
+      return res.status(401).json({ message: "Unauthorized to update Top 10 game" });
+    }
+
+    const { gameID } = req.params;
+    const gamedata = req.body;
+
+    if (!gameID || !gamedata) {
+      return res.status(400).json({ message: "Game ID and game data are required" });
+    }
+
+    const game = await Best_tens.findOne({ where: { id: gameID } });
+    if (!game) {
+      return res.status(404).json({ message: "Game not found" });
+    }
+
+    const title = gamedata.gamedata.title;
+    const date = gamedata.gamedata.date;
+    const type = gamedata.gamedata.type;
+    const statType = gamedata.gamedata.statType;
+    const results = gamedata.gamedata.results;
+
+    if (!title || !date || !type) {
+      return res.status(400).json({ message: "Title, date and type are required" });
+    }
+
+    // Update game data
+    await Best_tens.update(
+      {
+        title,
+        date,
+        type,
+        table: statType,
+      },
+      { where: { id: gameID } }
+    );
+
+    // If it's a manual game, update results
+    if (game.getDataValue("creation") === Top10Creation.MANUAL && results) {
+      if (!Array.isArray(results) || results.length !== 10) {
+        return res.status(400).json({ message: "Manual games must have exactly 10 results" });
+      }
+
+      // Delete existing results
+      await Best_tens_results.destroy({ where: { gameID: gameID } });
+      await Manual_Best_tens_results.destroy({ where: { gameid: gameID } });
+
+      // Create new results
+      for (let result of results) {
+        const top10Result = {
+          id: uuidv4(),
+          gameID: gameID,
+          resultID: result.resultID,
+          totalStat: result.totalStat,
+          position: result.position,
+        };
+
+        await Manual_Best_tens_results.create(top10Result);
+      }
+
+      // Update Best_tens_results table
+      await updateManualResults(gameID);
+    }
+
+    return res.status(200).json({ message: "Game updated successfully" });
+  } catch (error) {
+    return res.status(500).json({ message: "Error updating game", error });
+  }
+};
+
+export const getGameById = async (req: Request, res: Response) => {
+  const { gameID } = req.params;
+
+  if (!gameID) {
+    return res.status(400).json({ message: "Game ID is required" });
+  }
+
+  try {
+    const game = await Best_tens.findOne({
+      where: { id: gameID },
+    });
+
+    if (!game) {
+      return res.status(404).json({ message: "Game not found" });
+    }
+
+    const results = await Best_tens_results.findAll({
+      where: { gameID: gameID },
+      order: [['position', 'ASC']],
+    });
+
+    // Load entity details for each result
+    const resultsWithDetails = await Promise.all(
+      results.map(async (result) => {
+        const resultID = result.getDataValue("resultID");
+        let entityDetails = null;
+
+        try {
+          // Try to find the entity based on the type
+          if (game.getDataValue("type") === "driver") {
+            entityDetails = await Drivers.findOne({ where: { id: resultID } });
+          } else if (game.getDataValue("type") === "team") {
+            entityDetails = await Teams.findOne({ where: { id: resultID } });
+          } else if (game.getDataValue("type") === "track") {
+            entityDetails = await Tracks.findOne({ where: { id: resultID } });
+          }
+        } catch (error) {
+          console.log("Error loading entity details:", error);
+        }
+
+        return {
+          resultID: resultID,
+          totalStat: result.getDataValue("totalStat"),
+          position: result.getDataValue("position"),
+          entityName: entityDetails ?
+            (entityDetails.getDataValue("firstname") && entityDetails.getDataValue("lastname") ?
+              `${entityDetails.getDataValue("firstname")} ${entityDetails.getDataValue("lastname")}` :
+              entityDetails.getDataValue("name") || entityDetails.getDataValue("track_name") || "Unknown") :
+            "Unknown",
+          entity: entityDetails ? entityDetails.toJSON() : null,
+        };
+      })
+    );
+
+    const gameData = {
+      id: game.getDataValue("id"),
+      title: game.getDataValue("title"),
+      date: game.getDataValue("date"),
+      type: game.getDataValue("type"),
+      table: game.getDataValue("table"),
+      creation: game.getDataValue("creation"),
+      year: game.getDataValue("year"),
+      fromYear: game.getDataValue("fromYear"),
+      toYear: game.getDataValue("toYear"),
+      nationality: game.getDataValue("nationality"),
+      team: game.getDataValue("team"),
+      sqlTable: game.getDataValue("sqlTable"),
+      results: resultsWithDetails,
+    };
+
+    return res.status(200).json(gameData);
+  } catch (error) {
+    return res.status(500).json({ message: "Error fetching game", error });
+  }
+};
+
 export const getGameData = async (req: Request, res: Response) => {
   const today = new Date().toISOString().split("T")[0]; // YYYY-MM-DD
   const challenge = await Best_tens.findOne({

@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateBest10GameResults = exports.updateBest10GameResultsCore = exports.getGameData = exports.createBest10Game = exports.createBest10GameManual = exports.getSuggestions = void 0;
+exports.updateBest10GameResults = exports.updateBest10GameResultsCore = exports.getGameData = exports.getGameById = exports.updateGame = exports.deleteGame = exports.getAllGames = exports.createBest10Game = exports.createBest10GameManual = exports.getSuggestions = void 0;
 const sequelize_1 = require("sequelize");
 const uuid_1 = require("uuid");
 const Top10Creation_1 = require("../models/enums/Top10Creation");
@@ -219,6 +219,193 @@ const createBest10Game = (req, res) => __awaiter(void 0, void 0, void 0, functio
     }
 });
 exports.createBest10Game = createBest10Game;
+const getAllGames = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const games = yield Best_tens_1.default.findAll({
+            order: [['date', 'DESC']],
+        });
+        const gamesWithResults = yield Promise.all(games.map((game) => __awaiter(void 0, void 0, void 0, function* () {
+            const results = yield Best_tens_results_1.default.findAll({
+                where: { gameID: game.getDataValue("id") },
+                order: [['position', 'ASC']],
+            });
+            return {
+                id: game.getDataValue("id"),
+                title: game.getDataValue("title"),
+                date: game.getDataValue("date"),
+                type: game.getDataValue("type"),
+                table: game.getDataValue("table"),
+                creation: game.getDataValue("creation"),
+                resultsCount: results.length,
+            };
+        })));
+        return res.status(200).json(gamesWithResults);
+    }
+    catch (error) {
+        return res.status(500).json({ message: "Error fetching games", error });
+    }
+});
+exports.getAllGames = getAllGames;
+const deleteGame = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const user = yield (0, Users_1.getUserLogged)(req);
+        if (!user || !(0, Users_1.isAdmin)(user)) {
+            return res.status(401).json({ message: "Unauthorized to delete Top 10 game" });
+        }
+        const { gameID } = req.params;
+        if (!gameID) {
+            return res.status(400).json({ message: "Game ID is required" });
+        }
+        // Delete results first due to foreign key constraint
+        yield Best_tens_results_1.default.destroy({
+            where: { gameID: gameID },
+        });
+        // Delete manual results if they exist
+        yield Manual_Best_Tens_Results_1.default.destroy({
+            where: { gameid: gameID },
+        });
+        // Delete the game
+        const deletedCount = yield Best_tens_1.default.destroy({
+            where: { id: gameID },
+        });
+        if (deletedCount === 0) {
+            return res.status(404).json({ message: "Game not found" });
+        }
+        return res.status(200).json({ message: "Game deleted successfully" });
+    }
+    catch (error) {
+        return res.status(500).json({ message: "Error deleting game", error });
+    }
+});
+exports.deleteGame = deleteGame;
+const updateGame = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const user = yield (0, Users_1.getUserLogged)(req);
+        if (!user || !(0, Users_1.isAdmin)(user)) {
+            return res.status(401).json({ message: "Unauthorized to update Top 10 game" });
+        }
+        const { gameID } = req.params;
+        const gamedata = req.body;
+        if (!gameID || !gamedata) {
+            return res.status(400).json({ message: "Game ID and game data are required" });
+        }
+        const game = yield Best_tens_1.default.findOne({ where: { id: gameID } });
+        if (!game) {
+            return res.status(404).json({ message: "Game not found" });
+        }
+        const title = gamedata.gamedata.title;
+        const date = gamedata.gamedata.date;
+        const type = gamedata.gamedata.type;
+        const statType = gamedata.gamedata.statType;
+        const results = gamedata.gamedata.results;
+        if (!title || !date || !type) {
+            return res.status(400).json({ message: "Title, date and type are required" });
+        }
+        // Update game data
+        yield Best_tens_1.default.update({
+            title,
+            date,
+            type,
+            table: statType,
+        }, { where: { id: gameID } });
+        // If it's a manual game, update results
+        if (game.getDataValue("creation") === Top10Creation_1.Top10Creation.MANUAL && results) {
+            if (!Array.isArray(results) || results.length !== 10) {
+                return res.status(400).json({ message: "Manual games must have exactly 10 results" });
+            }
+            // Delete existing results
+            yield Best_tens_results_1.default.destroy({ where: { gameID: gameID } });
+            yield Manual_Best_Tens_Results_1.default.destroy({ where: { gameid: gameID } });
+            // Create new results
+            for (let result of results) {
+                const top10Result = {
+                    id: (0, uuid_1.v4)(),
+                    gameID: gameID,
+                    resultID: result.resultID,
+                    totalStat: result.totalStat,
+                    position: result.position,
+                };
+                yield Manual_Best_Tens_Results_1.default.create(top10Result);
+            }
+            // Update Best_tens_results table
+            yield updateManualResults(gameID);
+        }
+        return res.status(200).json({ message: "Game updated successfully" });
+    }
+    catch (error) {
+        return res.status(500).json({ message: "Error updating game", error });
+    }
+});
+exports.updateGame = updateGame;
+const getGameById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { gameID } = req.params;
+    if (!gameID) {
+        return res.status(400).json({ message: "Game ID is required" });
+    }
+    try {
+        const game = yield Best_tens_1.default.findOne({
+            where: { id: gameID },
+        });
+        if (!game) {
+            return res.status(404).json({ message: "Game not found" });
+        }
+        const results = yield Best_tens_results_1.default.findAll({
+            where: { gameID: gameID },
+            order: [['position', 'ASC']],
+        });
+        // Load entity details for each result
+        const resultsWithDetails = yield Promise.all(results.map((result) => __awaiter(void 0, void 0, void 0, function* () {
+            const resultID = result.getDataValue("resultID");
+            let entityDetails = null;
+            try {
+                // Try to find the entity based on the type
+                if (game.getDataValue("type") === "driver") {
+                    entityDetails = yield Drivers_1.default.findOne({ where: { id: resultID } });
+                }
+                else if (game.getDataValue("type") === "team") {
+                    entityDetails = yield Teams_1.default.findOne({ where: { id: resultID } });
+                }
+                else if (game.getDataValue("type") === "track") {
+                    entityDetails = yield associations_1.Tracks.findOne({ where: { id: resultID } });
+                }
+            }
+            catch (error) {
+                console.log("Error loading entity details:", error);
+            }
+            return {
+                resultID: resultID,
+                totalStat: result.getDataValue("totalStat"),
+                position: result.getDataValue("position"),
+                entityName: entityDetails ?
+                    (entityDetails.getDataValue("firstname") && entityDetails.getDataValue("lastname") ?
+                        `${entityDetails.getDataValue("firstname")} ${entityDetails.getDataValue("lastname")}` :
+                        entityDetails.getDataValue("name") || entityDetails.getDataValue("track_name") || "Unknown") :
+                    "Unknown",
+                entity: entityDetails ? entityDetails.toJSON() : null,
+            };
+        })));
+        const gameData = {
+            id: game.getDataValue("id"),
+            title: game.getDataValue("title"),
+            date: game.getDataValue("date"),
+            type: game.getDataValue("type"),
+            table: game.getDataValue("table"),
+            creation: game.getDataValue("creation"),
+            year: game.getDataValue("year"),
+            fromYear: game.getDataValue("fromYear"),
+            toYear: game.getDataValue("toYear"),
+            nationality: game.getDataValue("nationality"),
+            team: game.getDataValue("team"),
+            sqlTable: game.getDataValue("sqlTable"),
+            results: resultsWithDetails,
+        };
+        return res.status(200).json(gameData);
+    }
+    catch (error) {
+        return res.status(500).json({ message: "Error fetching game", error });
+    }
+});
+exports.getGameById = getGameById;
 const getGameData = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const today = new Date().toISOString().split("T")[0]; // YYYY-MM-DD
     const challenge = yield Best_tens_1.default.findOne({
