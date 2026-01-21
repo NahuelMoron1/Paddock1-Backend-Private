@@ -26,7 +26,7 @@ function slackStatus() {
             const raw = execSync("pm2 jlist", { encoding: "utf8" });
             const apps = JSON.parse(raw);
             // Armo un mensaje limpio
-            let message = "🚀 *Server restarted*\n\n";
+            let message = "🚀 *Private pdk1GamePrivate Server restarted*\n\n";
             apps.forEach((app) => {
                 const name = app.name;
                 const status = app.pm2_env.status;
