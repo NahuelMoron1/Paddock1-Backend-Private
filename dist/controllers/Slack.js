@@ -12,23 +12,25 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.postErrorNotification = void 0;
 const config_1 = require("../models/config");
 const postErrorNotification = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a, _b, _c;
+    var _a, _b, _c, _d, _e, _f;
     try {
         const { message, context } = req.body;
-        const publicMessage = ((_a = context === null || context === void 0 ? void 0 : context.err) === null || _a === void 0 ? void 0 : _a.message) || (context === null || context === void 0 ? void 0 : context.message) || "Sin mensaje";
-        const errorMessage = ((_b = context === null || context === void 0 ? void 0 : context.err) === null || _b === void 0 ? void 0 : _b.error.message) || "Sin mensaje";
-        const statusCode = ((_c = context === null || context === void 0 ? void 0 : context.err) === null || _c === void 0 ? void 0 : _c.status) || (context === null || context === void 0 ? void 0 : context.statusCode) || "N/A";
+        // Usar Optional Chaining (?.) y valores por defecto para evitar crashes
+        const publicMessage = ((_a = context === null || context === void 0 ? void 0 : context.err) === null || _a === void 0 ? void 0 : _a.message) || (context === null || context === void 0 ? void 0 : context.message) || "No public message provided";
+        // Aquí suele haber fallos si context.err o context.err.error no existen
+        const errorMessage = ((_c = (_b = context === null || context === void 0 ? void 0 : context.err) === null || _b === void 0 ? void 0 : _b.error) === null || _c === void 0 ? void 0 : _c.message) || ((_d = context === null || context === void 0 ? void 0 : context.err) === null || _d === void 0 ? void 0 : _d.name) || "No technical details provided";
+        const statusCode = ((_e = context === null || context === void 0 ? void 0 : context.err) === null || _e === void 0 ? void 0 : _e.status) || (context === null || context === void 0 ? void 0 : context.statusCode) || "N/A";
         const url = (context === null || context === void 0 ? void 0 : context.url) || req.headers.referer || "N/A";
         const userAgent = req.headers["user-agent"] || "N/A";
-        const authToken = req.cookies["access_token"];
+        const authToken = ((_f = req.cookies) === null || _f === void 0 ? void 0 : _f["access_token"]) || "No token";
         const payload = {
-            text: message, // fallback
+            text: `Error en Frontend: ${message}`,
             blocks: [
                 {
                     type: "header",
                     text: {
                         type: "plain_text",
-                        text: `${statusCode} - ${message}`,
+                        text: `🚨 ${statusCode} - ${message}`.substring(0, 3000), // Slack tiene límites de caracteres
                         emoji: true,
                     },
                 },
@@ -43,25 +45,17 @@ const postErrorNotification = (req, res) => __awaiter(void 0, void 0, void 0, fu
                     type: "section",
                     text: {
                         type: "mrkdwn",
-                        text: `*Error Message:*\n${errorMessage}`,
+                        text: `*Error Detail:*\n\`\`\`${errorMessage}\`\`\``, // En bloque de código se ve mejor
                     },
                 },
                 {
-                    type: "section",
-                    text: { type: "mrkdwn", text: `*Status:*\n${statusCode}` },
-                },
-                {
-                    type: "section",
-                    text: { type: "mrkdwn", text: `*Url:*\n${url}` },
-                },
-                {
-                    type: "section",
-                    text: { type: "mrkdwn", text: `*Auth Token:*\n${authToken}` },
-                },
-                {
-                    type: "section",
-                    text: { type: "mrkdwn", text: `*Browser:*\n${userAgent}` },
-                },
+                    type: "context",
+                    elements: [
+                        { type: "mrkdwn", text: `*URL:* ${url}` },
+                        { type: "mrkdwn", text: `*Browser:* ${userAgent}` },
+                        { type: "mrkdwn", text: `*Auth Token:* ${authToken}` }
+                    ]
+                }
             ],
         };
         const resp = yield fetch(config_1.SLACK_UI_CRITICAL_ERRORS, {
@@ -69,10 +63,19 @@ const postErrorNotification = (req, res) => __awaiter(void 0, void 0, void 0, fu
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(payload),
         });
-        res.json({ ok: true });
+        if (!resp.ok) {
+            const slackErr = yield resp.text();
+            throw new Error(`Slack API error: ${slackErr}`);
+        }
+        return res.json({ ok: true });
     }
     catch (error) {
-        return res.status(500).json({ message: error });
+        console.error("Error en Slack Controller:", error);
+        // IMPORTANTE: No envíes el objeto error directamente, envía el string
+        return res.status(500).json({
+            ok: false,
+            message: error.message || "Error interno del servidor"
+        });
     }
 });
 exports.postErrorNotification = postErrorNotification;

@@ -151,7 +151,7 @@ const createH2HGame = (req, res) => __awaiter(void 0, void 0, void 0, function* 
             points_finishes_driver1,
             points_finishes_driver2,
         });
-        return res.status(201).json({
+        return res.status(200).json({
             message: "H2H game created successfully",
             gameId: newGame.getDataValue("id"),
         });

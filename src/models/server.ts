@@ -23,6 +23,7 @@ import wordleRouter from "../routes/Wordle";
 import webhookRouter from "../webhook";
 import usersRouter from "../routes/Users";
 import cookieRouter from "../routes/Cookie";
+import slackRouter from "../routes/Slack";
 
 //functions
 import { updateBest10GameResultsCore } from "../controllers/Best_tens";
@@ -70,6 +71,7 @@ class Server {
     this.app.use("/api/h2h", h2hGamesRouter);
     this.app.use("/api/users", usersRouter);
     this.app.use("/api/cookie", cookieRouter);
+    this.app.use("/api/slack", slackRouter);
   }
   middlewares() {
     this.app.use(

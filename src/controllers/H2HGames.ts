@@ -182,7 +182,7 @@ export const createH2HGame = async (req: Request, res: Response) => {
       points_finishes_driver2,
     });
 
-    return res.status(201).json({
+    return res.status(200).json({
       message: "H2H game created successfully",
       gameId: newGame.getDataValue("id"),
     });
