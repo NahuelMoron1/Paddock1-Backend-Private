@@ -6,14 +6,7 @@ require("dotenv").config();
 dotenv.config();
 const server = new Server();
 
-import axios from "axios";
-import { PRODUCTION, SLACK_WEBHOOK_URL } from "./models/config";
-
-function notifySlack(text: string) {
-  axios
-    .post(SLACK_WEBHOOK_URL, { text })
-    .catch((err) => console.error("Error enviando mensaje a Slack:", err));
-}
+import { PRODUCTION, SLACK_BACKEND_STATUS } from "./models/config";
 
 function slackStatus() {
   (async () => {
@@ -45,7 +38,7 @@ function slackStatus() {
       });
 
       // Envío a Slack
-      await fetch(SLACK_WEBHOOK_URL, {
+      await fetch(SLACK_BACKEND_STATUS, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text: message }),

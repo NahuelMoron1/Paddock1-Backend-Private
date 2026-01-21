@@ -18,13 +18,7 @@ const { execSync } = require("child_process");
 require("dotenv").config();
 dotenv_1.default.config();
 const server = new server_1.default();
-const axios_1 = __importDefault(require("axios"));
 const config_1 = require("./models/config");
-function notifySlack(text) {
-    axios_1.default
-        .post(config_1.SLACK_WEBHOOK_URL, { text })
-        .catch((err) => console.error("Error enviando mensaje a Slack:", err));
-}
 function slackStatus() {
     (() => __awaiter(this, void 0, void 0, function* () {
         try {
@@ -53,7 +47,7 @@ function slackStatus() {
                 message += `• Memoria: ${mem}\n\n`;
             });
             // Envío a Slack
-            yield fetch(config_1.SLACK_WEBHOOK_URL, {
+            yield fetch(config_1.SLACK_BACKEND_STATUS, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ text: message }),
