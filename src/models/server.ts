@@ -10,6 +10,7 @@ import { Op } from "sequelize";
 import FEwebhookRouter from "../FEwebhook";
 import best10Router from "../routes/Best_tens";
 import connectionsRouter from "../routes/Connections";
+import guessCareersRouter from "../routes/GuessCareers";
 import guessTeamsRouter from "../routes/GuessTeams";
 import h2hGamesRouter from "../routes/H2HGames";
 import impostorRouter from "../routes/Impostors";
@@ -68,6 +69,7 @@ class Server {
     this.app.use("/api/impostor", impostorRouter);
     this.app.use("/api/connections", connectionsRouter);
     this.app.use("/api/guessTeams", guessTeamsRouter);
+    this.app.use("/api/guessCareers", guessCareersRouter);
     this.app.use("/api/h2h", h2hGamesRouter);
     this.app.use("/api/users", usersRouter);
     this.app.use("/api/cookie", cookieRouter);

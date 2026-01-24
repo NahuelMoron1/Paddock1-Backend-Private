@@ -2,6 +2,8 @@ import Connections from "./Connections.js";
 import Connections_Groups from "./Connections_Groups.js";
 import Connections_Groups_Results from "./Connections_Groups_Results.js";
 import Drivers from "./Drivers.js";
+import GuessCareers from "./GuessCareers.js";
+import GuessCareers_Teams from "./GuessCareers_Teams.js";
 import GuessTeams from "./GuessTeams.js";
 import Impostors from "./Impostors.js";
 import Impostors_Results from "./Impostors_Results.js";
@@ -106,11 +108,30 @@ H2HGames.belongsTo(Teams, { foreignKey: "team_id" });
 H2HGames.belongsTo(Drivers, { foreignKey: "driver1_id", as: "Driver1" });
 H2HGames.belongsTo(Drivers, { foreignKey: "driver2_id", as: "Driver2" });
 
+// Asociaciones para GuessCareers
+Drivers.hasMany(GuessCareers, { foreignKey: "driver_id" });
+GuessCareers.belongsTo(Drivers, { foreignKey: "driver_id" });
+
+// Asociaciones para GuessCareers_Teams
+GuessCareers.hasMany(GuessCareers_Teams, { foreignKey: "game_id" });
+GuessCareers_Teams.belongsTo(GuessCareers, { 
+  foreignKey: "game_id",
+  targetKey: "id"
+});
+
+Teams.hasMany(GuessCareers_Teams, { foreignKey: "team_id" });
+GuessCareers_Teams.belongsTo(Teams, { 
+  foreignKey: "team_id",
+  targetKey: "id"
+});
+
 export {
   Connections,
   Connections_Groups,
   Connections_Groups_Results,
   Drivers,
+  GuessCareers,
+  GuessCareers_Teams,
   GuessTeams,
   H2HGames,
   Impostors,

@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Tracks = exports.Teams = exports.Seasons = exports.Season_Tracks = exports.Season_Teams_Drivers = exports.Season_Teams = exports.Impostors_Results = exports.Impostors = exports.H2HGames = exports.GuessTeams = exports.Drivers = exports.Connections_Groups_Results = exports.Connections_Groups = exports.Connections = void 0;
+exports.Tracks = exports.Teams = exports.Seasons = exports.Season_Tracks = exports.Season_Teams_Drivers = exports.Season_Teams = exports.Impostors_Results = exports.Impostors = exports.H2HGames = exports.GuessTeams = exports.GuessCareers_Teams = exports.GuessCareers = exports.Drivers = exports.Connections_Groups_Results = exports.Connections_Groups = exports.Connections = void 0;
 const Connections_js_1 = __importDefault(require("./Connections.js"));
 exports.Connections = Connections_js_1.default;
 const Connections_Groups_js_1 = __importDefault(require("./Connections_Groups.js"));
@@ -12,6 +12,10 @@ const Connections_Groups_Results_js_1 = __importDefault(require("./Connections_G
 exports.Connections_Groups_Results = Connections_Groups_Results_js_1.default;
 const Drivers_js_1 = __importDefault(require("./Drivers.js"));
 exports.Drivers = Drivers_js_1.default;
+const GuessCareers_js_1 = __importDefault(require("./GuessCareers.js"));
+exports.GuessCareers = GuessCareers_js_1.default;
+const GuessCareers_Teams_js_1 = __importDefault(require("./GuessCareers_Teams.js"));
+exports.GuessCareers_Teams = GuessCareers_Teams_js_1.default;
 const GuessTeams_js_1 = __importDefault(require("./GuessTeams.js"));
 exports.GuessTeams = GuessTeams_js_1.default;
 const Impostors_js_1 = __importDefault(require("./Impostors.js"));
@@ -109,3 +113,17 @@ Drivers_js_1.default.hasMany(H2HGames_js_1.default, { foreignKey: "driver2_id", 
 H2HGames_js_1.default.belongsTo(Teams_js_1.default, { foreignKey: "team_id" });
 H2HGames_js_1.default.belongsTo(Drivers_js_1.default, { foreignKey: "driver1_id", as: "Driver1" });
 H2HGames_js_1.default.belongsTo(Drivers_js_1.default, { foreignKey: "driver2_id", as: "Driver2" });
+// Asociaciones para GuessCareers
+Drivers_js_1.default.hasMany(GuessCareers_js_1.default, { foreignKey: "driver_id" });
+GuessCareers_js_1.default.belongsTo(Drivers_js_1.default, { foreignKey: "driver_id" });
+// Asociaciones para GuessCareers_Teams
+GuessCareers_js_1.default.hasMany(GuessCareers_Teams_js_1.default, { foreignKey: "game_id" });
+GuessCareers_Teams_js_1.default.belongsTo(GuessCareers_js_1.default, {
+    foreignKey: "game_id",
+    targetKey: "id"
+});
+Teams_js_1.default.hasMany(GuessCareers_Teams_js_1.default, { foreignKey: "team_id" });
+GuessCareers_Teams_js_1.default.belongsTo(Teams_js_1.default, {
+    foreignKey: "team_id",
+    targetKey: "id"
+});

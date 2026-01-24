@@ -23,6 +23,7 @@ const sequelize_1 = require("sequelize");
 const FEwebhook_1 = __importDefault(require("../FEwebhook"));
 const Best_tens_1 = __importDefault(require("../routes/Best_tens"));
 const Connections_1 = __importDefault(require("../routes/Connections"));
+const GuessCareers_1 = __importDefault(require("../routes/GuessCareers"));
 const GuessTeams_1 = __importDefault(require("../routes/GuessTeams"));
 const H2HGames_1 = __importDefault(require("../routes/H2HGames"));
 const Impostors_1 = __importDefault(require("../routes/Impostors"));
@@ -75,6 +76,7 @@ class Server {
         this.app.use("/api/impostor", Impostors_1.default);
         this.app.use("/api/connections", Connections_1.default);
         this.app.use("/api/guessTeams", GuessTeams_1.default);
+        this.app.use("/api/guessCareers", GuessCareers_1.default);
         this.app.use("/api/h2h", H2HGames_1.default);
         this.app.use("/api/users", Users_1.default);
         this.app.use("/api/cookie", Cookie_1.default);
