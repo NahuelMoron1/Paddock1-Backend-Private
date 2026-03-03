@@ -14,6 +14,8 @@ import Seasons from "./Seasons.js";
 import Season_Tracks from "./Seasons_Tracks.js";
 import Teams from "./Teams.js";
 import Tracks from "./Tracks.js";
+import Timeline from "./TimeLine.js";
+import TimelineEvent from "./TimelineEvent.js";
 
 // --- Asociaciones de muchos a muchos ---
 
@@ -114,15 +116,27 @@ GuessCareers.belongsTo(Drivers, { foreignKey: "driver_id" });
 
 // Asociaciones para GuessCareers_Teams
 GuessCareers.hasMany(GuessCareers_Teams, { foreignKey: "game_id" });
-GuessCareers_Teams.belongsTo(GuessCareers, { 
+GuessCareers_Teams.belongsTo(GuessCareers, {
   foreignKey: "game_id",
-  targetKey: "id"
+  targetKey: "id",
 });
 
 Teams.hasMany(GuessCareers_Teams, { foreignKey: "team_id" });
-GuessCareers_Teams.belongsTo(Teams, { 
+GuessCareers_Teams.belongsTo(Teams, {
   foreignKey: "team_id",
-  targetKey: "id"
+  targetKey: "id",
+});
+
+Timeline.hasMany(TimelineEvent, {
+  foreignKey: "gameID",
+  sourceKey: "id",
+  onDelete: "CASCADE",
+  onUpdate: "CASCADE",
+});
+
+TimelineEvent.belongsTo(Timeline, {
+  foreignKey: "gameID",
+  targetKey: "id",
 });
 
 export {
@@ -142,4 +156,6 @@ export {
   Seasons,
   Teams,
   Tracks,
+  Timeline,
+  TimelineEvent,
 };

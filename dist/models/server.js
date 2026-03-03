@@ -38,6 +38,7 @@ const webhook_1 = __importDefault(require("../webhook"));
 const Users_1 = __importDefault(require("../routes/Users"));
 const Cookie_1 = __importDefault(require("../routes/Cookie"));
 const Slack_1 = __importDefault(require("../routes/Slack"));
+const Timeline_1 = __importDefault(require("../routes/Timeline"));
 //functions
 const Best_tens_2 = require("../controllers/Best_tens");
 //models
@@ -81,6 +82,7 @@ class Server {
         this.app.use("/api/users", Users_1.default);
         this.app.use("/api/cookie", Cookie_1.default);
         this.app.use("/api/slack", Slack_1.default);
+        this.app.use("/api/timeline", Timeline_1.default);
     }
     middlewares() {
         this.app.use("/uploads", express_1.default.static(path_1.default.join(__dirname, "../../uploads")));

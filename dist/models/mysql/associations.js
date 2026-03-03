@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Tracks = exports.Teams = exports.Seasons = exports.Season_Tracks = exports.Season_Teams_Drivers = exports.Season_Teams = exports.Impostors_Results = exports.Impostors = exports.H2HGames = exports.GuessTeams = exports.GuessCareers_Teams = exports.GuessCareers = exports.Drivers = exports.Connections_Groups_Results = exports.Connections_Groups = exports.Connections = void 0;
+exports.TimelineEvent = exports.Timeline = exports.Tracks = exports.Teams = exports.Seasons = exports.Season_Tracks = exports.Season_Teams_Drivers = exports.Season_Teams = exports.Impostors_Results = exports.Impostors = exports.H2HGames = exports.GuessTeams = exports.GuessCareers_Teams = exports.GuessCareers = exports.Drivers = exports.Connections_Groups_Results = exports.Connections_Groups = exports.Connections = void 0;
 const Connections_js_1 = __importDefault(require("./Connections.js"));
 exports.Connections = Connections_js_1.default;
 const Connections_Groups_js_1 = __importDefault(require("./Connections_Groups.js"));
@@ -36,6 +36,10 @@ const Teams_js_1 = __importDefault(require("./Teams.js"));
 exports.Teams = Teams_js_1.default;
 const Tracks_js_1 = __importDefault(require("./Tracks.js"));
 exports.Tracks = Tracks_js_1.default;
+const TimeLine_js_1 = __importDefault(require("./TimeLine.js"));
+exports.Timeline = TimeLine_js_1.default;
+const TimelineEvent_js_1 = __importDefault(require("./TimelineEvent.js"));
+exports.TimelineEvent = TimelineEvent_js_1.default;
 // --- Asociaciones de muchos a muchos ---
 // Asociación entre Seasons y Teams (a través de la tabla Season_Teams)
 Seasons_js_1.default.hasMany(Season_Teams_js_1.default, { foreignKey: "seasonID" });
@@ -120,10 +124,20 @@ GuessCareers_js_1.default.belongsTo(Drivers_js_1.default, { foreignKey: "driver_
 GuessCareers_js_1.default.hasMany(GuessCareers_Teams_js_1.default, { foreignKey: "game_id" });
 GuessCareers_Teams_js_1.default.belongsTo(GuessCareers_js_1.default, {
     foreignKey: "game_id",
-    targetKey: "id"
+    targetKey: "id",
 });
 Teams_js_1.default.hasMany(GuessCareers_Teams_js_1.default, { foreignKey: "team_id" });
 GuessCareers_Teams_js_1.default.belongsTo(Teams_js_1.default, {
     foreignKey: "team_id",
-    targetKey: "id"
+    targetKey: "id",
+});
+TimeLine_js_1.default.hasMany(TimelineEvent_js_1.default, {
+    foreignKey: "gameID",
+    sourceKey: "id",
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE",
+});
+TimelineEvent_js_1.default.belongsTo(TimeLine_js_1.default, {
+    foreignKey: "gameID",
+    targetKey: "id",
 });

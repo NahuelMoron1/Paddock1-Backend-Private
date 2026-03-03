@@ -25,6 +25,7 @@ import webhookRouter from "../webhook";
 import usersRouter from "../routes/Users";
 import cookieRouter from "../routes/Cookie";
 import slackRouter from "../routes/Slack";
+import timelineRouter from "../routes/Timeline";
 
 //functions
 import { updateBest10GameResultsCore } from "../controllers/Best_tens";
@@ -74,15 +75,16 @@ class Server {
     this.app.use("/api/users", usersRouter);
     this.app.use("/api/cookie", cookieRouter);
     this.app.use("/api/slack", slackRouter);
+    this.app.use("/api/timeline", timelineRouter);
   }
   middlewares() {
     this.app.use(
       "/uploads",
-      express.static(path.join(__dirname, "../../uploads"))
+      express.static(path.join(__dirname, "../../uploads")),
     );
     this.app.use(
       "/backups",
-      express.static(path.join(__dirname, "../../backups"))
+      express.static(path.join(__dirname, "../../backups")),
     );
     this.app.use(express.json());
     this.app.use(express.urlencoded({ extended: true }));
@@ -95,7 +97,7 @@ class Server {
         origin: ALLOWED_ORIGINS,
         methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
         credentials: true,
-      })
+      }),
     );
   }
   async dbConnect() {
@@ -116,7 +118,7 @@ class Server {
       "0 0 * * *",
       async () => {
         console.log(
-          "🕐 Running scheduled daily update for Best10 game results..."
+          "🕐 Running scheduled daily update for Best10 game results...",
         );
 
         try {
@@ -125,7 +127,7 @@ class Server {
           if (result.success) {
             console.log(
               "✅ Daily update completed successfully:",
-              result.message
+              result.message,
             );
           } else {
             console.error("❌ Daily update failed:", result.message);
@@ -175,9 +177,13 @@ class Server {
               word: driver.getDataValue("lastname").toLowerCase(),
             });
 
-            console.log(`✅ Wordle actualizado: ${driver.getDataValue("lastname")}`);
+            console.log(
+              `✅ Wordle actualizado: ${driver.getDataValue("lastname")}`,
+            );
           } else {
-            console.log("⚠️ No suitable driver found for Wordle word generation");
+            console.log(
+              "⚠️ No suitable driver found for Wordle word generation",
+            );
           }
         } catch (error) {
           console.error("💥 Error generating daily Wordle word:", error);
@@ -185,11 +191,11 @@ class Server {
       },
       {
         timezone: "GMT",
-      }
+      },
     );
 
     console.log(
-      "📅 Daily update scheduler initialized (runs at 00:00 GMT daily)"
+      "📅 Daily update scheduler initialized (runs at 00:00 GMT daily)",
     );
   }
 }
