@@ -17,8 +17,6 @@ import Tracks from "./Tracks.js";
 import TimelineEvent from "./TimelineEvent.js";
 import Timeline from "./Timeline.js";
 
-// --- Asociaciones de muchos a muchos ---
-
 // Asociación entre Seasons y Teams (a través de la tabla Season_Teams)
 Seasons.hasMany(Season_Teams, { foreignKey: "seasonID" });
 Season_Teams.belongsTo(Seasons, {

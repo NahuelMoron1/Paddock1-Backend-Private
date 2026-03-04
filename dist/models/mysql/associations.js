@@ -40,7 +40,6 @@ const TimelineEvent_js_1 = __importDefault(require("./TimelineEvent.js"));
 exports.TimelineEvent = TimelineEvent_js_1.default;
 const Timeline_js_1 = __importDefault(require("./Timeline.js"));
 exports.Timeline = Timeline_js_1.default;
-// --- Asociaciones de muchos a muchos ---
 // Asociación entre Seasons y Teams (a través de la tabla Season_Teams)
 Seasons_js_1.default.hasMany(Season_Teams_js_1.default, { foreignKey: "seasonID" });
 Season_Teams_js_1.default.belongsTo(Seasons_js_1.default, {
