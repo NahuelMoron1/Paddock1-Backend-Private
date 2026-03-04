@@ -13,14 +13,21 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.postImage = exports.deleteTimelineEvent = exports.updateTimeline = exports.addTimelineEvent = exports.createTimeline = exports.getTimelineById = exports.getTimelines = void 0;
-const TimeLine_1 = __importDefault(require("../models/mysql/TimeLine")); // tu modelo
+const Timeline_1 = __importDefault(require("../models/mysql/Timeline")); // tu modelo
 const TimelineEvent_1 = __importDefault(require("../models/mysql/TimelineEvent")); // tu modelo
 const uuid_1 = require("uuid");
 const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
+const Users_1 = require("./Users");
 const getTimelines = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const timelines = yield TimeLine_1.default.findAll();
+        const user = yield (0, Users_1.getUserLogged)(req);
+        if (!user || !(0, Users_1.isAdmin)(user)) {
+            return res.status(401).json({
+                message: "Unauthorized to create Timeline game ",
+            });
+        }
+        const timelines = yield Timeline_1.default.findAll();
         if (!timelines) {
             return res.status(404).json({ message: "No timelines found" });
         }
@@ -35,7 +42,7 @@ exports.getTimelines = getTimelines;
 const getTimelineById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { id } = req.params;
-        const timeline = yield TimeLine_1.default.findByPk(id);
+        const timeline = yield Timeline_1.default.findByPk(id);
         if (!timeline) {
             return res.status(404).json({ message: "Timeline not found" });
         }
@@ -53,11 +60,17 @@ const getTimelineById = (req, res) => __awaiter(void 0, void 0, void 0, function
 exports.getTimelineById = getTimelineById;
 const createTimeline = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        const user = yield (0, Users_1.getUserLogged)(req);
+        if (!user || !(0, Users_1.isAdmin)(user)) {
+            return res.status(401).json({
+                message: "Unauthorized to create Timeline game ",
+            });
+        }
         const { date } = req.body;
         if (!date) {
             return res.status(400).json({ message: "Date is required" });
         }
-        const newTimeline = yield TimeLine_1.default.create({ date });
+        const newTimeline = yield Timeline_1.default.create({ date });
         return res.status(201).json({
             message: "Timeline created successfully",
             timeline: newTimeline,
@@ -71,12 +84,18 @@ const createTimeline = (req, res) => __awaiter(void 0, void 0, void 0, function*
 exports.createTimeline = createTimeline;
 const addTimelineEvent = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        const user = yield (0, Users_1.getUserLogged)(req);
+        if (!user || !(0, Users_1.isAdmin)(user)) {
+            return res.status(401).json({
+                message: "Unauthorized to create Timeline event game ",
+            });
+        }
         const { timelineId, description, eventDate } = req.body;
         const file = req.file;
         if (!timelineId || !description || !file || !eventDate) {
             return res.status(400).json({ message: "Missing required fields" });
         }
-        const timeline = yield TimeLine_1.default.findByPk(timelineId);
+        const timeline = yield Timeline_1.default.findByPk(timelineId);
         if (!timeline) {
             return res.status(404).json({ message: "Timeline not found" });
         }
@@ -100,9 +119,15 @@ const addTimelineEvent = (req, res) => __awaiter(void 0, void 0, void 0, functio
 exports.addTimelineEvent = addTimelineEvent;
 const updateTimeline = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        const user = yield (0, Users_1.getUserLogged)(req);
+        if (!user || !(0, Users_1.isAdmin)(user)) {
+            return res.status(401).json({
+                message: "Unauthorized to update Timeline game ",
+            });
+        }
         const { id } = req.params;
         const { date } = req.body;
-        const timeline = yield TimeLine_1.default.findByPk(id);
+        const timeline = yield Timeline_1.default.findByPk(id);
         if (!timeline) {
             return res.status(404).json({ message: "Timeline not found" });
         }
@@ -117,6 +142,12 @@ const updateTimeline = (req, res) => __awaiter(void 0, void 0, void 0, function*
 exports.updateTimeline = updateTimeline;
 const deleteTimelineEvent = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        const user = yield (0, Users_1.getUserLogged)(req);
+        if (!user || !(0, Users_1.isAdmin)(user)) {
+            return res.status(401).json({
+                message: "Unauthorized to delete Timeline game ",
+            });
+        }
         const { eventId } = req.params;
         const event = yield TimelineEvent_1.default.findByPk(eventId);
         if (!event) {

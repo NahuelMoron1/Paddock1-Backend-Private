@@ -36,10 +36,10 @@ const Teams_js_1 = __importDefault(require("./Teams.js"));
 exports.Teams = Teams_js_1.default;
 const Tracks_js_1 = __importDefault(require("./Tracks.js"));
 exports.Tracks = Tracks_js_1.default;
-const TimeLine_js_1 = __importDefault(require("./TimeLine.js"));
-exports.Timeline = TimeLine_js_1.default;
 const TimelineEvent_js_1 = __importDefault(require("./TimelineEvent.js"));
 exports.TimelineEvent = TimelineEvent_js_1.default;
+const Timeline_js_1 = __importDefault(require("./Timeline.js"));
+exports.Timeline = Timeline_js_1.default;
 // --- Asociaciones de muchos a muchos ---
 // Asociación entre Seasons y Teams (a través de la tabla Season_Teams)
 Seasons_js_1.default.hasMany(Season_Teams_js_1.default, { foreignKey: "seasonID" });
@@ -131,13 +131,13 @@ GuessCareers_Teams_js_1.default.belongsTo(Teams_js_1.default, {
     foreignKey: "team_id",
     targetKey: "id",
 });
-TimeLine_js_1.default.hasMany(TimelineEvent_js_1.default, {
+Timeline_js_1.default.hasMany(TimelineEvent_js_1.default, {
     foreignKey: "gameID",
     sourceKey: "id",
     onDelete: "CASCADE",
     onUpdate: "CASCADE",
 });
-TimelineEvent_js_1.default.belongsTo(TimeLine_js_1.default, {
+TimelineEvent_js_1.default.belongsTo(Timeline_js_1.default, {
     foreignKey: "gameID",
     targetKey: "id",
 });

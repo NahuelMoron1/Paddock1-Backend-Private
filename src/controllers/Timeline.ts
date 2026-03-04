@@ -1,12 +1,20 @@
 import { Request, Response } from "express";
-import Timeline from "../models/mysql/TimeLine"; // tu modelo
+import Timeline from "../models/mysql/Timeline"; // tu modelo
 import TimelineEvent from "../models/mysql/TimelineEvent"; // tu modelo
 import { v4 as UUIDV4 } from "uuid";
 import path from "path";
 import fs from "fs";
+import { getUserLogged, isAdmin } from "./Users";
 
 export const getTimelines = async (req: Request, res: Response) => {
   try {
+    const user = await getUserLogged(req);
+    if (!user || !isAdmin(user)) {
+      return res.status(401).json({
+        message: "Unauthorized to create Timeline game ",
+      });
+    }
+
     const timelines = await Timeline.findAll();
     if (!timelines) {
       return res.status(404).json({ message: "No timelines found" });
@@ -39,6 +47,13 @@ export const getTimelineById = async (req: Request, res: Response) => {
 
 export const createTimeline = async (req: Request, res: Response) => {
   try {
+    const user = await getUserLogged(req);
+    if (!user || !isAdmin(user)) {
+      return res.status(401).json({
+        message: "Unauthorized to create Timeline game ",
+      });
+    }
+
     const { date } = req.body;
 
     if (!date) {
@@ -59,6 +74,13 @@ export const createTimeline = async (req: Request, res: Response) => {
 
 export const addTimelineEvent = async (req: Request, res: Response) => {
   try {
+    const user = await getUserLogged(req);
+    if (!user || !isAdmin(user)) {
+      return res.status(401).json({
+        message: "Unauthorized to create Timeline event game ",
+      });
+    }
+
     const { timelineId, description, eventDate } = req.body;
     const file = req.file;
 
@@ -93,6 +115,12 @@ export const addTimelineEvent = async (req: Request, res: Response) => {
 
 export const updateTimeline = async (req: Request, res: Response) => {
   try {
+    const user = await getUserLogged(req);
+    if (!user || !isAdmin(user)) {
+      return res.status(401).json({
+        message: "Unauthorized to update Timeline game ",
+      });
+    }
     const { id } = req.params;
     const { date } = req.body;
 
@@ -112,6 +140,13 @@ export const updateTimeline = async (req: Request, res: Response) => {
 
 export const deleteTimelineEvent = async (req: Request, res: Response) => {
   try {
+    const user = await getUserLogged(req);
+    if (!user || !isAdmin(user)) {
+      return res.status(401).json({
+        message: "Unauthorized to delete Timeline game ",
+      });
+    }
+
     const { eventId } = req.params;
 
     const event = await TimelineEvent.findByPk(eventId);

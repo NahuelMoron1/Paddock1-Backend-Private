@@ -14,8 +14,8 @@ import Seasons from "./Seasons.js";
 import Season_Tracks from "./Seasons_Tracks.js";
 import Teams from "./Teams.js";
 import Tracks from "./Tracks.js";
-import Timeline from "./TimeLine.js";
 import TimelineEvent from "./TimelineEvent.js";
+import Timeline from "./Timeline.js";
 
 // --- Asociaciones de muchos a muchos ---
 
