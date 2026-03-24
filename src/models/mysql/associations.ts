@@ -5,17 +5,19 @@ import Drivers from "./Drivers.js";
 import GuessCareers from "./GuessCareers.js";
 import GuessCareers_Teams from "./GuessCareers_Teams.js";
 import GuessTeams from "./GuessTeams.js";
+import H2HGames from "./H2HGames.js";
 import Impostors from "./Impostors.js";
 import Impostors_Results from "./Impostors_Results.js";
-import H2HGames from "./H2HGames.js";
 import Season_Teams from "./Season_Teams.js";
 import Season_Teams_Drivers from "./Season_Teams_Drivers.js"; // Importa la nueva tabla
 import Seasons from "./Seasons.js";
 import Season_Tracks from "./Seasons_Tracks.js";
 import Teams from "./Teams.js";
-import Tracks from "./Tracks.js";
-import TimelineEvent from "./TimelineEvent.js";
 import Timeline from "./Timeline.js";
+import TimelineEvent from "./TimelineEvent.js";
+import Tracks from "./Tracks.js";
+import TrueOrFalse from "./TrueOrFalse.js";
+import TrueOrFalse_Statements from "./TrueOrFalse_Statements.js";
 
 // Asociación entre Seasons y Teams (a través de la tabla Season_Teams)
 Seasons.hasMany(Season_Teams, { foreignKey: "seasonID" });
@@ -137,6 +139,20 @@ TimelineEvent.belongsTo(Timeline, {
   targetKey: "id",
 });
 
+// --- Asociación: TrueOrFalse → TrueOrFalse_Statements (1:N)
+TrueOrFalse.hasMany(TrueOrFalse_Statements, { foreignKey: "gameID" });
+TrueOrFalse_Statements.belongsTo(TrueOrFalse, {
+  foreignKey: "gameID",
+  targetKey: "id",
+});
+
+// Asociación entre Drivers y TrueOrFalse_Statements
+Drivers.hasMany(TrueOrFalse_Statements, { foreignKey: "driverId" });
+TrueOrFalse_Statements.belongsTo(Drivers, {
+  foreignKey: "driverId",
+  targetKey: "id",
+});
+
 export {
   Connections,
   Connections_Groups,
@@ -153,7 +169,9 @@ export {
   Season_Tracks,
   Seasons,
   Teams,
-  Tracks,
   Timeline,
   TimelineEvent,
+  Tracks,
+  TrueOrFalse,
+  TrueOrFalse_Statements,
 };

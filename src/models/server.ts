@@ -2,14 +2,15 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import express, { Application, Request, Response } from "express";
 import morgan from "morgan";
-import path from "path";
 import cron from "node-cron";
+import path from "path";
 import { Op } from "sequelize";
 
 //routes
 import FEwebhookRouter from "../FEwebhook";
 import best10Router from "../routes/Best_tens";
 import connectionsRouter from "../routes/Connections";
+import cookieRouter from "../routes/Cookie";
 import guessCareersRouter from "../routes/GuessCareers";
 import guessTeamsRouter from "../routes/GuessTeams";
 import h2hGamesRouter from "../routes/H2HGames";
@@ -18,14 +19,14 @@ import Seasons_TeamsRouter from "../routes/Season_Teams";
 import Seasons_Teams_DriversRouter from "../routes/Season_Teams_Drivers";
 import Seasons_TracksRouter from "../routes/Season_Tracks";
 import SeasonsRouter from "../routes/Seasons";
+import slackRouter from "../routes/Slack";
 import TeamsRouter from "../routes/Teams";
+import timelineRouter from "../routes/Timeline";
 import TracksRouter from "../routes/Tracks";
+import trueOrFalseRouter from "../routes/TrueOrFalse";
+import usersRouter from "../routes/Users";
 import wordleRouter from "../routes/Wordle";
 import webhookRouter from "../webhook";
-import usersRouter from "../routes/Users";
-import cookieRouter from "../routes/Cookie";
-import slackRouter from "../routes/Slack";
-import timelineRouter from "../routes/Timeline";
 
 //functions
 import { updateBest10GameResultsCore } from "../controllers/Best_tens";
@@ -72,6 +73,7 @@ class Server {
     this.app.use("/api/guessTeams", guessTeamsRouter);
     this.app.use("/api/guessCareers", guessCareersRouter);
     this.app.use("/api/h2h", h2hGamesRouter);
+    this.app.use("/api/trueorfalse", trueOrFalseRouter);
     this.app.use("/api/users", usersRouter);
     this.app.use("/api/cookie", cookieRouter);
     this.app.use("/api/slack", slackRouter);

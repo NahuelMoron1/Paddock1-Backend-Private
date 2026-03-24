@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.TimelineEvent = exports.Timeline = exports.Tracks = exports.Teams = exports.Seasons = exports.Season_Tracks = exports.Season_Teams_Drivers = exports.Season_Teams = exports.Impostors_Results = exports.Impostors = exports.H2HGames = exports.GuessTeams = exports.GuessCareers_Teams = exports.GuessCareers = exports.Drivers = exports.Connections_Groups_Results = exports.Connections_Groups = exports.Connections = void 0;
+exports.TrueOrFalse_Statements = exports.TrueOrFalse = exports.Tracks = exports.TimelineEvent = exports.Timeline = exports.Teams = exports.Seasons = exports.Season_Tracks = exports.Season_Teams_Drivers = exports.Season_Teams = exports.Impostors_Results = exports.Impostors = exports.H2HGames = exports.GuessTeams = exports.GuessCareers_Teams = exports.GuessCareers = exports.Drivers = exports.Connections_Groups_Results = exports.Connections_Groups = exports.Connections = void 0;
 const Connections_js_1 = __importDefault(require("./Connections.js"));
 exports.Connections = Connections_js_1.default;
 const Connections_Groups_js_1 = __importDefault(require("./Connections_Groups.js"));
@@ -18,12 +18,12 @@ const GuessCareers_Teams_js_1 = __importDefault(require("./GuessCareers_Teams.js
 exports.GuessCareers_Teams = GuessCareers_Teams_js_1.default;
 const GuessTeams_js_1 = __importDefault(require("./GuessTeams.js"));
 exports.GuessTeams = GuessTeams_js_1.default;
+const H2HGames_js_1 = __importDefault(require("./H2HGames.js"));
+exports.H2HGames = H2HGames_js_1.default;
 const Impostors_js_1 = __importDefault(require("./Impostors.js"));
 exports.Impostors = Impostors_js_1.default;
 const Impostors_Results_js_1 = __importDefault(require("./Impostors_Results.js"));
 exports.Impostors_Results = Impostors_Results_js_1.default;
-const H2HGames_js_1 = __importDefault(require("./H2HGames.js"));
-exports.H2HGames = H2HGames_js_1.default;
 const Season_Teams_js_1 = __importDefault(require("./Season_Teams.js"));
 exports.Season_Teams = Season_Teams_js_1.default;
 const Season_Teams_Drivers_js_1 = __importDefault(require("./Season_Teams_Drivers.js")); // Importa la nueva tabla
@@ -34,12 +34,16 @@ const Seasons_Tracks_js_1 = __importDefault(require("./Seasons_Tracks.js"));
 exports.Season_Tracks = Seasons_Tracks_js_1.default;
 const Teams_js_1 = __importDefault(require("./Teams.js"));
 exports.Teams = Teams_js_1.default;
-const Tracks_js_1 = __importDefault(require("./Tracks.js"));
-exports.Tracks = Tracks_js_1.default;
-const TimelineEvent_js_1 = __importDefault(require("./TimelineEvent.js"));
-exports.TimelineEvent = TimelineEvent_js_1.default;
 const Timeline_js_1 = __importDefault(require("./Timeline.js"));
 exports.Timeline = Timeline_js_1.default;
+const TimelineEvent_js_1 = __importDefault(require("./TimelineEvent.js"));
+exports.TimelineEvent = TimelineEvent_js_1.default;
+const Tracks_js_1 = __importDefault(require("./Tracks.js"));
+exports.Tracks = Tracks_js_1.default;
+const TrueOrFalse_js_1 = __importDefault(require("./TrueOrFalse.js"));
+exports.TrueOrFalse = TrueOrFalse_js_1.default;
+const TrueOrFalse_Statements_js_1 = __importDefault(require("./TrueOrFalse_Statements.js"));
+exports.TrueOrFalse_Statements = TrueOrFalse_Statements_js_1.default;
 // Asociación entre Seasons y Teams (a través de la tabla Season_Teams)
 Seasons_js_1.default.hasMany(Season_Teams_js_1.default, { foreignKey: "seasonID" });
 Season_Teams_js_1.default.belongsTo(Seasons_js_1.default, {
@@ -138,5 +142,17 @@ Timeline_js_1.default.hasMany(TimelineEvent_js_1.default, {
 });
 TimelineEvent_js_1.default.belongsTo(Timeline_js_1.default, {
     foreignKey: "gameID",
+    targetKey: "id",
+});
+// --- Asociación: TrueOrFalse → TrueOrFalse_Statements (1:N)
+TrueOrFalse_js_1.default.hasMany(TrueOrFalse_Statements_js_1.default, { foreignKey: "gameID" });
+TrueOrFalse_Statements_js_1.default.belongsTo(TrueOrFalse_js_1.default, {
+    foreignKey: "gameID",
+    targetKey: "id",
+});
+// Asociación entre Drivers y TrueOrFalse_Statements
+Drivers_js_1.default.hasMany(TrueOrFalse_Statements_js_1.default, { foreignKey: "driverId" });
+TrueOrFalse_Statements_js_1.default.belongsTo(Drivers_js_1.default, {
+    foreignKey: "driverId",
     targetKey: "id",
 });

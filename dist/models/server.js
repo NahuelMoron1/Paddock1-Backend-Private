@@ -16,13 +16,14 @@ const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const cors_1 = __importDefault(require("cors"));
 const express_1 = __importDefault(require("express"));
 const morgan_1 = __importDefault(require("morgan"));
-const path_1 = __importDefault(require("path"));
 const node_cron_1 = __importDefault(require("node-cron"));
+const path_1 = __importDefault(require("path"));
 const sequelize_1 = require("sequelize");
 //routes
 const FEwebhook_1 = __importDefault(require("../FEwebhook"));
 const Best_tens_1 = __importDefault(require("../routes/Best_tens"));
 const Connections_1 = __importDefault(require("../routes/Connections"));
+const Cookie_1 = __importDefault(require("../routes/Cookie"));
 const GuessCareers_1 = __importDefault(require("../routes/GuessCareers"));
 const GuessTeams_1 = __importDefault(require("../routes/GuessTeams"));
 const H2HGames_1 = __importDefault(require("../routes/H2HGames"));
@@ -31,14 +32,14 @@ const Season_Teams_1 = __importDefault(require("../routes/Season_Teams"));
 const Season_Teams_Drivers_1 = __importDefault(require("../routes/Season_Teams_Drivers"));
 const Season_Tracks_1 = __importDefault(require("../routes/Season_Tracks"));
 const Seasons_1 = __importDefault(require("../routes/Seasons"));
+const Slack_1 = __importDefault(require("../routes/Slack"));
 const Teams_1 = __importDefault(require("../routes/Teams"));
+const Timeline_1 = __importDefault(require("../routes/Timeline"));
 const Tracks_1 = __importDefault(require("../routes/Tracks"));
+const TrueOrFalse_1 = __importDefault(require("../routes/TrueOrFalse"));
+const Users_1 = __importDefault(require("../routes/Users"));
 const Wordle_1 = __importDefault(require("../routes/Wordle"));
 const webhook_1 = __importDefault(require("../webhook"));
-const Users_1 = __importDefault(require("../routes/Users"));
-const Cookie_1 = __importDefault(require("../routes/Cookie"));
-const Slack_1 = __importDefault(require("../routes/Slack"));
-const Timeline_1 = __importDefault(require("../routes/Timeline"));
 //functions
 const Best_tens_2 = require("../controllers/Best_tens");
 //models
@@ -79,6 +80,7 @@ class Server {
         this.app.use("/api/guessTeams", GuessTeams_1.default);
         this.app.use("/api/guessCareers", GuessCareers_1.default);
         this.app.use("/api/h2h", H2HGames_1.default);
+        this.app.use("/api/trueorfalse", TrueOrFalse_1.default);
         this.app.use("/api/users", Users_1.default);
         this.app.use("/api/cookie", Cookie_1.default);
         this.app.use("/api/slack", Slack_1.default);
