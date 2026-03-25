@@ -75,6 +75,7 @@ const getAllGuessTeams = (req, res) => __awaiter(void 0, void 0, void 0, functio
                 },
                 { model: associations_1.Seasons, attributes: ["id", "year"] },
             ],
+            order: [["date", "DESC"]],
         });
         if (!allGames || allGames.length === 0) {
             return res.status(404).json({ message: "No guess teams found" });
@@ -103,12 +104,12 @@ const getGuessTeamByID = (req, res) => __awaiter(void 0, void 0, void 0, functio
                 { model: associations_1.Teams, attributes: ["id", "name"] },
                 {
                     model: associations_1.Drivers,
-                    as: "driver1",
+                    as: "Driver1",
                     attributes: ["id", "firstname", "lastname"],
                 },
                 {
                     model: associations_1.Drivers,
-                    as: "driver2",
+                    as: "Driver2",
                     attributes: ["id", "firstname", "lastname"],
                 },
                 { model: associations_1.Seasons, attributes: ["id", "year"] },

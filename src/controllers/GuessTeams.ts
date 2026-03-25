@@ -78,6 +78,7 @@ export const getAllGuessTeams = async (req: Request, res: Response) => {
         },
         { model: Seasons, attributes: ["id", "year"] },
       ],
+      order: [["date", "DESC"]],
     });
 
     if (!allGames || allGames.length === 0) {
@@ -109,12 +110,12 @@ export const getGuessTeamByID = async (req: Request, res: Response) => {
         { model: Teams, attributes: ["id", "name"] },
         {
           model: Drivers,
-          as: "driver1",
+          as: "Driver1",
           attributes: ["id", "firstname", "lastname"],
         },
         {
           model: Drivers,
-          as: "driver2",
+          as: "Driver2",
           attributes: ["id", "firstname", "lastname"],
         },
         { model: Seasons, attributes: ["id", "year"] },
