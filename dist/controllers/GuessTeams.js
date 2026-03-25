@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createGuessTeamGame = void 0;
+exports.deleteGuessTeam = exports.updateGuessTeam = exports.getGuessTeamByID = exports.getAllGuessTeams = exports.createGuessTeamGame = void 0;
 const uuid_1 = require("uuid");
 const associations_1 = require("../models/mysql/associations");
 const Users_1 = require("./Users");
@@ -52,6 +52,147 @@ const createGuessTeamGame = (req, res) => __awaiter(void 0, void 0, void 0, func
     }
 });
 exports.createGuessTeamGame = createGuessTeamGame;
+const getAllGuessTeams = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const user = yield (0, Users_1.getUserLogged)(req);
+        if (!user || !(0, Users_1.isAdmin)(user)) {
+            return res
+                .status(401)
+                .json({ message: "Unauthorized to get all guess teams" });
+        }
+        const allGames = yield associations_1.GuessTeams.findAll({
+            include: [
+                { model: associations_1.Teams, attributes: ["id", "name"] },
+                {
+                    model: associations_1.Drivers,
+                    as: "Driver1",
+                    attributes: ["id", "firstname", "lastname"],
+                },
+                {
+                    model: associations_1.Drivers,
+                    as: "Driver2",
+                    attributes: ["id", "firstname", "lastname"],
+                },
+                { model: associations_1.Seasons, attributes: ["id", "year"] },
+            ],
+        });
+        if (!allGames || allGames.length === 0) {
+            return res.status(404).json({ message: "No guess teams found" });
+        }
+        return res.status(200).json(allGames);
+    }
+    catch (error) {
+        return res.status(500).json({ message: error });
+    }
+});
+exports.getAllGuessTeams = getAllGuessTeams;
+const getGuessTeamByID = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const user = yield (0, Users_1.getUserLogged)(req);
+        if (!user || !(0, Users_1.isAdmin)(user)) {
+            return res
+                .status(401)
+                .json({ message: "Unauthorized to get guess team by ID" });
+        }
+        const { gameID } = req.params;
+        if (!gameID) {
+            return res.status(400).json({ message: "No ID Provided" });
+        }
+        const game = yield associations_1.GuessTeams.findByPk(gameID, {
+            include: [
+                { model: associations_1.Teams, attributes: ["id", "name"] },
+                {
+                    model: associations_1.Drivers,
+                    as: "driver1",
+                    attributes: ["id", "firstname", "lastname"],
+                },
+                {
+                    model: associations_1.Drivers,
+                    as: "driver2",
+                    attributes: ["id", "firstname", "lastname"],
+                },
+                { model: associations_1.Seasons, attributes: ["id", "year"] },
+            ],
+        });
+        if (!game) {
+            return res.status(404).json({ message: "No guess team found" });
+        }
+        return res.status(200).json(game);
+    }
+    catch (error) {
+        return res.status(500).json({ message: error });
+    }
+});
+exports.getGuessTeamByID = getGuessTeamByID;
+const updateGuessTeam = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const user = yield (0, Users_1.getUserLogged)(req);
+        if (!user || !(0, Users_1.isAdmin)(user)) {
+            return res
+                .status(401)
+                .json({ message: "Unauthorized to update guess team" });
+        }
+        const { gameID } = req.params;
+        if (!gameID) {
+            return res.status(400).json({ message: "No ID Provided" });
+        }
+        const results = req.body;
+        if (!results || !results.updatedGame) {
+            return res
+                .status(400)
+                .json({ message: "Not all fields contains a value" });
+        }
+        const updatedGameParams = results.updatedGame;
+        const isValid = yield validateGuessTeamParams(updatedGameParams);
+        if (!isValid) {
+            return res
+                .status(400)
+                .json({ message: "Some parameters are not as expected" });
+        }
+        const game = yield associations_1.GuessTeams.findByPk(gameID);
+        if (!game) {
+            return res.status(404).json({ message: "No guess team found" });
+        }
+        yield game.update({
+            date: updatedGameParams.date,
+            team_id: updatedGameParams.team_id,
+            team_principal: updatedGameParams.team_principal,
+            tp_flag: updatedGameParams.tp_flag,
+            driver1_id: updatedGameParams.driver1_id,
+            driver2_id: updatedGameParams.driver2_id,
+            season_id: updatedGameParams.season_id,
+        });
+        return res.status(200).json({ message: "Game updated successfully" });
+    }
+    catch (err) {
+        return res.status(500).json({ message: err });
+    }
+});
+exports.updateGuessTeam = updateGuessTeam;
+const deleteGuessTeam = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const user = yield (0, Users_1.getUserLogged)(req);
+        if (!user || !(0, Users_1.isAdmin)(user)) {
+            return res
+                .status(401)
+                .json({ message: "Unauthorized to delete guess team" });
+        }
+        const { gameID } = req.params;
+        if (!gameID) {
+            return res.status(400).json({ message: "No ID Provided" });
+        }
+        const game = yield associations_1.GuessTeams.findByPk(gameID);
+        if (!game) {
+            return res.status(404).json({ message: "No guess team found" });
+        }
+        yield game.destroy();
+        return res.status(200).json({ message: "Game deleted successfully" });
+    }
+    catch (error) {
+        return res.status(500).json({ message: error });
+    }
+});
+exports.deleteGuessTeam = deleteGuessTeam;
 function validateGuessTeamParams(results) {
     return __awaiter(this, void 0, void 0, function* () {
         if (!results.date ||

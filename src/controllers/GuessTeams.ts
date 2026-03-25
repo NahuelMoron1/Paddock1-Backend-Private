@@ -54,6 +54,161 @@ export const createGuessTeamGame = async (req: Request, res: Response) => {
   }
 };
 
+export const getAllGuessTeams = async (req: Request, res: Response) => {
+  try {
+    const user = await getUserLogged(req);
+    if (!user || !isAdmin(user)) {
+      return res
+        .status(401)
+        .json({ message: "Unauthorized to get all guess teams" });
+    }
+
+    const allGames = await GuessTeams.findAll({
+      include: [
+        { model: Teams, attributes: ["id", "name"] },
+        {
+          model: Drivers,
+          as: "Driver1",
+          attributes: ["id", "firstname", "lastname"],
+        },
+        {
+          model: Drivers,
+          as: "Driver2",
+          attributes: ["id", "firstname", "lastname"],
+        },
+        { model: Seasons, attributes: ["id", "year"] },
+      ],
+    });
+
+    if (!allGames || allGames.length === 0) {
+      return res.status(404).json({ message: "No guess teams found" });
+    }
+
+    return res.status(200).json(allGames);
+  } catch (error) {
+    return res.status(500).json({ message: error });
+  }
+};
+
+export const getGuessTeamByID = async (req: Request, res: Response) => {
+  try {
+    const user = await getUserLogged(req);
+    if (!user || !isAdmin(user)) {
+      return res
+        .status(401)
+        .json({ message: "Unauthorized to get guess team by ID" });
+    }
+
+    const { gameID } = req.params;
+    if (!gameID) {
+      return res.status(400).json({ message: "No ID Provided" });
+    }
+
+    const game = await GuessTeams.findByPk(gameID, {
+      include: [
+        { model: Teams, attributes: ["id", "name"] },
+        {
+          model: Drivers,
+          as: "driver1",
+          attributes: ["id", "firstname", "lastname"],
+        },
+        {
+          model: Drivers,
+          as: "driver2",
+          attributes: ["id", "firstname", "lastname"],
+        },
+        { model: Seasons, attributes: ["id", "year"] },
+      ],
+    });
+
+    if (!game) {
+      return res.status(404).json({ message: "No guess team found" });
+    }
+
+    return res.status(200).json(game);
+  } catch (error) {
+    return res.status(500).json({ message: error });
+  }
+};
+
+export const updateGuessTeam = async (req: Request, res: Response) => {
+  try {
+    const user = await getUserLogged(req);
+    if (!user || !isAdmin(user)) {
+      return res
+        .status(401)
+        .json({ message: "Unauthorized to update guess team" });
+    }
+
+    const { gameID } = req.params;
+    if (!gameID) {
+      return res.status(400).json({ message: "No ID Provided" });
+    }
+
+    const results = req.body;
+    if (!results || !results.updatedGame) {
+      return res
+        .status(400)
+        .json({ message: "Not all fields contains a value" });
+    }
+
+    const updatedGameParams = results.updatedGame;
+
+    const isValid = await validateGuessTeamParams(updatedGameParams);
+    if (!isValid) {
+      return res
+        .status(400)
+        .json({ message: "Some parameters are not as expected" });
+    }
+
+    const game = await GuessTeams.findByPk(gameID);
+    if (!game) {
+      return res.status(404).json({ message: "No guess team found" });
+    }
+
+    await game.update({
+      date: updatedGameParams.date,
+      team_id: updatedGameParams.team_id,
+      team_principal: updatedGameParams.team_principal,
+      tp_flag: updatedGameParams.tp_flag,
+      driver1_id: updatedGameParams.driver1_id,
+      driver2_id: updatedGameParams.driver2_id,
+      season_id: updatedGameParams.season_id,
+    });
+
+    return res.status(200).json({ message: "Game updated successfully" });
+  } catch (err) {
+    return res.status(500).json({ message: err });
+  }
+};
+
+export const deleteGuessTeam = async (req: Request, res: Response) => {
+  try {
+    const user = await getUserLogged(req);
+    if (!user || !isAdmin(user)) {
+      return res
+        .status(401)
+        .json({ message: "Unauthorized to delete guess team" });
+    }
+
+    const { gameID } = req.params;
+    if (!gameID) {
+      return res.status(400).json({ message: "No ID Provided" });
+    }
+
+    const game = await GuessTeams.findByPk(gameID);
+    if (!game) {
+      return res.status(404).json({ message: "No guess team found" });
+    }
+
+    await game.destroy();
+
+    return res.status(200).json({ message: "Game deleted successfully" });
+  } catch (error) {
+    return res.status(500).json({ message: error });
+  }
+};
+
 async function validateGuessTeamParams(results: any) {
   if (
     !results.date ||

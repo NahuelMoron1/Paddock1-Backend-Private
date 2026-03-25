@@ -4,4 +4,8 @@ const express_1 = require("express");
 const GuessTeams_1 = require("../controllers/GuessTeams");
 const router = (0, express_1.Router)();
 router.post("/", GuessTeams_1.createGuessTeamGame);
+router.get("/all", GuessTeams_1.getAllGuessTeams);
+router.get("/:gameID", GuessTeams_1.getGuessTeamByID);
+router.post("/update/:gameID", GuessTeams_1.updateGuessTeam);
+router.delete("/delete/:gameID", GuessTeams_1.deleteGuessTeam);
 exports.default = router;
