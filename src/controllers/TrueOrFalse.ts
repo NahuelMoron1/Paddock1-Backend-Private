@@ -31,9 +31,11 @@ const validateTrueOrFalseGame = (
     ) {
       return false;
     }
-    if (stmt.answer === false && !stmt.falseDescription) {
+    /*if (stmt.answer === false && !stmt.falseDescription) {
+      console.log(stmt);
+
       return false;
-    }
+    }*/
   }
 
   return true;
@@ -227,6 +229,7 @@ export const updateTrueOrFalseGame = async (req: Request, res: Response) => {
     }
 
     // Validar los datos
+
     const validated = validateTrueOrFalseGame(title, date, statements);
 
     if (!validated) {

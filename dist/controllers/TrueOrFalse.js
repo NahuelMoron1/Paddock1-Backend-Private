@@ -28,9 +28,11 @@ const validateTrueOrFalseGame = (title, date, statements) => {
             !stmt.driverId) {
             return false;
         }
-        if (stmt.answer === false && !stmt.falseDescription) {
-            return false;
-        }
+        /*if (stmt.answer === false && !stmt.falseDescription) {
+          console.log(stmt);
+    
+          return false;
+        }*/
     }
     return true;
 };
