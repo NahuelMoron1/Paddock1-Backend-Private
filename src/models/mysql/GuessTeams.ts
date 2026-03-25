@@ -10,7 +10,7 @@ const GuessTeams = db.define(
       defaultValue: DataTypes.UUIDV4, // Genera UUID automáticamente
     },
     date: {
-      type: DataTypes.DATE,
+      type: DataTypes.DATEONLY, // Usar DATEONLY para evitar problemas de zona horaria
       allowNull: false,
     },
     team_id: {
@@ -40,7 +40,7 @@ const GuessTeams = db.define(
   },
   {
     timestamps: false,
-  }
+  },
 );
 
 export default GuessTeams;

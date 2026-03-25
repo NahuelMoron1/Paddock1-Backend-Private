@@ -222,12 +222,12 @@ exports.createBest10Game = createBest10Game;
 const getAllGames = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const games = yield Best_tens_1.default.findAll({
-            order: [['date', 'DESC']],
+            order: [["date", "DESC"]],
         });
         const gamesWithResults = yield Promise.all(games.map((game) => __awaiter(void 0, void 0, void 0, function* () {
             const results = yield Best_tens_results_1.default.findAll({
                 where: { gameID: game.getDataValue("id") },
-                order: [['position', 'ASC']],
+                order: [["position", "ASC"]],
             });
             return {
                 id: game.getDataValue("id"),
@@ -250,7 +250,9 @@ const deleteGame = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     try {
         const user = yield (0, Users_1.getUserLogged)(req);
         if (!user || !(0, Users_1.isAdmin)(user)) {
-            return res.status(401).json({ message: "Unauthorized to delete Top 10 game" });
+            return res
+                .status(401)
+                .json({ message: "Unauthorized to delete Top 10 game" });
         }
         const { gameID } = req.params;
         if (!gameID) {
@@ -282,12 +284,16 @@ const updateGame = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     try {
         const user = yield (0, Users_1.getUserLogged)(req);
         if (!user || !(0, Users_1.isAdmin)(user)) {
-            return res.status(401).json({ message: "Unauthorized to update Top 10 game" });
+            return res
+                .status(401)
+                .json({ message: "Unauthorized to update Top 10 game" });
         }
         const { gameID } = req.params;
         const gamedata = req.body;
         if (!gameID || !gamedata) {
-            return res.status(400).json({ message: "Game ID and game data are required" });
+            return res
+                .status(400)
+                .json({ message: "Game ID and game data are required" });
         }
         const game = yield Best_tens_1.default.findOne({ where: { id: gameID } });
         if (!game) {
@@ -299,7 +305,9 @@ const updateGame = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         const statType = gamedata.gamedata.statType;
         const results = gamedata.gamedata.results;
         if (!title || !date || !type) {
-            return res.status(400).json({ message: "Title, date and type are required" });
+            return res
+                .status(400)
+                .json({ message: "Title, date and type are required" });
         }
         // Update game data
         yield Best_tens_1.default.update({
@@ -311,7 +319,9 @@ const updateGame = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         // If it's a manual game, update results
         if (game.getDataValue("creation") === Top10Creation_1.Top10Creation.MANUAL && results) {
             if (!Array.isArray(results) || results.length !== 10) {
-                return res.status(400).json({ message: "Manual games must have exactly 10 results" });
+                return res
+                    .status(400)
+                    .json({ message: "Manual games must have exactly 10 results" });
             }
             // Delete existing results
             yield Best_tens_results_1.default.destroy({ where: { gameID: gameID } });
@@ -349,9 +359,9 @@ const getGameById = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         if (!game) {
             return res.status(404).json({ message: "Game not found" });
         }
-        const results = yield Best_tens_results_1.default.findAll({
+        const results = yield Manual_Best_Tens_Results_1.default.findAll({
             where: { gameID: gameID },
-            order: [['position', 'ASC']],
+            order: [["position", "ASC"]],
         });
         // Load entity details for each result
         const resultsWithDetails = yield Promise.all(results.map((result) => __awaiter(void 0, void 0, void 0, function* () {
@@ -376,11 +386,14 @@ const getGameById = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
                 resultID: resultID,
                 totalStat: result.getDataValue("totalStat"),
                 position: result.getDataValue("position"),
-                entityName: entityDetails ?
-                    (entityDetails.getDataValue("firstname") && entityDetails.getDataValue("lastname") ?
-                        `${entityDetails.getDataValue("firstname")} ${entityDetails.getDataValue("lastname")}` :
-                        entityDetails.getDataValue("name") || entityDetails.getDataValue("track_name") || "Unknown") :
-                    "Unknown",
+                entityName: entityDetails
+                    ? entityDetails.getDataValue("firstname") &&
+                        entityDetails.getDataValue("lastname")
+                        ? `${entityDetails.getDataValue("firstname")} ${entityDetails.getDataValue("lastname")}`
+                        : entityDetails.getDataValue("name") ||
+                            entityDetails.getDataValue("track_name") ||
+                            "Unknown"
+                    : "Unknown",
                 entity: entityDetails ? entityDetails.toJSON() : null,
             };
         })));

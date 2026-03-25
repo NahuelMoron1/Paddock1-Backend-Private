@@ -12,7 +12,7 @@ const GuessTeams = connection_1.default.define("GuessTeams", {
         defaultValue: sequelize_1.DataTypes.UUIDV4, // Genera UUID automáticamente
     },
     date: {
-        type: sequelize_1.DataTypes.DATE,
+        type: sequelize_1.DataTypes.DATEONLY, // Usar DATEONLY para evitar problemas de zona horaria
         allowNull: false,
     },
     team_id: {

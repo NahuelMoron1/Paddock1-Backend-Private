@@ -40,12 +40,12 @@ export const getSuggestions = async (req: Request, res: Response) => {
                 "concat",
                 Sequelize.col("firstname"),
                 " ",
-                Sequelize.col("lastname")
-              )
+                Sequelize.col("lastname"),
+              ),
             ),
             {
               [Op.like]: `%${normalized}%`,
-            }
+            },
           ),
         });
         break;
@@ -64,7 +64,7 @@ export const getSuggestions = async (req: Request, res: Response) => {
             Sequelize.fn("lower", Sequelize.col("track_name")),
             {
               [Op.like]: `%${normalized}%`,
-            }
+            },
           ),
         });
         break;
@@ -87,10 +87,10 @@ export const getSuggestions = async (req: Request, res: Response) => {
         type === "driver"
           ? `${r.firstname} ${r.lastname}`
           : type === "team"
-          ? r.name
-          : type === "season"
-          ? r.year
-          : r.track_name,
+            ? r.name
+            : type === "season"
+              ? r.year
+              : r.track_name,
     }));
 
     return res.status(200).json(suggestions);
@@ -139,7 +139,7 @@ export const createBest10GameManual = async (req: Request, res: Response) => {
           item !== null &&
           typeof item.resultID === "string" &&
           typeof item.totalStat === "number" &&
-          typeof item.position === "number"
+          typeof item.position === "number",
       )
     ) {
       return res
@@ -267,14 +267,14 @@ export const createBest10Game = async (req: Request, res: Response) => {
 export const getAllGames = async (req: Request, res: Response) => {
   try {
     const games = await Best_tens.findAll({
-      order: [['date', 'DESC']],
+      order: [["date", "DESC"]],
     });
 
     const gamesWithResults = await Promise.all(
       games.map(async (game) => {
         const results = await Best_tens_results.findAll({
           where: { gameID: game.getDataValue("id") },
-          order: [['position', 'ASC']],
+          order: [["position", "ASC"]],
         });
 
         return {
@@ -286,7 +286,7 @@ export const getAllGames = async (req: Request, res: Response) => {
           creation: game.getDataValue("creation"),
           resultsCount: results.length,
         };
-      })
+      }),
     );
 
     return res.status(200).json(gamesWithResults);
@@ -299,7 +299,9 @@ export const deleteGame = async (req: Request, res: Response) => {
   try {
     const user = await getUserLogged(req);
     if (!user || !isAdmin(user)) {
-      return res.status(401).json({ message: "Unauthorized to delete Top 10 game" });
+      return res
+        .status(401)
+        .json({ message: "Unauthorized to delete Top 10 game" });
     }
 
     const { gameID } = req.params;
@@ -337,14 +339,18 @@ export const updateGame = async (req: Request, res: Response) => {
   try {
     const user = await getUserLogged(req);
     if (!user || !isAdmin(user)) {
-      return res.status(401).json({ message: "Unauthorized to update Top 10 game" });
+      return res
+        .status(401)
+        .json({ message: "Unauthorized to update Top 10 game" });
     }
 
     const { gameID } = req.params;
     const gamedata = req.body;
 
     if (!gameID || !gamedata) {
-      return res.status(400).json({ message: "Game ID and game data are required" });
+      return res
+        .status(400)
+        .json({ message: "Game ID and game data are required" });
     }
 
     const game = await Best_tens.findOne({ where: { id: gameID } });
@@ -359,7 +365,9 @@ export const updateGame = async (req: Request, res: Response) => {
     const results = gamedata.gamedata.results;
 
     if (!title || !date || !type) {
-      return res.status(400).json({ message: "Title, date and type are required" });
+      return res
+        .status(400)
+        .json({ message: "Title, date and type are required" });
     }
 
     // Update game data
@@ -370,13 +378,15 @@ export const updateGame = async (req: Request, res: Response) => {
         type,
         table: statType,
       },
-      { where: { id: gameID } }
+      { where: { id: gameID } },
     );
 
     // If it's a manual game, update results
     if (game.getDataValue("creation") === Top10Creation.MANUAL && results) {
       if (!Array.isArray(results) || results.length !== 10) {
-        return res.status(400).json({ message: "Manual games must have exactly 10 results" });
+        return res
+          .status(400)
+          .json({ message: "Manual games must have exactly 10 results" });
       }
 
       // Delete existing results
@@ -422,9 +432,9 @@ export const getGameById = async (req: Request, res: Response) => {
       return res.status(404).json({ message: "Game not found" });
     }
 
-    const results = await Best_tens_results.findAll({
+    const results = await Manual_Best_tens_results.findAll({
       where: { gameID: gameID },
-      order: [['position', 'ASC']],
+      order: [["position", "ASC"]],
     });
 
     // Load entity details for each result
@@ -450,14 +460,17 @@ export const getGameById = async (req: Request, res: Response) => {
           resultID: resultID,
           totalStat: result.getDataValue("totalStat"),
           position: result.getDataValue("position"),
-          entityName: entityDetails ?
-            (entityDetails.getDataValue("firstname") && entityDetails.getDataValue("lastname") ?
-              `${entityDetails.getDataValue("firstname")} ${entityDetails.getDataValue("lastname")}` :
-              entityDetails.getDataValue("name") || entityDetails.getDataValue("track_name") || "Unknown") :
-            "Unknown",
+          entityName: entityDetails
+            ? entityDetails.getDataValue("firstname") &&
+              entityDetails.getDataValue("lastname")
+              ? `${entityDetails.getDataValue("firstname")} ${entityDetails.getDataValue("lastname")}`
+              : entityDetails.getDataValue("name") ||
+                entityDetails.getDataValue("track_name") ||
+                "Unknown"
+            : "Unknown",
           entity: entityDetails ? entityDetails.toJSON() : null,
         };
-      })
+      }),
     );
 
     const gameData = {
@@ -570,7 +583,7 @@ export const updateBest10GameResults = async (req: Request, res: Response) => {
 async function updateAutomaticResults(
   id: string,
   challenge: any,
-  validation?: boolean
+  validation?: boolean,
 ) {
   const year = challenge.getDataValue("year");
   const fromYear = challenge.getDataValue("fromYear");
@@ -593,7 +606,7 @@ async function updateAutomaticResults(
       toYear,
       year,
       team,
-      sqlTable
+      sqlTable,
     );
   }
   if (!topStats) {
@@ -681,7 +694,7 @@ async function getWithParams(
   toYear: number,
   year: number,
   team: string,
-  sqlTable: string
+  sqlTable: string,
 ) {
   const options: StatQueryOptions = {
     stat: table,
@@ -758,7 +771,7 @@ async function findStdBySeason(seasonID: string, table: string, type: string) {
 async function findSeasonTeamsBySeason(
   seasonID: string,
   table: string,
-  type: string
+  type: string,
 ) {
   ///Type means DESC or ASC
   try {
@@ -795,7 +808,7 @@ async function findSeasonTeamsBySeason(
 async function findSeasonTracksBySeason(
   seasonID: string,
   table: string,
-  type: string
+  type: string,
 ) {
   ///Type means DESC or ASC
   try {
